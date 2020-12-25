@@ -58,7 +58,6 @@ export const FollowFavorite = ({ attrs: { mdl, data } }) => {
           author: { username, image, following },
           favoritesCount,
           favorited,
-          createdAt,
           slug,
         },
       },
@@ -70,8 +69,8 @@ export const FollowFavorite = ({ attrs: { mdl, data } }) => {
             m.route.Link,
             { href: `profile/${username}` },
             m(
-              "ion-avatar",
-              m("img", { src: sanitizeImg(image) }),
+              "ion-chip",
+              m("ion-avatar", m("ion-img", { src: sanitizeImg(image) })),
               m("ion-text", username)
             )
           ),
@@ -99,13 +98,13 @@ export const FollowFavorite = ({ attrs: { mdl, data } }) => {
                       ? "people-circle-outline"
                       : "people-outline",
                   }),
-                  m("ion-text", `${username}`),
+                  m("ion-label", `${username}`),
                 ]),
                 m("ion-chip", { onclick: (e) => toggleArticleLike(data) }, [
                   m("ion-icon", {
                     name: favorited ? "heart-dislike-outline" : "heart-outline",
                   }),
-                  m("ion-text", favoritesCount),
+                  m("ion-label", favoritesCount),
                 ]),
               ],
         ])

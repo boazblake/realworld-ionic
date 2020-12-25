@@ -23,7 +23,7 @@ const loadDataTask = (http) => (mdl) => (state) => (data) =>
 
 const Home = () => {
   const data = {
-    tags: { tagList: [], selected: [], current: "global" },
+    tags: { tagList: [], selected: [], current: "" },
     articles: {},
   }
   const state = {
@@ -86,33 +86,37 @@ const Home = () => {
         state.pageStatus == "error" &&
           m(Banner, [m("h1.logo-font", `Error Loading Data: ${state.error}`)]),
 
-        state.pageStatus == "success" &&
-          m("ion-row", { wrap: true }, [
-            m("ion-col[col-9]", [
-              m(FeedNav, { fetchData: loadArticles, mdl, data }),
+        state.pageStatus == "success" && [
+          m(FeedNav, { fetchData: loadArticles, mdl, data }),
 
-              state.feedStatus == "loading" && m("p", "Loading Articles ..."),
+          state.feedStatus == "loading" &&
+            m("ion-text", "Loading Articles ..."),
 
-              state.feedStatus == "success"
-                ? state.total
-                  ? [
-                      m(Articles, { mdl, data }),
+          state.feedStatus == "success" && state.total
+            ? [
+                m(Articles, { mdl, data }),
 
-                      m(Paginator, {
-                        mdl,
-                        state,
-                        fetchDataFor: (offset) => {
-                          state.offset = offset
-                          loadArticles(mdl)
-                        },
-                      }),
-                    ]
-                  : m("ion-text", "No articles are here... yet.")
-                : "",
-            ]),
+                m(Paginator, {
+                  mdl,
+                  state,
+                  fetchDataFor: (offset) => {
+                    state.offset = offset
+                    loadArticles(mdl)
+                  },
+                }),
+              ]
+            : m("ion-text", "No articles are here... yet."),
+          mdl.state.isLoggedIn() &&
+            m(
+              "ion-fab",
+              { vertical: "bottom", horizontal: "end", slot: "fixed" },
+              m(m.route.Link, { class: "nav-link", href: "/editor" }, [
+                m("ion-fab-button", m("ion-icon", { name: "add-circle" })),
+              ])
+            ),
 
-            m("", m(SideBar, { mdl, data })),
-          ]),
+          m("", m(SideBar, { mdl, data })),
+        ],
       ]
     },
   }

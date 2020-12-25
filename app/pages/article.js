@@ -39,13 +39,14 @@ const Article = () => {
         m(Banner, [m("h1.logo-font", `Error Loading Data: ${state.error}`)]),
 
       state.status == "success" && [
-        m("ion-title", m("h1", data.article.title)),
+        m("ion-text", m("h1", data.article.title)),
+        m("ion-text", m.trust(md(data.article.body))),
         m(FollowFavorite, {
           mdl,
           data: data.article,
         }),
 
-        m("ion-text", m.trust(md(data.article.body))),
+        // m("ion-item-divider"),
         m(Comments, {
           mdl,
           comments: data.comments,

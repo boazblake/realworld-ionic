@@ -1,5 +1,4 @@
 import Http from "Http"
-import { Card } from "./card"
 import { log, sanitizeImg, errorViewModel } from "Utils"
 import { lensProp, over, trim } from "ramda"
 
@@ -37,38 +36,43 @@ const CommentForm = ({ attrs: { mdl, reload } }) => {
   return {
     oninit: () => (comment.body = ""),
     view: ({ attrs: { mdl } }) => [
-      m(Card, {
-        content: m("ion-textarea", {
-          rows: 3,
-          placeholder: "Write a comment ...",
-          onchange: (e) => (comment.body = e.target.value),
-          disabled: state.disabled,
-          value: comment.body,
-        }),
-        footer: [
+      m(
+        "ion-grid",
+        m(
+          "ion-row",
           m(
-            "ion-row",
-            m(
-              "ion-col",
-              m("ion-avatar", m("img", { src: sanitizeImg(mdl.user.image) }))
-            ),
-
-            m(
-              "ion-col",
-              m(
-                "ion-button",
-                {
-                  onclick: (e) => {
-                    state.disabled = true
-                    submit(comment)
-                  },
-                },
-                " Post Comment "
-              )
-            )
+            "ion-col",
+            m("ion-textarea", {
+              rows: 3,
+              placeholder: "Write a comment ...",
+              onchange: (e) => (comment.body = e.target.value),
+              disabled: state.disabled,
+              value: comment.body,
+            })
+          )
+        ),
+        m(
+          "ion-row",
+          m(
+            "ion-col",
+            m("ion-avatar", m("img", { src: sanitizeImg(mdl.user.image) }))
           ),
-        ],
-      }),
+
+          m(
+            "ion-col",
+            m(
+              "ion-button",
+              {
+                onclick: (e) => {
+                  state.disabled = true
+                  submit(comment)
+                },
+              },
+              " Post Comment "
+            )
+          )
+        )
+      ),
 
       state.errors.map((e) =>
         e.values.map((err) => m("p.error-messages", `${e.key} ${err}`))

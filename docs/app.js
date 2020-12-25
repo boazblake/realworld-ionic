@@ -323,7 +323,9 @@ var ArticlePreview = (_ref) => {
 
   return {
     view: () => {
-      return m("ion-item", m("ion-grid", [m("ion-row", m("ion-col", m(m.route.Link, {
+      return m("ion-item", {
+        button: true
+      }, m("ion-grid", [m("ion-row", m("ion-col", m(m.route.Link, {
         class: "preview-link",
         href: "/article/".concat(data.slug)
       }, m("ion-text", m("h1", data.title)), m("ion-text", m("p", data.description))))), m("ion-row", m("ion-col", m("ion-list", {
@@ -400,12 +402,13 @@ var Card = {
   view: (_ref) => {
     var {
       attrs: {
+        options,
         header,
         content,
         footer
       }
     } = _ref;
-    return m("ion-card", m("ion-card-header", {
+    return m("ion-card", options, m("ion-card-header", {
       translucent: true
     }, header), m("ion-card-content", content), m("ion-card-footer", footer));
   }
@@ -422,8 +425,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.Comments = void 0;
 
 var _Http = _interopRequireDefault(require("Http"));
-
-var _card = require("./card");
 
 var _Utils = require("Utils");
 
@@ -479,23 +480,20 @@ var CommentForm = (_ref) => {
           mdl
         }
       } = _ref2;
-      return [m(_card.Card, {
-        content: m("ion-textarea", {
-          rows: 3,
-          placeholder: "Write a comment ...",
-          onchange: e => comment.body = e.target.value,
-          disabled: state.disabled,
-          value: comment.body
-        }),
-        footer: [m("ion-row", m("ion-col", m("ion-avatar", m("img", {
-          src: (0, _Utils.sanitizeImg)(mdl.user.image)
-        }))), m("ion-col", m("ion-button", {
-          onclick: e => {
-            state.disabled = true;
-            submit(comment);
-          }
-        }, " Post Comment ")))]
-      }), state.errors.map(e => e.values.map(err => m("p.error-messages", "".concat(e.key, " ").concat(err))))];
+      return [m("ion-grid", m("ion-row", m("ion-col", m("ion-textarea", {
+        rows: 3,
+        placeholder: "Write a comment ...",
+        onchange: e => comment.body = e.target.value,
+        disabled: state.disabled,
+        value: comment.body
+      }))), m("ion-row", m("ion-col", m("ion-avatar", m("img", {
+        src: (0, _Utils.sanitizeImg)(mdl.user.image)
+      }))), m("ion-col", m("ion-button", {
+        onclick: e => {
+          state.disabled = true;
+          submit(comment);
+        }
+      }, " Post Comment ")))), state.errors.map(e => e.values.map(err => m("p.error-messages", "".concat(e.key, " ").concat(err))))];
     }
   };
 };
@@ -765,16 +763,15 @@ var FollowFavorite = (_ref) => {
             },
             favoritesCount,
             favorited,
-            createdAt,
             slug
           }
         }
       } = _ref6;
       return m("ion-grid", m("ion-row", [m(m.route.Link, {
         href: "profile/".concat(username)
-      }, m("ion-avatar", m("img", {
+      }, m("ion-chip", m("ion-avatar", m("ion-img", {
         src: (0, _Utils.sanitizeImg)(image)
-      }), m("ion-text", username))), mdl.user.username == username ? [m(m.route.Link, {
+      })), m("ion-text", username))), mdl.user.username == username ? [m(m.route.Link, {
         class: "btn btn-sm btn-outline-secondary",
         href: "/editor/".concat(slug),
         selector: "button"
@@ -788,11 +785,11 @@ var FollowFavorite = (_ref) => {
         onclick: e => toggleAuthorFollow(data)
       }, [m("ion-icon", {
         name: following ? "people-circle-outline" : "people-outline"
-      }), m("ion-text", "".concat(username))]), m("ion-chip", {
+      }), m("ion-label", "".concat(username))]), m("ion-chip", {
         onclick: e => toggleArticleLike(data)
       }, [m("ion-icon", {
         name: favorited ? "heart-dislike-outline" : "heart-outline"
-      }), m("ion-text", favoritesCount)])]]));
+      }), m("ion-label", favoritesCount)])]]));
     }
   };
 };
@@ -1125,12 +1122,11 @@ var Header = () => {
           mdl
         }
       } = _ref;
-      return m("nav.navbar navbar-light", m(".container", m("ion-buttons", m("ion-menu-button")), m("a.navbar-brand", {
+      return m("ion-header", m("ion-toolbar", m("ion-buttons", {
+        slot: "start"
+      }, m("ion-back-button"), m("ion-menu-button")), m("a.navbar-brand", {
         href: "#"
       }, "conduit"), m("ul.nav navbar-nav pull-xs-right", mdl.state.isLoggedIn() ? [m("li.nav-item", m(m.route.Link, {
-        class: "nav-link",
-        href: "/editor"
-      }, [m("i.ion-compose.p-5"), "New Article"])), m("li.nav-item", m(m.route.Link, {
         class: "nav-link",
         href: "/settings/".concat(mdl.user.username)
       }, [m("i.ion-gear-a.p-5"), "Settings"])), m("li.nav-item", m(m.route.Link, {
@@ -1299,10 +1295,11 @@ var Article = () => {
           mdl
         }
       } = _ref3;
-      return [state.status == "loading" && m(_components.Banner, [m("h1.logo-font", "Loading ...")]), state.status == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.status == "success" && [m("ion-title", m("h1", data.article.title)), m(_components.FollowFavorite, {
+      return [state.status == "loading" && m(_components.Banner, [m("h1.logo-font", "Loading ...")]), state.status == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.status == "success" && [m("ion-text", m("h1", data.article.title)), m("ion-text", m.trust((0, _marked.default)(data.article.body))), m(_components.FollowFavorite, {
         mdl,
         data: data.article
-      }), m("ion-text", m.trust((0, _marked.default)(data.article.body))), m(_components.Comments, {
+      }), // m("ion-item-divider"),
+      m(_components.Comments, {
         mdl,
         comments: data.comments,
         reloadArticle: () => loadData(mdl)
@@ -1469,7 +1466,7 @@ var Home = () => {
     tags: {
       tagList: [],
       selected: [],
-      current: "global"
+      current: ""
     },
     articles: {}
   };
@@ -1542,13 +1539,11 @@ var Home = () => {
           mdl
         }
       } = _ref4;
-      return [!mdl.state.isLoggedIn() && m(_components.Banner, [m("h1.logo-font", "conduit"), m("p", "A place to share your knowledge.")]), state.pageStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading Data")]), state.pageStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && m("ion-row", {
-        wrap: true
-      }, [m("ion-col[col-9]", [m(_components.FeedNav, {
+      return [!mdl.state.isLoggedIn() && m(_components.Banner, [m("h1.logo-font", "conduit"), m("p", "A place to share your knowledge.")]), state.pageStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading Data")]), state.pageStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && [m(_components.FeedNav, {
         fetchData: loadArticles,
         mdl,
         data
-      }), state.feedStatus == "loading" && m("p", "Loading Articles ..."), state.feedStatus == "success" ? state.total ? [m(_components.Articles, {
+      }), state.feedStatus == "loading" && m("ion-text", "Loading Articles ..."), state.feedStatus == "success" && state.total ? [m(_components.Articles, {
         mdl,
         data
       }), m(_components.Paginator, {
@@ -1558,10 +1553,19 @@ var Home = () => {
           state.offset = offset;
           loadArticles(mdl);
         }
-      })] : m("ion-text", "No articles are here... yet.") : ""]), m("", m(_components.SideBar, {
+      })] : m("ion-text", "No articles are here... yet."), mdl.state.isLoggedIn() && m("ion-fab", {
+        vertical: "bottom",
+        horizontal: "end",
+        slot: "fixed"
+      }, m(m.route.Link, {
+        class: "nav-link",
+        href: "/editor"
+      }, [m("ion-fab-button", m("ion-icon", {
+        name: "add-circle"
+      }))])), m("", m(_components.SideBar, {
         mdl,
         data
-      }))])];
+      }))]];
     }
   };
 };

@@ -25,6 +25,7 @@ const ArticlePreview = ({ attrs: { mdl, article } }) => {
     view: () => {
       return m(
         "ion-item",
+        { button: true },
         m("ion-grid", [
           m(
             "ion-row",

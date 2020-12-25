@@ -2,22 +2,20 @@ const Header = () => {
   return {
     view: ({ attrs: { mdl } }) =>
       m(
-        "nav.navbar navbar-light",
+        "ion-header",
         m(
-          ".container",
-          m("ion-buttons", m("ion-menu-button")),
+          "ion-toolbar",
+          m(
+            "ion-buttons",
+            { slot: "start" },
+            m("ion-back-button"),
+            m("ion-menu-button")
+          ),
           m("a.navbar-brand", { href: "#" }, "conduit"),
           m(
             "ul.nav navbar-nav pull-xs-right",
             mdl.state.isLoggedIn()
               ? [
-                  m(
-                    "li.nav-item",
-                    m(m.route.Link, { class: "nav-link", href: "/editor" }, [
-                      m("i.ion-compose.p-5"),
-                      "New Article",
-                    ])
-                  ),
                   m(
                     "li.nav-item",
                     m(
