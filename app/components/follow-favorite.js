@@ -63,58 +63,53 @@ export const FollowFavorite = ({ attrs: { mdl, data } }) => {
         },
       },
     }) => {
-      return m(".article-meta", [
-        m(
-          m.route.Link,
-          { href: `profile/${username}` },
-          m("img", { src: sanitizeImg(image) })
-        ),
-        m(".info", [
+      return m(
+        "ion-grid",
+        m("ion-row", [
           m(
             m.route.Link,
-            { class: "author", href: `profile/${username}` },
-            username
+            { href: `profile/${username}` },
+            m(
+              "ion-avatar",
+              m("img", { src: sanitizeImg(image) }),
+              m("ion-text", username)
+            )
           ),
-          m("span.date", createdAt),
-        ]),
-        mdl.user.username == username
-          ? [
-              m(
-                m.route.Link,
-                {
-                  class: "btn btn-sm btn-outline-secondary",
-                  href: `/editor/${slug}`,
-                  selector: "button",
-                },
-                [m("i.ion-edit.p-5"), "Edit Article"]
-              ),
-              m(
-                "button.btn.btn-sm.btn-outline-danger.m-5",
-                { onclick: (e) => deleteArticle(slug) },
-                [m("i.ion-trash-a.m-5"), "Delete Article "]
-              ),
-            ]
-          : [
-              m(
-                "button.btn.btn-sm.btn-outline-secondary",
-                { onclick: (e) => toggleAuthorFollow(data) },
-                [
-                  following
-                    ? [m("i.ion-minus-round"), ` Unfollow ${username} `]
-                    : [m("i.ion-plus-round"), ` Follow ${username} `],
-                ]
-              ),
-              m(
-                "button.btn.btn-sm.btn-outline-primary.m-5",
-                { onclick: (e) => toggleArticleLike(data) },
-                [
-                  m("i.ion-heart.m-5"),
-                  favorited ? " Unfavorite Article " : " Favorite Article ",
-                  m("span.counter", `( ${favoritesCount} )`),
-                ]
-              ),
-            ],
-      ])
+
+          mdl.user.username == username
+            ? [
+                m(
+                  m.route.Link,
+                  {
+                    class: "btn btn-sm btn-outline-secondary",
+                    href: `/editor/${slug}`,
+                    selector: "button",
+                  },
+                  [m("ion-icon", { name: "edit" }), "Edit Article"]
+                ),
+                m("ion-button", { onclick: (e) => deleteArticle(slug) }, [
+                  m("ion-icon", { name: "trash-outline" }),
+                  "Delete Article ",
+                ]),
+              ]
+            : [
+                m("ion-chip", { onclick: (e) => toggleAuthorFollow(data) }, [
+                  m("ion-icon", {
+                    name: following
+                      ? "people-circle-outline"
+                      : "people-outline",
+                  }),
+                  m("ion-text", `${username}`),
+                ]),
+                m("ion-chip", { onclick: (e) => toggleArticleLike(data) }, [
+                  m("ion-icon", {
+                    name: favorited ? "heart-dislike-outline" : "heart-outline",
+                  }),
+                  m("ion-text", favoritesCount),
+                ]),
+              ],
+        ])
+      )
     },
   }
 }

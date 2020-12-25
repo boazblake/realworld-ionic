@@ -6,21 +6,16 @@ export const Paginator = () => {
       let range = [...Array(total).keys()].slice(1)
       return (
         state.total > state.limit &&
-        m(
-          "ul.pagination",
-          range.map((page, idx) => {
-            return m(
-              `li.page-item ${page == current && "active"}`,
-              m(
-                ".page-link active",
-                {
-                  onclick: (e) => fetchDataFor(idx * state.limit),
-                },
-                page
-              )
-            )
-          })
-        )
+        range.map((page, idx) => {
+          return m(
+            "ion-chip",
+            {
+              color: page == current && "primary",
+              onclick: (e) => fetchDataFor(idx * state.limit),
+            },
+            page
+          )
+        })
       )
     },
   }

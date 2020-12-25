@@ -23,54 +23,67 @@ const ArticlePreview = ({ attrs: { mdl, article } }) => {
 
   return {
     view: () => {
-      return m(".article-preview", [
-        m(".article-meta", [
+      return m(
+        "ion-item",
+        m("ion-grid", [
           m(
-            m.route.Link,
-            {
-              href: `/profile/${data.author.username}`,
-              options: { replace: true },
-            },
-            m("img", { src: sanitizeImg(data.author.image) })
+            "ion-row",
+            m(
+              "ion-col",
+              m(
+                m.route.Link,
+                { class: "preview-link", href: `/article/${data.slug}` },
+                m("ion-text", m("h1", data.title)),
+                m("ion-text", m("p", data.description))
+              )
+            )
           ),
-
-          m(".info", [
+          m(
+            "ion-row",
+            m(
+              "ion-col",
+              m(
+                "ion-list",
+                { side: "end" },
+                data.tagList.map((tag) => m("ion-chip", tag))
+              )
+            )
+          ),
+          m("ion-row", [
             m(
               m.route.Link,
               {
-                class: "author",
                 href: `/profile/${data.author.username}`,
                 options: { replace: true },
               },
-              data.author.username
-            ),
-            m("span.date", data.createdAt),
-          ]),
-          m(
-            "button.btn btn-outline-primary btn-sm pull-xs-right",
-            {
-              onclick: (e) => toggleArticleLike(data.favorited, data.slug),
-              class: data.favorited && "active",
-            },
-            [m("i.ion-heart.p-5"), m("span", data.favoritesCount)]
-          ),
-        ]),
-        m(
-          m.route.Link,
-          { class: "preview-link", href: `/article/${data.slug}` },
-          [
-            m("h1", data.title),
-            m("p", data.description),
-            m(
-              "ul.tag-list",
-              data.tagList.map((tag) =>
-                m("li.tag-default tag-pill tag-outline", tag)
+              m(
+                "ion-avatar",
+                { slot: "start" },
+                m("img", { src: sanitizeImg(data.author.image) })
               )
             ),
-            m("span", "Read more..."),
-          ]
-        ),
-      ])
+            m(
+              "ion-label",
+              m("ion-text", m("h2", data.author.username)),
+              m("p", data.createdAt)
+            ),
+            m(
+              "ion-chip",
+              {
+                onclick: (e) => toggleArticleLike(data.favorited, data.slug),
+              },
+              [
+                m("ion-icon", {
+                  name: data.favorited
+                    ? "heart-dislike-outline"
+                    : "heart-outline",
+                }),
+                m("ion-text", data.favoritesCount),
+              ]
+            ),
+          ]),
+        ])
+      )
     },
   }
 }
@@ -79,8 +92,11 @@ export const Articles = () => {
   return {
     view: ({ attrs: { mdl, data } }) => {
       return data.articles.length
-        ? data.articles.map((article) =>
-            m(ArticlePreview, { mdl, data, article })
+        ? m(
+            "ion-list",
+            data.articles.map((article) =>
+              m(ArticlePreview, { mdl, data, article })
+            )
           )
         : m("p", "No articles are here... yet.")
     },

@@ -1,4 +1,5 @@
 import Http from "Http"
+import { Card } from "./card"
 import { log, sanitizeImg, errorViewModel } from "Utils"
 import { lensProp, over, trim } from "ramda"
 
@@ -36,32 +37,39 @@ const CommentForm = ({ attrs: { mdl, reload } }) => {
   return {
     oninit: () => (comment.body = ""),
     view: ({ attrs: { mdl } }) => [
-      m("form.card.comment-form", [
-        m(
-          ".card-block",
-          m("textarea.form-control", {
-            rows: 3,
-            placeholder: "Write a comment ...",
-            onchange: (e) => (comment.body = e.target.value),
-            disabled: state.disabled,
-            value: comment.body,
-          })
-        ),
-        m(".card-footer", [
-          m("img.comment-author-img", { src: sanitizeImg(mdl.user.image) }),
-
+      m(Card, {
+        content: m("ion-textarea", {
+          rows: 3,
+          placeholder: "Write a comment ...",
+          onchange: (e) => (comment.body = e.target.value),
+          disabled: state.disabled,
+          value: comment.body,
+        }),
+        footer: [
           m(
-            "button.btn.btn-sm.btn-primary",
-            {
-              onclick: (e) => {
-                state.disabled = true
-                submit(comment)
-              },
-            },
-            " Post Comment "
+            "ion-row",
+            m(
+              "ion-col",
+              m("ion-avatar", m("img", { src: sanitizeImg(mdl.user.image) }))
+            ),
+
+            m(
+              "ion-col",
+              m(
+                "ion-button",
+                {
+                  onclick: (e) => {
+                    state.disabled = true
+                    submit(comment)
+                  },
+                },
+                " Post Comment "
+              )
+            )
           ),
-        ]),
-      ]),
+        ],
+      }),
+
       state.errors.map((e) =>
         e.values.map((err) => m("p.error-messages", `${e.key} ${err}`))
       ),
@@ -83,36 +91,38 @@ const Comment = () => {
         deleteComment,
       },
     }) =>
-      m(".card", [
-        m(".card-block", m("p.card-text", body)),
-        m(".card-footer", [
-          m(
-            m.route.Link,
-            {
-              href: `/profile/${username}`,
-              class: "comment-author m-5",
-            },
-            m("img.comment-author-img", {
-              src: sanitizeImg(image),
-            })
-          ),
+      m(
+        "ion-item",
 
+        m(
+          "ion-grid",
+          ("ion-row", m("ion-text", body)),
           m(
-            m.route.Link,
-            {
-              href: `/profile/${username}`,
-              class: "comment-author m-5",
-            },
-            username
-          ),
+            "ion-row",
+            m(
+              m.route.Link,
+              {
+                href: `/profile/${username}`,
+                class: "comment-author m-5",
+              },
+              m(
+                "ion-avatar",
+                m("img", {
+                  src: sanitizeImg(image),
+                })
+              ),
+              m("ion-text", username)
+            ),
+            m("ion-text", createdAt),
 
-          m("span.date-posted", createdAt),
-          username == mdl.user.username &&
-            m("span.mod-options", [
-              m("i.ion-trash-a", { onclick: (e) => deleteComment(id) }),
-            ]),
-        ]),
-      ]),
+            username == mdl.user.username &&
+              m("ion-icon", {
+                name: "trash-outline",
+                onclick: (e) => deleteComment(id),
+              })
+          )
+        )
+      ),
   }
 }
 
@@ -141,17 +151,15 @@ export const Comments = ({ attrs: { mdl } }) => {
     oninit: ({ attrs: { mdl } }) => loadComments(mdl),
     view: ({ attrs: { mdl } }) =>
       m(
-        ".row",
-        m(".col-xs-12.col-md-8.offset-md-2", [
-          m(CommentForm, { mdl, reload: () => loadComments(mdl) }),
-          data.comments.map((c) =>
-            m(Comment, {
-              mdl,
-              comment: c,
-              deleteComment: (id) => deleteComment(id),
-            })
-          ),
-        ])
+        "item-list",
+        m(CommentForm, { mdl, reload: () => loadComments(mdl) }),
+        data.comments.map((c) =>
+          m(Comment, {
+            mdl,
+            comment: c,
+            deleteComment: (id) => deleteComment(id),
+          })
+        )
       ),
   }
 }

@@ -1,0 +1,7 @@
+{
+  "name": "realworld-ionic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}

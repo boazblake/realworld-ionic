@@ -5,6 +5,7 @@ const Header = () => {
         "nav.navbar navbar-light",
         m(
           ".container",
+          m("ion-buttons", m("ion-menu-button")),
           m("a.navbar-brand", { href: "#" }, "conduit"),
           m(
             "ul.nav navbar-nav pull-xs-right",

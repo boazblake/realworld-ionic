@@ -1,63 +1,83 @@
-import { without } from "ramda"
-
 export const FeedNav = ({ attrs: { fetchData } }) => {
   return {
     view: ({ attrs: { mdl, data } }) => {
-      return m(
-        ".feed-toggle",
-        m("ul.nav nav-pills outline-active", [
-          mdl.state.isLoggedIn() &&
-            m(
-              "li.nav-item",
+      return [
+        m(
+          "ion-toolbar",
+          m(
+            "ion-row",
+            mdl.state.isLoggedIn() &&
               m(
-                `a.nav-link ${data.tags.current == "feed" && "active"}`,
+                "ion-col",
+                m(
+                  "ion-button",
+                  {
+                    fill: "solid",
+                    expand: "full",
+                    id: "feed",
+                    color:
+                      data.tags.current == "feed" ? "primary" : "secondary",
+                    onclick: (e) => {
+                      console.log("data.tags.current", e.target.id, e)
+                      data.tags.current = e.target.id
+                      fetchData(mdl)
+                    },
+                  },
+                  "Your Feed"
+                )
+              ),
+
+            m(
+              "ion-col",
+              m(
+                "ion-button",
                 {
+                  fill: "solid",
+                  expand: "full",
+                  id: "",
+                  color: data.tags.current == "" ? "primary" : "secondary",
                   onclick: (e) => {
-                    data.tags.current = "feed"
+                    data.tags.current = e.target.id
                     fetchData(mdl)
                   },
                 },
-                "Your Feed"
+                "Global Feed"
               )
-            ),
-
-          m(
-            "li.nav-item",
-            m(
-              `a.nav-link ${data.tags.current == "" && "active"}`,
-              {
-                onclick: (e) => {
-                  data.tags.current = ""
-                  fetchData(mdl)
-                },
-              },
-              "Global Feed"
             )
           ),
 
-          data.tags.selected.map((tag) =>
+          m(
+            "ion-row",
+
             m(
-              "li.nav-item",
-              m(`a.nav-link ${data.tags.current == tag && "active"}`, [
+              "ion-col",
+              data.tags.selected.map((tag) =>
                 m(
-                  "span",
+                  "ion-button",
                   {
+                    fill: "solid",
+                    size: "small",
+                    color: data.tags.current == tag ? "primary" : "secondary",
+                    id: tag,
                     onclick: (e) => {
                       data.tags.current = tag
                       fetchData(mdl)
                     },
                   },
-                  `# ${tag}`
-                ),
-                m("i.ion-close-circled.p-5", {
-                  onclick: (e) =>
-                    (data.tags.selected = without(tag, data.tags.selected)),
-                }),
-              ])
+                  m("ion-text", `# ${tag}`)
+                  //Move this to user profile
+                  // import { without } from "ramda"
+                  // m("ion-icon", {
+                  //   name: "close-circle-outline",
+                  //   onclick: (e) =>
+                  //     (data.tags.selected = without(tag, data.tags.selected)),
+                  // })
+                )
+              )
             )
-          ),
-        ])
-      )
+          )
+        ),
+      ]
     },
   }
 }

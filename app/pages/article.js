@@ -1,5 +1,5 @@
 import Http from "Http"
-import { Banner, FollowFavorite, Comments } from "components"
+import { Banner, FollowFavorite, Comments, Card } from "components"
 import md from "marked"
 
 const getArticleTask = (http) => (mdl) => (slug) =>
@@ -31,45 +31,28 @@ const Article = () => {
 
   return {
     oninit: ({ attrs: { mdl } }) => loadData(mdl),
-    view: ({ attrs: { mdl } }) =>
-      m(".article-page", [
-        state.status == "loading" &&
-          m(Banner, [m("h1.logo-font", "Loading ...")]),
-        state.status == "error" &&
-          m(Banner, [m("h1.logo-font", `Error Loading Data: ${state.error}`)]),
+    view: ({ attrs: { mdl } }) => [
+      state.status == "loading" &&
+        m(Banner, [m("h1.logo-font", "Loading ...")]),
 
-        state.status == "success" && [
-          m(
-            ".banner",
-            m(".container", [
-              m("h1", data.article.title),
-              m(FollowFavorite, {
-                mdl,
-                data: data.article,
-              }),
-            ])
-          ),
-          m(".container.page", [
-            m(
-              ".row.article-content",
-              m(".col-xs-12.text-justify", m.trust(md(data.article.body)))
-            ),
-            m("hr"),
+      state.status == "error" &&
+        m(Banner, [m("h1.logo-font", `Error Loading Data: ${state.error}`)]),
 
-            m(".article-actions", [
-              m(FollowFavorite, {
-                mdl,
-                data: data.article,
-              }),
-            ]),
-            m(Comments, {
-              mdl,
-              comments: data.comments,
-              reloadArticle: () => loadData(mdl),
-            }),
-          ]),
-        ],
-      ]),
+      state.status == "success" && [
+        m("ion-title", m("h1", data.article.title)),
+        m(FollowFavorite, {
+          mdl,
+          data: data.article,
+        }),
+
+        m("ion-text", m.trust(md(data.article.body))),
+        m(Comments, {
+          mdl,
+          comments: data.comments,
+          reloadArticle: () => loadData(mdl),
+        }),
+      ],
+    ],
   }
 }
 

@@ -1,5 +1,5 @@
 {
-  "name": "realworld-mithril",
+  "name": "realworld-ionic",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -19,16 +19,23 @@
     "ramda": "^0.27.0"
   },
   "devDependencies": {
-    "@babel/plugin-transform-spread": "^7.7.4",
-    "auto-reload-brunch": "^2.7.1",
+    "@babel/plugin-transform-runtime": "^7.12.10",
+    "@capacitor/android": "2.4.1",
+    "@capacitor/core": "2.4.1",
+    "@capacitor/ios": "2.4.1",
+    "@ionic-native/camera": "^5.30.0",
+    "@ionic-native/core": "^5.30.0",
+    "@ionic/core": "^5.5.2",
+    "uglify-js-brunch": "^2.10.0",
+    "auto-reload-brunch": "git+https://github.com/brunch/auto-reload-brunch.git",
     "babel-brunch": "7.0.1",
     "brunch": "3.0.0",
     "clean-css-brunch": "3.0.0",
     "copycat-brunch": "1.1.1",
     "imagemin-brunch": "^1.1.0",
     "sass-brunch": "3.0.0",
-    "size-limit": "^4.5.0",
+    "size-limit": "^4.9.1",
     "sw-precache-brunch": "^2.0.1",
-    "uglify-js-brunch": "^2.10.0"
+    "terser-brunch": "^4.0.0"
   }
 }

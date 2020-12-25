@@ -1,8 +1,8 @@
-const Footer = () => {
+const info = () => {
   return {
     view: () =>
       m(
-        "ion-footer",
+        "footer",
         m("div", { class: "container" }, [
           m(
             "a",
@@ -24,4 +24,4 @@ const Footer = () => {
   }
 }
 
-export default Footer
+export default info

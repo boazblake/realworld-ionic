@@ -1,4 +1,4 @@
-// See http://brunch.io for documentation.
+/// See http://brunch.io for documentation.
 exports.files = {
   javascripts: {
     joinTo: {
@@ -7,21 +7,40 @@ exports.files = {
     },
   },
   stylesheets: {
+    // order: {
+    //   // before: ["./imports.scss"],
+    //   after: ["app.css"],
+    // },
     joinTo: {
       "app.css": [
         (path) => path.includes(".scss"),
         (path) => path.includes(".css"),
+        (path) => path.includes(".sass"),
       ],
     },
   },
 }
 
+exports.modules = {
+  autoRequire: {
+    "app.js": ["initialize"],
+  },
+}
+
 exports.plugins = {
+  uglify: {
+    mangle: false,
+    compress: {
+      global_defs: {
+        DEBUG: false,
+      },
+    },
+  },
   sass: {
     precision: 8,
     mode: "native",
     sourceMapEmbed: true,
-    includePaths: ["node_modules/spectre.css/src/**/*.scss"],
+    includePaths: [],
   },
   imagemin: {
     plugins: {
@@ -32,12 +51,30 @@ exports.plugins = {
     },
     pattern: /\.(gif|jpg|jpeg|jpe|jif|jfif|jfi|png|svg|svgz)$/,
   },
-  copycat: {
-    // fonts: [
-    //   "node_modules/@mithril-icons/clarity/cjs"
-    //   "bower_components/material-design-iconic-font",
-    //   "bower_components/font-awesome/fonts"
+  babel: {
+    // ignore: [/^(vendor)/, /^node_modules\/(?!@ionic)/],
+    //   plugins:[
+    //   ["@babel/plugin-transform-runtime",
+    //     {
+    //       "regenerator": true
+    //     }
+    //   ]
     // ],
+    presets: [
+      [
+        "@babel/preset-env",
+        {
+          targets: {
+            esmodules: true,
+          },
+        },
+      ],
+    ],
+  },
+  copycat: {
+    fonts: [
+      // "app/assets/fonts",
+    ],
     images: ["app/assets/images"],
     verbose: true, //shows each file that is copied to the destination directory
     onlyChanged: true, //only copy a file if it's modified time has changed (only effective when using brunch watch)
@@ -45,7 +82,7 @@ exports.plugins = {
   swPrecache: {
     swFileName: "service-worker.js",
     options: {
-      autorequire: ["app/assets/index.html"],
+      autorequire: ["app/assets/index.html", "app/assets/images"],
       staticFileGlobs: [
         "docs/app.css",
         "docs/app.js",
@@ -56,6 +93,17 @@ exports.plugins = {
     },
   },
   "@babel": { presets: ["env"] },
+  autoReload: {
+    enabled: {
+      css: true,
+      js: true,
+      assets: false,
+    },
+    // port: [3333],
+    // keyPath: "app",
+    // certPath: "app",
+    forcewss: process.env.NODE_ENV == "development" && false,
+  },
 }
 
 exports.paths = {
@@ -70,6 +118,7 @@ exports.paths = {
 }
 
 exports.npm = {
+  compilers: ["babel-brunch"],
   enabled: true,
   globals: { m: "mithril", Task: "data.task" },
 }

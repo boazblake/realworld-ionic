@@ -23,7 +23,7 @@ const loadDataTask = (http) => (mdl) => (state) => (data) =>
 
 const Home = () => {
   const data = {
-    tags: { tagList: [], selected: [], current: "" },
+    tags: { tagList: [], selected: [], current: "global" },
     articles: {},
   }
   const state = {
@@ -73,7 +73,7 @@ const Home = () => {
   return {
     oninit: ({ attrs: { mdl } }) => loadInitData(mdl),
     view: ({ attrs: { mdl } }) => {
-      return m(".home-page", [
+      return [
         !mdl.state.isLoggedIn() &&
           m(Banner, [
             m("h1.logo-font", "conduit"),
@@ -87,36 +87,33 @@ const Home = () => {
           m(Banner, [m("h1.logo-font", `Error Loading Data: ${state.error}`)]),
 
         state.pageStatus == "success" &&
-          m(
-            ".container page",
-            m(".row", [
-              m(".col-md-9", [
-                m(FeedNav, { fetchData: loadArticles, mdl, data }),
+          m("ion-row", { wrap: true }, [
+            m("ion-col[col-9]", [
+              m(FeedNav, { fetchData: loadArticles, mdl, data }),
 
-                state.feedStatus == "loading" && m("p", "Loading Articles ..."),
+              state.feedStatus == "loading" && m("p", "Loading Articles ..."),
 
-                state.feedStatus == "success"
-                  ? state.total
-                    ? [
-                        m(Articles, { mdl, data }),
+              state.feedStatus == "success"
+                ? state.total
+                  ? [
+                      m(Articles, { mdl, data }),
 
-                        m(Paginator, {
-                          mdl,
-                          state,
-                          fetchDataFor: (offset) => {
-                            state.offset = offset
-                            loadArticles(mdl)
-                          },
-                        }),
-                      ]
-                    : m("p.pull-xs-left", "No articles are here... yet.")
-                  : "",
-              ]),
+                      m(Paginator, {
+                        mdl,
+                        state,
+                        fetchDataFor: (offset) => {
+                          state.offset = offset
+                          loadArticles(mdl)
+                        },
+                      }),
+                    ]
+                  : m("ion-text", "No articles are here... yet.")
+                : "",
+            ]),
 
-              m(".col-md-3", m(SideBar, { mdl, data })),
-            ])
-          ),
-      ])
+            m("", m(SideBar, { mdl, data })),
+          ]),
+      ]
     },
   }
 }

@@ -4,7 +4,12 @@ import Footer from "./footer.js"
 const Layout = () => {
   return {
     view: ({ children, attrs: { mdl } }) =>
-      m("", [m(Header, { mdl }), children, m(Footer, { mdl })]),
+      m(
+        "ion-app",
+        m(Header, { mdl }),
+        m("ion-content", children),
+        m(Footer, { mdl })
+      ),
   }
 }
 

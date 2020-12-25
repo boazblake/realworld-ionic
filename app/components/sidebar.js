@@ -7,24 +7,24 @@ export const SideBar = () => {
   return {
     view: ({ attrs: { data } }) => {
       const isSelected = (tag) =>
-        data.tags.selected.includes(tag) && "tag-selected"
+        data.tags.selected.includes(tag) ? "primary" : "secondary"
 
-      return m(".sidebar", [
-        m("p", "Popular Tags"),
-        m(
-          ".tag-list",
-          data.tags.tagList.map((tag) =>
+      return [
+        m("ion-text", "Popular Tags"),
+
+        data.tags.tagList
+          .filter((tag) => !data.tags.selected.includes(tag))
+          .map((tag) =>
             m(
-              "a.tag-pill.tag-default",
+              "ion-chip",
               {
-                class: isSelected(tag),
+                color: isSelected(tag),
                 onclick: (e) => selectTag(data, tag),
               },
               tag
             )
-          )
-        ),
-      ])
+          ),
+      ]
     },
   }
 }
