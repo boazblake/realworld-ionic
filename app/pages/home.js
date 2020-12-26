@@ -5,7 +5,7 @@ import {
   Paginator,
   Articles,
   FeedNav,
-  SideBar,
+  TagList,
 } from "components"
 
 const getTagsTask = (http) => (mdl) => http.getTask(mdl)("tags")
@@ -115,7 +115,7 @@ const Home = () => {
               ])
             ),
 
-          m("", m(SideBar, { mdl, data })),
+          m("", m(TagList, { mdl, data })),
         ],
       ]
     },

@@ -95,6 +95,7 @@ export const Articles = () => {
       return data.articles.length
         ? m(
             "ion-list",
+            { button: true },
             data.articles.map((article) =>
               m(ArticlePreview, { mdl, data, article })
             )

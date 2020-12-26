@@ -357,7 +357,9 @@ var Articles = () => {
           data
         }
       } = _ref3;
-      return data.articles.length ? m("ion-list", data.articles.map(article => m(ArticlePreview, {
+      return data.articles.length ? m("ion-list", {
+        button: true
+      }, data.articles.map(article => m(ArticlePreview, {
         mdl,
         data,
         article
@@ -615,7 +617,16 @@ var FeedNav = (_ref) => {
           data
         }
       } = _ref2;
-      return [m("ion-toolbar", m("ion-row", mdl.state.isLoggedIn() && m("ion-col", m("ion-button", {
+      return [m("ion-toolbar", m("ion-row", m("ion-col", m("ion-button", {
+        fill: "solid",
+        expand: "full",
+        id: "",
+        color: data.tags.current == "" ? "primary" : "secondary",
+        onclick: e => {
+          data.tags.current = e.target.id;
+          fetchData(mdl);
+        }
+      }, "Global Feed")), mdl.state.isLoggedIn() && m("ion-col", m("ion-button", {
         fill: "solid",
         expand: "full",
         id: "feed",
@@ -625,16 +636,7 @@ var FeedNav = (_ref) => {
           data.tags.current = e.target.id;
           fetchData(mdl);
         }
-      }, "Your Feed")), m("ion-col", m("ion-button", {
-        fill: "solid",
-        expand: "full",
-        id: "",
-        color: data.tags.current == "" ? "primary" : "secondary",
-        onclick: e => {
-          data.tags.current = e.target.id;
-          fetchData(mdl);
-        }
-      }, "Global Feed"))), m("ion-row", m("ion-col", data.tags.selected.map(tag => m("ion-button", {
+      }, "Your Feed"))), m("ion-row", m("ion-col", data.tags.selected.map(tag => m("ion-button", {
         fill: "solid",
         size: "small",
         color: data.tags.current == tag ? "primary" : "secondary",
@@ -895,15 +897,15 @@ Object.keys(_feedNav).forEach(function (key) {
   });
 });
 
-var _sidebar = require("./sidebar");
+var _taglist = require("./taglist");
 
-Object.keys(_sidebar).forEach(function (key) {
+Object.keys(_taglist).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _sidebar[key]) return;
+  if (key in exports && exports[key] === _taglist[key]) return;
   Object.defineProperty(exports, key, {
     enumerable: true,
     get: function get() {
-      return _sidebar[key];
+      return _taglist[key];
     }
   });
 });
@@ -917,6 +919,32 @@ Object.keys(_card).forEach(function (key) {
     enumerable: true,
     get: function get() {
       return _card[key];
+    }
+  });
+});
+
+var _menu = require("./menu");
+
+Object.keys(_menu).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _menu[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _menu[key];
+    }
+  });
+});
+
+var _sidebars = require("./sidebars");
+
+Object.keys(_sidebars).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _sidebars[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _sidebars[key];
     }
   });
 });
@@ -942,6 +970,73 @@ var Loader = () => {
 };
 
 exports.Loader = Loader;
+});
+
+;require.register("components/menu.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Menu = exports.MenuButton = void 0;
+
+var _core = require("@ionic/core");
+
+var MenuButton = () => {
+  var toggleMenu = menuId => {
+    console.log(_core.menuController);
+
+    _core.menuController.open(menuId).then(s => console.log(s), e => console.log(e));
+  };
+
+  return {
+    view: (_ref) => {
+      var {
+        attrs: {
+          name,
+          menuId
+        }
+      } = _ref;
+      return m("ion-menu-toggle", {
+        oncreate: (_ref2) => {
+          var {
+            dom
+          } = _ref2;
+
+          _core.menuController.enable(true, menuId);
+        },
+        onclick: e => toggleMenu(menuId)
+      }, m("ion-button", m("ion-icon", {
+        name
+      })));
+    }
+  };
+};
+
+exports.MenuButton = MenuButton;
+
+var Menu = () => {
+  return {
+    view: (_ref3) => {
+      var {
+        attrs: {
+          title,
+          side,
+          menuId,
+          contentId,
+          contents
+        }
+      } = _ref3;
+      return m("ion-menu[main]", {
+        side,
+        menuId,
+        contentId
+      }, [m("ion-header", m("ion-toolbar[translucent]", m("ion-title", title))), m("ion-content", contents)]);
+    }
+  };
+};
+
+exports.Menu = Menu;
 });
 
 ;require.register("components/paginator.js", function(exports, require, module) {
@@ -977,17 +1072,84 @@ var Paginator = () => {
 exports.Paginator = Paginator;
 });
 
-;require.register("components/sidebar.js", function(exports, require, module) {
+;require.register("components/sidebars.js", function(exports, require, module) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SideBar = void 0;
+exports.SideBars = exports.SettingsMenu = void 0;
+
+var _menu = require("./menu");
+
+var _core = require("@ionic/core");
+
+var SettingsMenu = () => {
+  return {
+    view: (_ref) => {
+      var {
+        attrs: {
+          mdl
+        }
+      } = _ref;
+      return m("ion-list", [m("ion-item", m(m.route.Link, {
+        onclick: e => _core.menuController.toggle("settings"),
+        href: "/settings/".concat(mdl.user.username)
+      }, [m("i.ion-gear-a.p-5"), "Settings"])), m("ion-item", m(m.route.Link, {
+        onclick: e => _core.menuController.toggle("settings"),
+        href: "/profile/".concat(mdl.user.username)
+      }, mdl.user.username))]);
+    }
+  };
+};
+
+exports.SettingsMenu = SettingsMenu;
+
+var SideBars = () => {
+  return {
+    view: (_ref2) => {
+      var {
+        attrs: {
+          mdl
+        }
+      } = _ref2;
+      return [m(_menu.Menu, {
+        mdl,
+        title: "Settings",
+        side: "start",
+        menuId: "settings",
+        contentId: "layout",
+        contents: m(SettingsMenu, {
+          mdl
+        })
+      }), m(_menu.Menu, {
+        mdl,
+        title: "Options",
+        side: "end",
+        menuId: "options",
+        contentId: "layout",
+        contents: m(SettingsMenu, {
+          mdl
+        })
+      })];
+    }
+  };
+};
+
+exports.SideBars = SideBars;
+});
+
+;require.register("components/taglist.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.TagList = void 0;
 
 var _ramda = require("ramda");
 
-var SideBar = () => {
+var TagList = () => {
   var selectTag = (data, tag) => data.tags.selected = (0, _ramda.uniq)(data.tags.selected.concat([tag]));
 
   return {
@@ -1008,7 +1170,7 @@ var SideBar = () => {
   };
 };
 
-exports.SideBar = SideBar;
+exports.TagList = TagList;
 });
 
 ;require.register("index.js", function(exports, require, module) {
@@ -1114,6 +1276,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+var _components = require("components");
+
 var Header = () => {
   return {
     view: (_ref) => {
@@ -1124,21 +1288,25 @@ var Header = () => {
       } = _ref;
       return m("ion-header", m("ion-toolbar", m("ion-buttons", {
         slot: "start"
-      }, m("ion-back-button"), m("ion-menu-button")), m("a.navbar-brand", {
-        href: "#"
-      }, "conduit"), m("ul.nav navbar-nav pull-xs-right", mdl.state.isLoggedIn() ? [m("li.nav-item", m(m.route.Link, {
-        class: "nav-link",
-        href: "/settings/".concat(mdl.user.username)
-      }, [m("i.ion-gear-a.p-5"), "Settings"])), m("li.nav-item", m(m.route.Link, {
-        class: "nav-link",
-        href: "/profile/".concat(mdl.user.username)
-      }, mdl.user.username))] : [m("li.nav-item", m(m.route.Link, {
-        class: "nav-link",
+      }, m.route.get() !== "/home" && m("ion-back-button", {
+        slot: "start",
+        onclick: () => history.back(),
+        defaultHref: "/"
+      }), mdl.state.isLoggedIn() ? m(_components.MenuButton, {
+        mdl,
+        name: "settings"
+      }) : [m("ion-item", m(m.route.Link, {
         href: "/register"
-      }, "Sign up")), m("li.nav-item", m(m.route.Link, {
-        class: "nav-link",
+      }, "Sign up")), m("ion-item", m(m.route.Link, {
         href: "/login"
-      }, "Login"))])));
+      }, "Login"))], m(m.route.Link, {
+        href: "#"
+      }, "Home")), m("ion-buttons", {
+        slot: "end"
+      }, m(_components.MenuButton, {
+        mdl,
+        name: "options"
+      }))));
     }
   };
 };
@@ -1159,6 +1327,8 @@ var _header = _interopRequireDefault(require("./header.js"));
 
 var _footer = _interopRequireDefault(require("./footer.js"));
 
+var _components = require("components");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Layout = () => {
@@ -1172,7 +1342,11 @@ var Layout = () => {
       } = _ref;
       return m("ion-app", m(_header.default, {
         mdl
-      }), m("ion-content", children), m(_footer.default, {
+      }), m("ion-content", {
+        id: "layout"
+      }, children), m(_components.SideBars, {
+        mdl
+      }), m(_footer.default, {
         mdl
       }));
     }
@@ -1562,7 +1736,7 @@ var Home = () => {
         href: "/editor"
       }, [m("ion-fab-button", m("ion-icon", {
         name: "add-circle"
-      }))])), m("", m(_components.SideBar, {
+      }))])), m("", m(_components.TagList, {
         mdl,
         data
       }))]];

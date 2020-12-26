@@ -6,6 +6,25 @@ export const FeedNav = ({ attrs: { fetchData } }) => {
           "ion-toolbar",
           m(
             "ion-row",
+
+            m(
+              "ion-col",
+              m(
+                "ion-button",
+                {
+                  fill: "solid",
+                  expand: "full",
+                  id: "",
+                  color: data.tags.current == "" ? "primary" : "secondary",
+                  onclick: (e) => {
+                    data.tags.current = e.target.id
+                    fetchData(mdl)
+                  },
+                },
+                "Global Feed"
+              )
+            ),
+
             mdl.state.isLoggedIn() &&
               m(
                 "ion-col",
@@ -25,25 +44,7 @@ export const FeedNav = ({ attrs: { fetchData } }) => {
                   },
                   "Your Feed"
                 )
-              ),
-
-            m(
-              "ion-col",
-              m(
-                "ion-button",
-                {
-                  fill: "solid",
-                  expand: "full",
-                  id: "",
-                  color: data.tags.current == "" ? "primary" : "secondary",
-                  onclick: (e) => {
-                    data.tags.current = e.target.id
-                    fetchData(mdl)
-                  },
-                },
-                "Global Feed"
               )
-            )
           ),
 
           m(

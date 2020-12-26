@@ -1,6 +1,6 @@
 import { uniq } from "ramda"
 
-export const SideBar = () => {
+export const TagList = () => {
   const selectTag = (data, tag) =>
     (data.tags.selected = uniq(data.tags.selected.concat([tag])))
 

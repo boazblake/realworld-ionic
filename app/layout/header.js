@@ -1,3 +1,5 @@
+import { MenuButton } from "components"
+
 const Header = () => {
   return {
     view: ({ attrs: { mdl } }) =>
@@ -8,55 +10,27 @@ const Header = () => {
           m(
             "ion-buttons",
             { slot: "start" },
-            m("ion-back-button"),
-            m("ion-menu-button")
-          ),
-          m("a.navbar-brand", { href: "#" }, "conduit"),
-          m(
-            "ul.nav navbar-nav pull-xs-right",
+            m.route.get() !== "/home" &&
+              m("ion-back-button", {
+                slot: "start",
+                onclick: () => history.back(),
+                defaultHref: "/",
+              }),
             mdl.state.isLoggedIn()
-              ? [
-                  m(
-                    "li.nav-item",
-                    m(
-                      m.route.Link,
-                      {
-                        class: "nav-link",
-                        href: `/settings/${mdl.user.username}`,
-                      },
-                      [m("i.ion-gear-a.p-5"), "Settings"]
-                    )
-                  ),
-                  m(
-                    "li.nav-item",
-                    m(
-                      m.route.Link,
-                      {
-                        class: "nav-link",
-                        href: `/profile/${mdl.user.username}`,
-                      },
-                      mdl.user.username
-                    )
-                  ),
-                ]
+              ? m(MenuButton, { mdl, name: "settings" })
               : [
                   m(
-                    "li.nav-item",
-                    m(
-                      m.route.Link,
-                      { class: "nav-link", href: "/register" },
-                      "Sign up"
-                    )
+                    "ion-item",
+                    m(m.route.Link, { href: "/register" }, "Sign up")
                   ),
-                  m(
-                    "li.nav-item",
-                    m(
-                      m.route.Link,
-                      { class: "nav-link", href: "/login" },
-                      "Login"
-                    )
-                  ),
-                ]
+                  m("ion-item", m(m.route.Link, { href: "/login" }, "Login")),
+                ],
+            m(m.route.Link, { href: "#" }, "Home")
+          ),
+          m(
+            "ion-buttons",
+            { slot: "end" },
+            m(MenuButton, { mdl, name: "options" })
           )
         )
       ),

@@ -150,6 +150,7734 @@ var __makeRelativeRequire = function(require, mappings, pref) {
   }
 };
 
+require.register("@ionic/core/dist/cjs/animation-9929f2ae.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+
+var helpers = require('./helpers-7e840ed2.js');
+
+var animationPrefix;
+/**
+ * Web Animations requires hyphenated CSS properties
+ * to be written in camelCase when animating
+ */
+
+var processKeyframes = keyframes => {
+  keyframes.forEach(keyframe => {
+    for (var key in keyframe) {
+      if (keyframe.hasOwnProperty(key)) {
+        var value = keyframe[key];
+
+        if (key === 'easing') {
+          var newKey = 'animation-timing-function';
+          keyframe[newKey] = value;
+          delete keyframe[key];
+        } else {
+          var _newKey = convertCamelCaseToHypen(key);
+
+          if (_newKey !== key) {
+            keyframe[_newKey] = value;
+            delete keyframe[key];
+          }
+        }
+      }
+    }
+  });
+  return keyframes;
+};
+
+var convertCamelCaseToHypen = str => {
+  return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+};
+
+var getAnimationPrefix = el => {
+  if (animationPrefix === undefined) {
+    var supportsUnprefixed = el.style.animationName !== undefined;
+    var supportsWebkitPrefix = el.style.webkitAnimationName !== undefined;
+    animationPrefix = !supportsUnprefixed && supportsWebkitPrefix ? '-webkit-' : '';
+  }
+
+  return animationPrefix;
+};
+
+var setStyleProperty = (element, propertyName, value) => {
+  var prefix = propertyName.startsWith('animation') ? getAnimationPrefix(element) : '';
+  element.style.setProperty(prefix + propertyName, value);
+};
+
+var removeStyleProperty = (element, propertyName) => {
+  var prefix = propertyName.startsWith('animation') ? getAnimationPrefix(element) : '';
+  element.style.removeProperty(prefix + propertyName);
+};
+
+var animationEnd = (el, callback) => {
+  var unRegTrans;
+  var opts = {
+    passive: true
+  };
+
+  var unregister = () => {
+    if (unRegTrans) {
+      unRegTrans();
+    }
+  };
+
+  var onTransitionEnd = ev => {
+    if (el === ev.target) {
+      unregister();
+      callback(ev);
+    }
+  };
+
+  if (el) {
+    el.addEventListener('webkitAnimationEnd', onTransitionEnd, opts);
+    el.addEventListener('animationend', onTransitionEnd, opts);
+
+    unRegTrans = () => {
+      el.removeEventListener('webkitAnimationEnd', onTransitionEnd, opts);
+      el.removeEventListener('animationend', onTransitionEnd, opts);
+    };
+  }
+
+  return unregister;
+};
+
+var generateKeyframeRules = function generateKeyframeRules() {
+  var keyframes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  return keyframes.map(keyframe => {
+    var offset = keyframe.offset;
+    var frameString = [];
+
+    for (var property in keyframe) {
+      if (keyframe.hasOwnProperty(property) && property !== 'offset') {
+        frameString.push("".concat(property, ": ").concat(keyframe[property], ";"));
+      }
+    }
+
+    return "".concat(offset * 100, "% { ").concat(frameString.join(' '), " }");
+  }).join(' ');
+};
+
+var keyframeIds = [];
+
+var generateKeyframeName = keyframeRules => {
+  var index = keyframeIds.indexOf(keyframeRules);
+
+  if (index < 0) {
+    index = keyframeIds.push(keyframeRules) - 1;
+  }
+
+  return "ion-animation-".concat(index);
+};
+
+var getStyleContainer = element => {
+  var rootNode = element.getRootNode();
+  return rootNode.head || rootNode;
+};
+
+var createKeyframeStylesheet = (keyframeName, keyframeRules, element) => {
+  var styleContainer = getStyleContainer(element);
+  var keyframePrefix = getAnimationPrefix(element);
+  var existingStylesheet = styleContainer.querySelector('#' + keyframeName);
+
+  if (existingStylesheet) {
+    return existingStylesheet;
+  }
+
+  var stylesheet = (element.ownerDocument || document).createElement('style');
+  stylesheet.id = keyframeName;
+  stylesheet.textContent = "@".concat(keyframePrefix, "keyframes ").concat(keyframeName, " { ").concat(keyframeRules, " } @").concat(keyframePrefix, "keyframes ").concat(keyframeName, "-alt { ").concat(keyframeRules, " }");
+  styleContainer.appendChild(stylesheet);
+  return stylesheet;
+};
+
+var addClassToArray = function addClassToArray() {
+  var classes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var className = arguments.length > 1 ? arguments[1] : undefined;
+
+  if (className !== undefined) {
+    var classNameToAppend = Array.isArray(className) ? className : [className];
+    return [...classes, ...classNameToAppend];
+  }
+
+  return classes;
+};
+
+var createAnimation = animationId => {
+  var _delay;
+
+  var _duration;
+
+  var _easing;
+
+  var _iterations;
+
+  var _fill;
+
+  var _direction;
+
+  var _keyframes = [];
+  var beforeAddClasses = [];
+  var beforeRemoveClasses = [];
+  var initialized = false;
+  var parentAnimation;
+  var beforeStylesValue = {};
+  var afterAddClasses = [];
+  var afterRemoveClasses = [];
+  var afterStylesValue = {};
+  var numAnimationsRunning = 0;
+  var shouldForceLinearEasing = false;
+  var shouldForceSyncPlayback = false;
+  var cssAnimationsTimerFallback;
+  var forceDirectionValue;
+  var forceDurationValue;
+  var forceDelayValue;
+  var willComplete = true;
+  var finished = false;
+  var shouldCalculateNumAnimations = true;
+  var keyframeName;
+  var ani;
+  var id = animationId;
+  var onFinishCallbacks = [];
+  var onFinishOneTimeCallbacks = [];
+  var elements = [];
+  var childAnimations = [];
+  var stylesheets = [];
+  var _beforeAddReadFunctions = [];
+  var _beforeAddWriteFunctions = [];
+  var _afterAddReadFunctions = [];
+  var _afterAddWriteFunctions = [];
+  var webAnimations = [];
+  var supportsAnimationEffect = typeof AnimationEffect === 'function' || typeof window.AnimationEffect === 'function';
+  var supportsWebAnimations = typeof Element === 'function' && typeof Element.prototype.animate === 'function' && supportsAnimationEffect;
+  var ANIMATION_END_FALLBACK_PADDING_MS = 100;
+
+  var getWebAnimations = () => {
+    return webAnimations;
+  };
+
+  var destroy = clearStyleSheets => {
+    childAnimations.forEach(childAnimation => {
+      childAnimation.destroy(clearStyleSheets);
+    });
+    cleanUp(clearStyleSheets);
+    elements.length = 0;
+    childAnimations.length = 0;
+    _keyframes.length = 0;
+    clearOnFinish();
+    initialized = false;
+    shouldCalculateNumAnimations = true;
+    return ani;
+  };
+  /**
+   * Cancels any Web Animations, removes
+   * any animation properties from the
+   * animation's elements, and removes the
+   * animation's stylesheets from the DOM.
+   */
+
+
+  var cleanUp = clearStyleSheets => {
+    cleanUpElements();
+
+    if (clearStyleSheets) {
+      cleanUpStyleSheets();
+    }
+  };
+
+  var resetFlags = () => {
+    shouldForceLinearEasing = false;
+    shouldForceSyncPlayback = false;
+    shouldCalculateNumAnimations = true;
+    forceDirectionValue = undefined;
+    forceDurationValue = undefined;
+    forceDelayValue = undefined;
+    numAnimationsRunning = 0;
+    finished = false;
+    willComplete = true;
+  };
+
+  var onFinish = (callback, opts) => {
+    var callbacks = opts && opts.oneTimeCallback ? onFinishOneTimeCallbacks : onFinishCallbacks;
+    callbacks.push({
+      c: callback,
+      o: opts
+    });
+    return ani;
+  };
+
+  var clearOnFinish = () => {
+    onFinishCallbacks.length = 0;
+    onFinishOneTimeCallbacks.length = 0;
+    return ani;
+  };
+  /**
+   * Cancels any Web Animations and removes
+   * any animation properties from the
+   * the animation's elements.
+   */
+
+
+  var cleanUpElements = () => {
+    if (supportsWebAnimations) {
+      webAnimations.forEach(animation => {
+        animation.cancel();
+      });
+      webAnimations.length = 0;
+    } else {
+      var elementsArray = elements.slice();
+      helpers.raf(() => {
+        elementsArray.forEach(element => {
+          removeStyleProperty(element, 'animation-name');
+          removeStyleProperty(element, 'animation-duration');
+          removeStyleProperty(element, 'animation-timing-function');
+          removeStyleProperty(element, 'animation-iteration-count');
+          removeStyleProperty(element, 'animation-delay');
+          removeStyleProperty(element, 'animation-play-state');
+          removeStyleProperty(element, 'animation-fill-mode');
+          removeStyleProperty(element, 'animation-direction');
+        });
+      });
+    }
+  };
+  /**
+   * Removes the animation's stylesheets
+   * from the DOM.
+   */
+
+
+  var cleanUpStyleSheets = () => {
+    stylesheets.forEach(stylesheet => {
+      /**
+       * When sharing stylesheets, it's possible
+       * for another animation to have already
+       * cleaned up a particular stylesheet
+       */
+      if (stylesheet && stylesheet.parentNode) {
+        stylesheet.parentNode.removeChild(stylesheet);
+      }
+    });
+    stylesheets.length = 0;
+  };
+
+  var beforeAddRead = readFn => {
+    _beforeAddReadFunctions.push(readFn);
+
+    return ani;
+  };
+
+  var beforeAddWrite = writeFn => {
+    _beforeAddWriteFunctions.push(writeFn);
+
+    return ani;
+  };
+
+  var afterAddRead = readFn => {
+    _afterAddReadFunctions.push(readFn);
+
+    return ani;
+  };
+
+  var afterAddWrite = writeFn => {
+    _afterAddWriteFunctions.push(writeFn);
+
+    return ani;
+  };
+
+  var beforeAddClass = className => {
+    beforeAddClasses = addClassToArray(beforeAddClasses, className);
+    return ani;
+  };
+
+  var beforeRemoveClass = className => {
+    beforeRemoveClasses = addClassToArray(beforeRemoveClasses, className);
+    return ani;
+  };
+  /**
+   * Set CSS inline styles to the animation's
+   * elements before the animation begins.
+   */
+
+
+  var beforeStyles = function beforeStyles() {
+    var styles = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    beforeStylesValue = styles;
+    return ani;
+  };
+  /**
+   * Clear CSS inline styles from the animation's
+   * elements before the animation begins.
+   */
+
+
+  var beforeClearStyles = function beforeClearStyles() {
+    var propertyNames = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+    for (var property of propertyNames) {
+      beforeStylesValue[property] = '';
+    }
+
+    return ani;
+  };
+
+  var afterAddClass = className => {
+    afterAddClasses = addClassToArray(afterAddClasses, className);
+    return ani;
+  };
+
+  var afterRemoveClass = className => {
+    afterRemoveClasses = addClassToArray(afterRemoveClasses, className);
+    return ani;
+  };
+
+  var afterStyles = function afterStyles() {
+    var styles = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    afterStylesValue = styles;
+    return ani;
+  };
+
+  var afterClearStyles = function afterClearStyles() {
+    var propertyNames = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+    for (var property of propertyNames) {
+      afterStylesValue[property] = '';
+    }
+
+    return ani;
+  };
+
+  var getFill = () => {
+    if (_fill !== undefined) {
+      return _fill;
+    }
+
+    if (parentAnimation) {
+      return parentAnimation.getFill();
+    }
+
+    return 'both';
+  };
+
+  var getDirection = () => {
+    if (forceDirectionValue !== undefined) {
+      return forceDirectionValue;
+    }
+
+    if (_direction !== undefined) {
+      return _direction;
+    }
+
+    if (parentAnimation) {
+      return parentAnimation.getDirection();
+    }
+
+    return 'normal';
+  };
+
+  var getEasing = () => {
+    if (shouldForceLinearEasing) {
+      return 'linear';
+    }
+
+    if (_easing !== undefined) {
+      return _easing;
+    }
+
+    if (parentAnimation) {
+      return parentAnimation.getEasing();
+    }
+
+    return 'linear';
+  };
+
+  var getDuration = () => {
+    if (shouldForceSyncPlayback) {
+      return 0;
+    }
+
+    if (forceDurationValue !== undefined) {
+      return forceDurationValue;
+    }
+
+    if (_duration !== undefined) {
+      return _duration;
+    }
+
+    if (parentAnimation) {
+      return parentAnimation.getDuration();
+    }
+
+    return 0;
+  };
+
+  var getIterations = () => {
+    if (_iterations !== undefined) {
+      return _iterations;
+    }
+
+    if (parentAnimation) {
+      return parentAnimation.getIterations();
+    }
+
+    return 1;
+  };
+
+  var getDelay = () => {
+    if (forceDelayValue !== undefined) {
+      return forceDelayValue;
+    }
+
+    if (_delay !== undefined) {
+      return _delay;
+    }
+
+    if (parentAnimation) {
+      return parentAnimation.getDelay();
+    }
+
+    return 0;
+  };
+
+  var getKeyframes = () => {
+    return _keyframes;
+  };
+
+  var direction = animationDirection => {
+    _direction = animationDirection;
+    update(true);
+    return ani;
+  };
+
+  var fill = animationFill => {
+    _fill = animationFill;
+    update(true);
+    return ani;
+  };
+
+  var delay = animationDelay => {
+    _delay = animationDelay;
+    update(true);
+    return ani;
+  };
+
+  var easing = animationEasing => {
+    _easing = animationEasing;
+    update(true);
+    return ani;
+  };
+
+  var duration = animationDuration => {
+    /**
+     * CSS Animation Durations of 0ms work fine on Chrome
+     * but do not run on Safari, so force it to 1ms to
+     * get it to run on both platforms.
+     */
+    if (!supportsWebAnimations && animationDuration === 0) {
+      animationDuration = 1;
+    }
+
+    _duration = animationDuration;
+    update(true);
+    return ani;
+  };
+
+  var iterations = animationIterations => {
+    _iterations = animationIterations;
+    update(true);
+    return ani;
+  };
+
+  var parent = animation => {
+    parentAnimation = animation;
+    return ani;
+  };
+
+  var addElement = el => {
+    if (el != null) {
+      if (el.nodeType === 1) {
+        elements.push(el);
+      } else if (el.length >= 0) {
+        for (var i = 0; i < el.length; i++) {
+          elements.push(el[i]);
+        }
+      } else {
+        console.error('Invalid addElement value');
+      }
+    }
+
+    return ani;
+  };
+
+  var addAnimation = animationToAdd => {
+    if (animationToAdd != null) {
+      if (Array.isArray(animationToAdd)) {
+        for (var animation of animationToAdd) {
+          animation.parent(ani);
+          childAnimations.push(animation);
+        }
+      } else {
+        animationToAdd.parent(ani);
+        childAnimations.push(animationToAdd);
+      }
+    }
+
+    return ani;
+  };
+
+  var keyframes = keyframeValues => {
+    _keyframes = keyframeValues;
+    return ani;
+  };
+  /**
+   * Run all "before" animation hooks.
+   */
+
+
+  var beforeAnimation = () => {
+    // Runs all before read callbacks
+    _beforeAddReadFunctions.forEach(callback => callback()); // Runs all before write callbacks
+
+
+    _beforeAddWriteFunctions.forEach(callback => callback()); // Updates styles and classes before animation runs
+
+
+    var addClasses = beforeAddClasses;
+    var removeClasses = beforeRemoveClasses;
+    var styles = beforeStylesValue;
+    elements.forEach(el => {
+      var elementClassList = el.classList;
+      addClasses.forEach(c => elementClassList.add(c));
+      removeClasses.forEach(c => elementClassList.remove(c));
+
+      for (var property in styles) {
+        if (styles.hasOwnProperty(property)) {
+          setStyleProperty(el, property, styles[property]);
+        }
+      }
+    });
+  };
+  /**
+   * Run all "after" animation hooks.
+   */
+
+
+  var afterAnimation = () => {
+    clearCSSAnimationsTimeout(); // Runs all after read callbacks
+
+    _afterAddReadFunctions.forEach(callback => callback()); // Runs all after write callbacks
+
+
+    _afterAddWriteFunctions.forEach(callback => callback()); // Updates styles and classes before animation ends
+
+
+    var currentStep = willComplete ? 1 : 0;
+    var addClasses = afterAddClasses;
+    var removeClasses = afterRemoveClasses;
+    var styles = afterStylesValue;
+    elements.forEach(el => {
+      var elementClassList = el.classList;
+      addClasses.forEach(c => elementClassList.add(c));
+      removeClasses.forEach(c => elementClassList.remove(c));
+
+      for (var property in styles) {
+        if (styles.hasOwnProperty(property)) {
+          setStyleProperty(el, property, styles[property]);
+        }
+      }
+    });
+    onFinishCallbacks.forEach(onFinishCallback => {
+      return onFinishCallback.c(currentStep, ani);
+    });
+    onFinishOneTimeCallbacks.forEach(onFinishCallback => {
+      return onFinishCallback.c(currentStep, ani);
+    });
+    onFinishOneTimeCallbacks.length = 0;
+    shouldCalculateNumAnimations = true;
+
+    if (willComplete) {
+      finished = true;
+    }
+
+    willComplete = true;
+  };
+
+  var animationFinish = () => {
+    if (numAnimationsRunning === 0) {
+      return;
+    }
+
+    numAnimationsRunning--;
+
+    if (numAnimationsRunning === 0) {
+      afterAnimation();
+
+      if (parentAnimation) {
+        parentAnimation.animationFinish();
+      }
+    }
+  };
+
+  var initializeCSSAnimation = function initializeCSSAnimation() {
+    var toggleAnimationName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+    cleanUpStyleSheets();
+    var processedKeyframes = processKeyframes(_keyframes);
+    elements.forEach(element => {
+      if (processedKeyframes.length > 0) {
+        var keyframeRules = generateKeyframeRules(processedKeyframes);
+        keyframeName = animationId !== undefined ? animationId : generateKeyframeName(keyframeRules);
+        var stylesheet = createKeyframeStylesheet(keyframeName, keyframeRules, element);
+        stylesheets.push(stylesheet);
+        setStyleProperty(element, 'animation-duration', "".concat(getDuration(), "ms"));
+        setStyleProperty(element, 'animation-timing-function', getEasing());
+        setStyleProperty(element, 'animation-delay', "".concat(getDelay(), "ms"));
+        setStyleProperty(element, 'animation-fill-mode', getFill());
+        setStyleProperty(element, 'animation-direction', getDirection());
+        var iterationsCount = getIterations() === Infinity ? 'infinite' : getIterations().toString();
+        setStyleProperty(element, 'animation-iteration-count', iterationsCount);
+        setStyleProperty(element, 'animation-play-state', 'paused');
+
+        if (toggleAnimationName) {
+          setStyleProperty(element, 'animation-name', "".concat(stylesheet.id, "-alt"));
+        }
+
+        helpers.raf(() => {
+          setStyleProperty(element, 'animation-name', stylesheet.id || null);
+        });
+      }
+    });
+  };
+
+  var initializeWebAnimation = () => {
+    elements.forEach(element => {
+      var animation = element.animate(_keyframes, {
+        id,
+        delay: getDelay(),
+        duration: getDuration(),
+        easing: getEasing(),
+        iterations: getIterations(),
+        fill: getFill(),
+        direction: getDirection()
+      });
+      animation.pause();
+      webAnimations.push(animation);
+    });
+
+    if (webAnimations.length > 0) {
+      webAnimations[0].onfinish = () => {
+        animationFinish();
+      };
+    }
+  };
+
+  var initializeAnimation = function initializeAnimation() {
+    var toggleAnimationName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+    beforeAnimation();
+
+    if (_keyframes.length > 0) {
+      if (supportsWebAnimations) {
+        initializeWebAnimation();
+      } else {
+        initializeCSSAnimation(toggleAnimationName);
+      }
+    }
+
+    initialized = true;
+  };
+
+  var setAnimationStep = step => {
+    step = Math.min(Math.max(step, 0), 0.9999);
+
+    if (supportsWebAnimations) {
+      webAnimations.forEach(animation => {
+        animation.currentTime = animation.effect.getComputedTiming().delay + getDuration() * step;
+        animation.pause();
+      });
+    } else {
+      var animationDuration = "-".concat(getDuration() * step, "ms");
+      elements.forEach(element => {
+        if (_keyframes.length > 0) {
+          setStyleProperty(element, 'animation-delay', animationDuration);
+          setStyleProperty(element, 'animation-play-state', 'paused');
+        }
+      });
+    }
+  };
+
+  var updateWebAnimation = step => {
+    webAnimations.forEach(animation => {
+      animation.effect.updateTiming({
+        delay: getDelay(),
+        duration: getDuration(),
+        easing: getEasing(),
+        iterations: getIterations(),
+        fill: getFill(),
+        direction: getDirection()
+      });
+    });
+
+    if (step !== undefined) {
+      setAnimationStep(step);
+    }
+  };
+
+  var updateCSSAnimation = function updateCSSAnimation() {
+    var toggleAnimationName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+    var step = arguments.length > 1 ? arguments[1] : undefined;
+    helpers.raf(() => {
+      elements.forEach(element => {
+        setStyleProperty(element, 'animation-name', keyframeName || null);
+        setStyleProperty(element, 'animation-duration', "".concat(getDuration(), "ms"));
+        setStyleProperty(element, 'animation-timing-function', getEasing());
+        setStyleProperty(element, 'animation-delay', step !== undefined ? "-".concat(step * getDuration(), "ms") : "".concat(getDelay(), "ms"));
+        setStyleProperty(element, 'animation-fill-mode', getFill() || null);
+        setStyleProperty(element, 'animation-direction', getDirection() || null);
+        var iterationsCount = getIterations() === Infinity ? 'infinite' : getIterations().toString();
+        setStyleProperty(element, 'animation-iteration-count', iterationsCount);
+
+        if (toggleAnimationName) {
+          setStyleProperty(element, 'animation-name', "".concat(keyframeName, "-alt"));
+        }
+
+        helpers.raf(() => {
+          setStyleProperty(element, 'animation-name', keyframeName || null);
+        });
+      });
+    });
+  };
+
+  var update = function update() {
+    var deep = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    var toggleAnimationName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+    var step = arguments.length > 2 ? arguments[2] : undefined;
+
+    if (deep) {
+      childAnimations.forEach(animation => {
+        animation.update(deep, toggleAnimationName, step);
+      });
+    }
+
+    if (supportsWebAnimations) {
+      updateWebAnimation(step);
+    } else {
+      updateCSSAnimation(toggleAnimationName, step);
+    }
+
+    return ani;
+  };
+
+  var progressStart = function progressStart() {
+    var forceLinearEasing = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    var step = arguments.length > 1 ? arguments[1] : undefined;
+    childAnimations.forEach(animation => {
+      animation.progressStart(forceLinearEasing, step);
+    });
+    pauseAnimation();
+    shouldForceLinearEasing = forceLinearEasing;
+
+    if (!initialized) {
+      initializeAnimation();
+    } else {
+      update(false, true, step);
+    }
+
+    return ani;
+  };
+
+  var progressStep = step => {
+    childAnimations.forEach(animation => {
+      animation.progressStep(step);
+    });
+    setAnimationStep(step);
+    return ani;
+  };
+
+  var progressEnd = (playTo, step, dur) => {
+    shouldForceLinearEasing = false;
+    childAnimations.forEach(animation => {
+      animation.progressEnd(playTo, step, dur);
+    });
+
+    if (dur !== undefined) {
+      forceDurationValue = dur;
+    }
+
+    finished = false; // tslint:disable-next-line: strict-boolean-conditions
+
+    willComplete = true;
+
+    if (playTo === 0) {
+      forceDirectionValue = getDirection() === 'reverse' ? 'normal' : 'reverse';
+
+      if (forceDirectionValue === 'reverse') {
+        willComplete = false;
+      }
+
+      if (supportsWebAnimations) {
+        update();
+        setAnimationStep(1 - step);
+      } else {
+        forceDelayValue = (1 - step) * getDuration() * -1;
+        update(false, false);
+      }
+    } else if (playTo === 1) {
+      if (supportsWebAnimations) {
+        update();
+        setAnimationStep(step);
+      } else {
+        forceDelayValue = step * getDuration() * -1;
+        update(false, false);
+      }
+    }
+
+    if (playTo !== undefined) {
+      onFinish(() => {
+        forceDurationValue = undefined;
+        forceDirectionValue = undefined;
+        forceDelayValue = undefined;
+      }, {
+        oneTimeCallback: true
+      });
+
+      if (!parentAnimation) {
+        play();
+      }
+    }
+
+    return ani;
+  };
+
+  var pauseAnimation = () => {
+    if (initialized) {
+      if (supportsWebAnimations) {
+        webAnimations.forEach(animation => {
+          animation.pause();
+        });
+      } else {
+        elements.forEach(element => {
+          setStyleProperty(element, 'animation-play-state', 'paused');
+        });
+      }
+    }
+  };
+
+  var pause = () => {
+    childAnimations.forEach(animation => {
+      animation.pause();
+    });
+    pauseAnimation();
+    return ani;
+  };
+
+  var onAnimationEndFallback = () => {
+    cssAnimationsTimerFallback = undefined;
+    animationFinish();
+  };
+
+  var clearCSSAnimationsTimeout = () => {
+    if (cssAnimationsTimerFallback) {
+      clearTimeout(cssAnimationsTimerFallback);
+    }
+  };
+
+  var playCSSAnimations = () => {
+    clearCSSAnimationsTimeout();
+    helpers.raf(() => {
+      elements.forEach(element => {
+        if (_keyframes.length > 0) {
+          setStyleProperty(element, 'animation-play-state', 'running');
+        }
+      });
+    });
+
+    if (_keyframes.length === 0 || elements.length === 0) {
+      animationFinish();
+    } else {
+      /**
+       * This is a catchall in the event that a CSS Animation did not finish.
+       * The Web Animations API has mechanisms in place for preventing this.
+       * CSS Animations will not fire an `animationend` event
+       * for elements with `display: none`. The Web Animations API
+       * accounts for this, but using raw CSS Animations requires
+       * this workaround.
+       */
+      var animationDelay = getDelay() || 0;
+      var animationDuration = getDuration() || 0;
+      var animationIterations = getIterations() || 1; // No need to set a timeout when animation has infinite iterations
+
+      if (isFinite(animationIterations)) {
+        cssAnimationsTimerFallback = setTimeout(onAnimationEndFallback, animationDelay + animationDuration * animationIterations + ANIMATION_END_FALLBACK_PADDING_MS);
+      }
+
+      animationEnd(elements[0], () => {
+        clearCSSAnimationsTimeout();
+        /**
+         * Ensure that clean up
+         * is always done a frame
+         * before the onFinish handlers
+         * are fired. Otherwise, there
+         * may be flickering if a new
+         * animation is started on the same
+         * element too quickly
+         *
+         * TODO: Is there a cleaner way to do this?
+         */
+
+        helpers.raf(() => {
+          clearCSSAnimationPlayState();
+          helpers.raf(animationFinish);
+        });
+      });
+    }
+  };
+
+  var clearCSSAnimationPlayState = () => {
+    elements.forEach(element => {
+      removeStyleProperty(element, 'animation-duration');
+      removeStyleProperty(element, 'animation-delay');
+      removeStyleProperty(element, 'animation-play-state');
+    });
+  };
+
+  var playWebAnimations = () => {
+    webAnimations.forEach(animation => {
+      animation.play();
+    });
+
+    if (_keyframes.length === 0 || elements.length === 0) {
+      animationFinish();
+    }
+  };
+
+  var resetAnimation = () => {
+    if (supportsWebAnimations) {
+      setAnimationStep(0);
+      updateWebAnimation();
+    } else {
+      updateCSSAnimation();
+    }
+  };
+
+  var play = opts => {
+    return new Promise(resolve => {
+      if (opts && opts.sync) {
+        shouldForceSyncPlayback = true;
+        onFinish(() => shouldForceSyncPlayback = false, {
+          oneTimeCallback: true
+        });
+      }
+
+      if (!initialized) {
+        initializeAnimation();
+      }
+
+      if (finished) {
+        resetAnimation();
+        finished = false;
+      }
+
+      if (shouldCalculateNumAnimations) {
+        numAnimationsRunning = childAnimations.length + 1;
+        shouldCalculateNumAnimations = false;
+      }
+
+      onFinish(() => resolve(), {
+        oneTimeCallback: true
+      });
+      childAnimations.forEach(animation => {
+        animation.play();
+      });
+
+      if (supportsWebAnimations) {
+        playWebAnimations();
+      } else {
+        playCSSAnimations();
+      }
+    });
+  };
+
+  var stop = () => {
+    childAnimations.forEach(animation => {
+      animation.stop();
+    });
+
+    if (initialized) {
+      cleanUpElements();
+      initialized = false;
+    }
+
+    resetFlags();
+  };
+
+  var from = (property, value) => {
+    var firstFrame = _keyframes[0];
+
+    if (firstFrame !== undefined && (firstFrame.offset === undefined || firstFrame.offset === 0)) {
+      firstFrame[property] = value;
+    } else {
+      _keyframes = [{
+        offset: 0,
+        [property]: value
+      }, ..._keyframes];
+    }
+
+    return ani;
+  };
+
+  var to = (property, value) => {
+    var lastFrame = _keyframes[_keyframes.length - 1];
+
+    if (lastFrame !== undefined && (lastFrame.offset === undefined || lastFrame.offset === 1)) {
+      lastFrame[property] = value;
+    } else {
+      _keyframes = [..._keyframes, {
+        offset: 1,
+        [property]: value
+      }];
+    }
+
+    return ani;
+  };
+
+  var fromTo = (property, fromValue, toValue) => {
+    return from(property, fromValue).to(property, toValue);
+  };
+
+  return ani = {
+    parentAnimation,
+    elements,
+    childAnimations,
+    id,
+    animationFinish,
+    from,
+    to,
+    fromTo,
+    parent,
+    play,
+    pause,
+    stop,
+    destroy,
+    keyframes,
+    addAnimation,
+    addElement,
+    update,
+    fill,
+    direction,
+    iterations,
+    duration,
+    easing,
+    delay,
+    getWebAnimations,
+    getKeyframes,
+    getFill,
+    getDirection,
+    getDelay,
+    getIterations,
+    getEasing,
+    getDuration,
+    afterAddRead,
+    afterAddWrite,
+    afterClearStyles,
+    afterStyles,
+    afterRemoveClass,
+    afterAddClass,
+    beforeAddRead,
+    beforeAddWrite,
+    beforeClearStyles,
+    beforeStyles,
+    beforeRemoveClass,
+    beforeAddClass,
+    onFinish,
+    progressStart,
+    progressStep,
+    progressEnd
+  };
+};
+
+exports.createAnimation = createAnimation;
+  })();
+});
+require.register("@ionic/core/dist/cjs/cubic-bezier-0b2ccc35.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+/**
+ * Based on:
+ * https://stackoverflow.com/questions/7348009/y-coordinate-for-a-given-x-cubic-bezier
+ * https://math.stackexchange.com/questions/26846/is-there-an-explicit-form-for-cubic-b%C3%A9zier-curves
+ * TODO: Reduce rounding error
+ */
+
+/**
+ * EXPERIMENTAL
+ * Given a cubic-bezier curve, get the x value (time) given
+ * the y value (progression).
+ * Ex: cubic-bezier(0.32, 0.72, 0, 1);
+ * P0: (0, 0)
+ * P1: (0.32, 0.72)
+ * P2: (0, 1)
+ * P3: (1, 1)
+ *
+ * If you give a cubic bezier curve that never reaches the
+ * provided progression, this function will return an empty array.
+ */
+
+var getTimeGivenProgression = (p0, p1, p2, p3, progression) => {
+  return solveCubicBezier(p0[1], p1[1], p2[1], p3[1], progression).map(tValue => {
+    return solveCubicParametricEquation(p0[0], p1[0], p2[0], p3[0], tValue);
+  });
+};
+/**
+ * Solve a cubic equation in one dimension (time)
+ */
+
+
+var solveCubicParametricEquation = (p0, p1, p2, p3, t) => {
+  var partA = 3 * p1 * Math.pow(t - 1, 2);
+  var partB = -3 * p2 * t + 3 * p2 + p3 * t;
+  var partC = p0 * Math.pow(t - 1, 3);
+  return t * (partA + t * partB) - partC;
+};
+/**
+ * Find the `t` value for a cubic bezier using Cardano's formula
+ */
+
+
+var solveCubicBezier = (p0, p1, p2, p3, refPoint) => {
+  p0 -= refPoint;
+  p1 -= refPoint;
+  p2 -= refPoint;
+  p3 -= refPoint;
+  var roots = solveCubicEquation(p3 - 3 * p2 + 3 * p1 - p0, 3 * p2 - 6 * p1 + 3 * p0, 3 * p1 - 3 * p0, p0);
+  return roots.filter(root => root >= 0 && root <= 1);
+};
+
+var solveQuadraticEquation = (a, b, c) => {
+  var discriminant = b * b - 4 * a * c;
+
+  if (discriminant < 0) {
+    return [];
+  } else {
+    return [(-b + Math.sqrt(discriminant)) / (2 * a), (-b - Math.sqrt(discriminant)) / (2 * a)];
+  }
+};
+
+var solveCubicEquation = (a, b, c, d) => {
+  if (a === 0) {
+    return solveQuadraticEquation(b, c, d);
+  }
+
+  b /= a;
+  c /= a;
+  d /= a;
+  var p = (3 * c - b * b) / 3;
+  var q = (2 * b * b * b - 9 * b * c + 27 * d) / 27;
+
+  if (p === 0) {
+    return [Math.pow(-q, 1 / 3)];
+  } else if (q === 0) {
+    return [Math.sqrt(-p), -Math.sqrt(-p)];
+  }
+
+  var discriminant = Math.pow(q / 2, 2) + Math.pow(p / 3, 3);
+
+  if (discriminant === 0) {
+    return [Math.pow(q / 2, 1 / 2) - b / 3];
+  } else if (discriminant > 0) {
+    return [Math.pow(-(q / 2) + Math.sqrt(discriminant), 1 / 3) - Math.pow(q / 2 + Math.sqrt(discriminant), 1 / 3) - b / 3];
+  }
+
+  var r = Math.sqrt(Math.pow(-(p / 3), 3));
+  var phi = Math.acos(-(q / (2 * Math.sqrt(Math.pow(-(p / 3), 3)))));
+  var s = 2 * Math.pow(r, 1 / 3);
+  return [s * Math.cos(phi / 3) - b / 3, s * Math.cos((phi + 2 * Math.PI) / 3) - b / 3, s * Math.cos((phi + 4 * Math.PI) / 3) - b / 3];
+};
+
+exports.getTimeGivenProgression = getTimeGivenProgression;
+  })();
+});
+require.register("@ionic/core/dist/cjs/gesture-controller-29adda71.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+
+class GestureController {
+  constructor() {
+    this.gestureId = 0;
+    this.requestedStart = new Map();
+    this.disabledGestures = new Map();
+    this.disabledScroll = new Set();
+  }
+  /**
+   * Creates a gesture delegate based on the GestureConfig passed
+   */
+
+
+  createGesture(config) {
+    return new GestureDelegate(this, this.newID(), config.name, config.priority || 0, !!config.disableScroll);
+  }
+  /**
+   * Creates a blocker that will block any other gesture events from firing. Set in the ion-gesture component.
+   */
+
+
+  createBlocker() {
+    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    return new BlockerDelegate(this, this.newID(), opts.disable, !!opts.disableScroll);
+  }
+
+  start(gestureName, id, priority) {
+    if (!this.canStart(gestureName)) {
+      this.requestedStart.delete(id);
+      return false;
+    }
+
+    this.requestedStart.set(id, priority);
+    return true;
+  }
+
+  capture(gestureName, id, priority) {
+    if (!this.start(gestureName, id, priority)) {
+      return false;
+    }
+
+    var requestedStart = this.requestedStart;
+    var maxPriority = -10000;
+    requestedStart.forEach(value => {
+      maxPriority = Math.max(maxPriority, value);
+    });
+
+    if (maxPriority === priority) {
+      this.capturedId = id;
+      requestedStart.clear();
+      var event = new CustomEvent('ionGestureCaptured', {
+        detail: {
+          gestureName
+        }
+      });
+      document.dispatchEvent(event);
+      return true;
+    }
+
+    requestedStart.delete(id);
+    return false;
+  }
+
+  release(id) {
+    this.requestedStart.delete(id);
+
+    if (this.capturedId === id) {
+      this.capturedId = undefined;
+    }
+  }
+
+  disableGesture(gestureName, id) {
+    var set = this.disabledGestures.get(gestureName);
+
+    if (set === undefined) {
+      set = new Set();
+      this.disabledGestures.set(gestureName, set);
+    }
+
+    set.add(id);
+  }
+
+  enableGesture(gestureName, id) {
+    var set = this.disabledGestures.get(gestureName);
+
+    if (set !== undefined) {
+      set.delete(id);
+    }
+  }
+
+  disableScroll(id) {
+    this.disabledScroll.add(id);
+
+    if (this.disabledScroll.size === 1) {
+      document.body.classList.add(BACKDROP_NO_SCROLL);
+    }
+  }
+
+  enableScroll(id) {
+    this.disabledScroll.delete(id);
+
+    if (this.disabledScroll.size === 0) {
+      document.body.classList.remove(BACKDROP_NO_SCROLL);
+    }
+  }
+
+  canStart(gestureName) {
+    if (this.capturedId !== undefined) {
+      // a gesture already captured
+      return false;
+    }
+
+    if (this.isDisabled(gestureName)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  isCaptured() {
+    return this.capturedId !== undefined;
+  }
+
+  isScrollDisabled() {
+    return this.disabledScroll.size > 0;
+  }
+
+  isDisabled(gestureName) {
+    var disabled = this.disabledGestures.get(gestureName);
+
+    if (disabled && disabled.size > 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  newID() {
+    this.gestureId++;
+    return this.gestureId;
+  }
+
+}
+
+class GestureDelegate {
+  constructor(ctrl, id, name, priority, disableScroll) {
+    this.id = id;
+    this.name = name;
+    this.disableScroll = disableScroll;
+    this.priority = priority * 1000000 + id;
+    this.ctrl = ctrl;
+  }
+
+  canStart() {
+    if (!this.ctrl) {
+      return false;
+    }
+
+    return this.ctrl.canStart(this.name);
+  }
+
+  start() {
+    if (!this.ctrl) {
+      return false;
+    }
+
+    return this.ctrl.start(this.name, this.id, this.priority);
+  }
+
+  capture() {
+    if (!this.ctrl) {
+      return false;
+    }
+
+    var captured = this.ctrl.capture(this.name, this.id, this.priority);
+
+    if (captured && this.disableScroll) {
+      this.ctrl.disableScroll(this.id);
+    }
+
+    return captured;
+  }
+
+  release() {
+    if (this.ctrl) {
+      this.ctrl.release(this.id);
+
+      if (this.disableScroll) {
+        this.ctrl.enableScroll(this.id);
+      }
+    }
+  }
+
+  destroy() {
+    this.release();
+    this.ctrl = undefined;
+  }
+
+}
+
+class BlockerDelegate {
+  constructor(ctrl, id, disable, disableScroll) {
+    this.id = id;
+    this.disable = disable;
+    this.disableScroll = disableScroll;
+    this.ctrl = ctrl;
+  }
+
+  block() {
+    if (!this.ctrl) {
+      return;
+    }
+
+    if (this.disable) {
+      for (var gesture of this.disable) {
+        this.ctrl.disableGesture(gesture, this.id);
+      }
+    }
+
+    if (this.disableScroll) {
+      this.ctrl.disableScroll(this.id);
+    }
+  }
+
+  unblock() {
+    if (!this.ctrl) {
+      return;
+    }
+
+    if (this.disable) {
+      for (var gesture of this.disable) {
+        this.ctrl.enableGesture(gesture, this.id);
+      }
+    }
+
+    if (this.disableScroll) {
+      this.ctrl.enableScroll(this.id);
+    }
+  }
+
+  destroy() {
+    this.unblock();
+    this.ctrl = undefined;
+  }
+
+}
+
+var BACKDROP_NO_SCROLL = 'backdrop-no-scroll';
+var GESTURE_CONTROLLER = new GestureController();
+exports.GESTURE_CONTROLLER = GESTURE_CONTROLLER;
+  })();
+});
+require.register("@ionic/core/dist/cjs/hardware-back-button-148ce546.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+/**
+ * When hardwareBackButton: false in config,
+ * we need to make sure we also block the default
+ * webview behavior. If we don't then it will be
+ * possible for users to navigate backward while
+ * an overlay is still open. Additionally, it will
+ * give the appearance that the hardwareBackButton
+ * config is not working as the page transition
+ * will still happen.
+ */
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+var blockHardwareBackButton = () => {
+  document.addEventListener('backbutton', () => {}); // tslint:disable-line
+};
+
+var startHardwareBackButton = () => {
+  var doc = document;
+  var busy = false;
+  doc.addEventListener('backbutton', () => {
+    if (busy) {
+      return;
+    }
+
+    var index = 0;
+    var handlers = [];
+    var ev = new CustomEvent('ionBackButton', {
+      bubbles: false,
+      detail: {
+        register(priority, handler) {
+          handlers.push({
+            priority,
+            handler,
+            id: index++
+          });
+        }
+
+      }
+    });
+    doc.dispatchEvent(ev);
+
+    var executeAction = /*#__PURE__*/function () {
+      var _ref = _asyncToGenerator(function* (handlerRegister) {
+        try {
+          if (handlerRegister && handlerRegister.handler) {
+            var result = handlerRegister.handler(processHandlers);
+
+            if (result != null) {
+              yield result;
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      });
+
+      return function executeAction(_x) {
+        return _ref.apply(this, arguments);
+      };
+    }();
+
+    var processHandlers = () => {
+      if (handlers.length > 0) {
+        var selectedHandler = {
+          priority: Number.MIN_SAFE_INTEGER,
+          handler: () => undefined,
+          id: -1
+        };
+        handlers.forEach(handler => {
+          if (handler.priority >= selectedHandler.priority) {
+            selectedHandler = handler;
+          }
+        });
+        busy = true;
+        handlers = handlers.filter(handler => handler.id !== selectedHandler.id);
+        executeAction(selectedHandler).then(() => busy = false);
+      }
+    };
+
+    processHandlers();
+  });
+};
+
+var OVERLAY_BACK_BUTTON_PRIORITY = 100;
+var MENU_BACK_BUTTON_PRIORITY = 99; // 1 less than overlay priority since menu is displayed behind overlays
+
+exports.MENU_BACK_BUTTON_PRIORITY = MENU_BACK_BUTTON_PRIORITY;
+exports.OVERLAY_BACK_BUTTON_PRIORITY = OVERLAY_BACK_BUTTON_PRIORITY;
+exports.blockHardwareBackButton = blockHardwareBackButton;
+exports.startHardwareBackButton = startHardwareBackButton;
+  })();
+});
+require.register("@ionic/core/dist/cjs/helpers-7e840ed2.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+/**
+ * Elements inside of web components sometimes need to inherit global attributes
+ * set on the host. For example, the inner input in `ion-input` should inherit
+ * the `title` attribute that developers set directly on `ion-input`. This
+ * helper function should be called in componentWillLoad and assigned to a variable
+ * that is later used in the render function.
+ *
+ * This does not need to be reactive as changing attributes on the host element
+ * does not trigger a re-render.
+ */
+
+var inheritAttributes = function inheritAttributes(el) {
+  var attributes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+  var attributeObject = {};
+  attributes.forEach(attr => {
+    if (el.hasAttribute(attr)) {
+      var value = el.getAttribute(attr);
+
+      if (value !== null) {
+        attributeObject[attr] = el.getAttribute(attr);
+      }
+
+      el.removeAttribute(attr);
+    }
+  });
+  return attributeObject;
+};
+
+var addEventListener = (el, eventName, callback, opts) => {
+  if (typeof window !== 'undefined') {
+    var win = window;
+    var config = win && win.Ionic && win.Ionic.config;
+
+    if (config) {
+      var ael = config.get('_ael');
+
+      if (ael) {
+        return ael(el, eventName, callback, opts);
+      } else if (config._ael) {
+        return config._ael(el, eventName, callback, opts);
+      }
+    }
+  }
+
+  return el.addEventListener(eventName, callback, opts);
+};
+
+var removeEventListener = (el, eventName, callback, opts) => {
+  if (typeof window !== 'undefined') {
+    var win = window;
+    var config = win && win.Ionic && win.Ionic.config;
+
+    if (config) {
+      var rel = config.get('_rel');
+
+      if (rel) {
+        return rel(el, eventName, callback, opts);
+      } else if (config._rel) {
+        return config._rel(el, eventName, callback, opts);
+      }
+    }
+  }
+
+  return el.removeEventListener(eventName, callback, opts);
+};
+/**
+ * Gets the root context of a shadow dom element
+ * On newer browsers this will be the shadowRoot,
+ * but for older browser this may just be the
+ * element itself.
+ *
+ * Useful for whenever you need to explicitly
+ * do "myElement.shadowRoot!.querySelector(...)".
+ */
+
+
+var getElementRoot = function getElementRoot(el) {
+  var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : el;
+  return el.shadowRoot || fallback;
+};
+/**
+ * Patched version of requestAnimationFrame that avoids ngzone
+ * Use only when you know ngzone should not run
+ */
+
+
+var raf = h => {
+  if (typeof __zone_symbol__requestAnimationFrame === 'function') {
+    return __zone_symbol__requestAnimationFrame(h);
+  }
+
+  if (typeof requestAnimationFrame === 'function') {
+    return requestAnimationFrame(h);
+  }
+
+  return setTimeout(h);
+};
+
+var hasShadowDom = el => {
+  return !!el.shadowRoot && !!el.attachShadow;
+};
+
+var findItemLabel = componentEl => {
+  var itemEl = componentEl.closest('ion-item');
+
+  if (itemEl) {
+    return itemEl.querySelector('ion-label');
+  }
+
+  return null;
+};
+/**
+ * This method is used for Ionic's input components that use Shadow DOM. In
+ * order to properly label the inputs to work with screen readers, we need
+ * to get the text content of the label outside of the shadow root and pass
+ * it to the input inside of the shadow root.
+ *
+ * Referencing label elements by id from outside of the component is
+ * impossible due to the shadow boundary, read more here:
+ * https://developer.salesforce.com/blogs/2020/01/accessibility-for-web-components.html
+ *
+ * @param componentEl The shadow element that needs the aria label
+ * @param inputId The unique identifier for the input
+ */
+
+
+var getAriaLabel = (componentEl, inputId) => {
+  var labelText; // If the user provides their own label via the aria-labelledby attr
+  // we should use that instead of looking for an ion-label
+
+  var labelledBy = componentEl.getAttribute('aria-labelledby'); // Grab the id off of the component in case they are using
+  // a custom label using the label element
+
+  var componentId = componentEl.id;
+  var labelId = labelledBy !== null && labelledBy.trim() !== '' ? labelledBy : inputId + '-lbl';
+  var label = labelledBy !== null && labelledBy.trim() !== '' ? document.querySelector("#".concat(labelledBy)) : findItemLabel(componentEl);
+
+  if (label) {
+    if (labelledBy === null) {
+      label.id = labelId;
+    }
+
+    labelText = label.textContent;
+    label.setAttribute('aria-hidden', 'true'); // if there is no label, check to see if the user has provided
+    // one by setting an id on the component and using the label element
+  } else if (componentId.trim() !== '') {
+    label = document.querySelector("label[for=".concat(componentId, "]"));
+
+    if (label) {
+      label.id = labelId = "".concat(componentId, "-lbl");
+      labelText = label.textContent;
+    }
+  }
+
+  return {
+    label,
+    labelId,
+    labelText
+  };
+};
+/**
+ * This method is used to add a hidden input to a host element that contains
+ * a Shadow DOM. It does not add the input inside of the Shadow root which
+ * allows it to be picked up inside of forms. It should contain the same
+ * values as the host element.
+ *
+ * @param always Add a hidden input even if the container does not use Shadow
+ * @param container The element where the input will be added
+ * @param name The name of the input
+ * @param value The value of the input
+ * @param disabled If true, the input is disabled
+ */
+
+
+var renderHiddenInput = (always, container, name, value, disabled) => {
+  if (always || hasShadowDom(container)) {
+    var input = container.querySelector('input.aux-input');
+
+    if (!input) {
+      input = container.ownerDocument.createElement('input');
+      input.type = 'hidden';
+      input.classList.add('aux-input');
+      container.appendChild(input);
+    }
+
+    input.disabled = disabled;
+    input.name = name;
+    input.value = value || '';
+  }
+};
+
+var clamp = (min, n, max) => {
+  return Math.max(min, Math.min(n, max));
+};
+
+var assert = (actual, reason) => {
+  if (!actual) {
+    var message = 'ASSERT: ' + reason;
+    console.error(message);
+    debugger; // tslint:disable-line
+
+    throw new Error(message);
+  }
+};
+
+var now = ev => {
+  return ev.timeStamp || Date.now();
+};
+
+var pointerCoord = ev => {
+  // get X coordinates for either a mouse click
+  // or a touch depending on the given event
+  if (ev) {
+    var changedTouches = ev.changedTouches;
+
+    if (changedTouches && changedTouches.length > 0) {
+      var touch = changedTouches[0];
+      return {
+        x: touch.clientX,
+        y: touch.clientY
+      };
+    }
+
+    if (ev.pageX !== undefined) {
+      return {
+        x: ev.pageX,
+        y: ev.pageY
+      };
+    }
+  }
+
+  return {
+    x: 0,
+    y: 0
+  };
+};
+/**
+ * @hidden
+ * Given a side, return if it should be on the end
+ * based on the value of dir
+ * @param side the side
+ * @param isRTL whether the application dir is rtl
+ */
+
+
+var isEndSide = side => {
+  var isRTL = document.dir === 'rtl';
+
+  switch (side) {
+    case 'start':
+      return isRTL;
+
+    case 'end':
+      return !isRTL;
+
+    default:
+      throw new Error("\"".concat(side, "\" is not a valid value for [side]. Use \"start\" or \"end\" instead."));
+  }
+};
+
+var debounceEvent = (event, wait) => {
+  var original = event._original || event;
+  return {
+    _original: event,
+    emit: debounce(original.emit.bind(original), wait)
+  };
+};
+
+var debounce = function debounce(func) {
+  var wait = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var timer;
+  return function () {
+    clearTimeout(timer);
+
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    timer = setTimeout(func, wait, ...args);
+  };
+};
+
+exports.addEventListener = addEventListener;
+exports.assert = assert;
+exports.clamp = clamp;
+exports.debounce = debounce;
+exports.debounceEvent = debounceEvent;
+exports.findItemLabel = findItemLabel;
+exports.getAriaLabel = getAriaLabel;
+exports.getElementRoot = getElementRoot;
+exports.hasShadowDom = hasShadowDom;
+exports.inheritAttributes = inheritAttributes;
+exports.isEndSide = isEndSide;
+exports.now = now;
+exports.pointerCoord = pointerCoord;
+exports.raf = raf;
+exports.removeEventListener = removeEventListener;
+exports.renderHiddenInput = renderHiddenInput;
+  })();
+});
+require.register("@ionic/core/dist/cjs/index-3d9409db.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+var index = require('./index-a35cc20f.js');
+
+var LIFECYCLE_WILL_ENTER = 'ionViewWillEnter';
+var LIFECYCLE_DID_ENTER = 'ionViewDidEnter';
+var LIFECYCLE_WILL_LEAVE = 'ionViewWillLeave';
+var LIFECYCLE_DID_LEAVE = 'ionViewDidLeave';
+var LIFECYCLE_WILL_UNLOAD = 'ionViewWillUnload';
+
+var iosTransitionAnimation = () => Promise.resolve().then(function () {
+  return require('./ios.transition-93930998.js');
+});
+
+var mdTransitionAnimation = () => Promise.resolve().then(function () {
+  return require('./md.transition-407efd2b.js');
+});
+
+var transition = opts => {
+  return new Promise((resolve, reject) => {
+    index.writeTask(() => {
+      beforeTransition(opts);
+      runTransition(opts).then(result => {
+        if (result.animation) {
+          result.animation.destroy();
+        }
+
+        afterTransition(opts);
+        resolve(result);
+      }, error => {
+        afterTransition(opts);
+        reject(error);
+      });
+    });
+  });
+};
+
+var beforeTransition = opts => {
+  var enteringEl = opts.enteringEl;
+  var leavingEl = opts.leavingEl;
+  setZIndex(enteringEl, leavingEl, opts.direction);
+
+  if (opts.showGoBack) {
+    enteringEl.classList.add('can-go-back');
+  } else {
+    enteringEl.classList.remove('can-go-back');
+  }
+
+  setPageHidden(enteringEl, false);
+
+  if (leavingEl) {
+    setPageHidden(leavingEl, false);
+  }
+};
+
+var runTransition = /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator(function* (opts) {
+    var animationBuilder = yield getAnimationBuilder(opts);
+    var ani = animationBuilder && index.Build.isBrowser ? animation(animationBuilder, opts) : noAnimation(opts); // fast path for no animation
+
+    return ani;
+  });
+
+  return function runTransition(_x) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+var afterTransition = opts => {
+  var enteringEl = opts.enteringEl;
+  var leavingEl = opts.leavingEl;
+  enteringEl.classList.remove('ion-page-invisible');
+
+  if (leavingEl !== undefined) {
+    leavingEl.classList.remove('ion-page-invisible');
+  }
+};
+
+var getAnimationBuilder = /*#__PURE__*/function () {
+  var _ref2 = _asyncToGenerator(function* (opts) {
+    if (!opts.leavingEl || !opts.animated || opts.duration === 0) {
+      return undefined;
+    }
+
+    if (opts.animationBuilder) {
+      return opts.animationBuilder;
+    }
+
+    var getAnimation = opts.mode === 'ios' ? (yield iosTransitionAnimation()).iosTransitionAnimation : (yield mdTransitionAnimation()).mdTransitionAnimation;
+    return getAnimation;
+  });
+
+  return function getAnimationBuilder(_x2) {
+    return _ref2.apply(this, arguments);
+  };
+}();
+
+var animation = /*#__PURE__*/function () {
+  var _ref3 = _asyncToGenerator(function* (animationBuilder, opts) {
+    yield waitForReady(opts, true);
+    var trans = animationBuilder(opts.baseEl, opts);
+    fireWillEvents(opts.enteringEl, opts.leavingEl);
+    var didComplete = yield playTransition(trans, opts);
+
+    if (opts.progressCallback) {
+      opts.progressCallback(undefined);
+    }
+
+    if (didComplete) {
+      fireDidEvents(opts.enteringEl, opts.leavingEl);
+    }
+
+    return {
+      hasCompleted: didComplete,
+      animation: trans
+    };
+  });
+
+  return function animation(_x3, _x4) {
+    return _ref3.apply(this, arguments);
+  };
+}();
+
+var noAnimation = /*#__PURE__*/function () {
+  var _ref4 = _asyncToGenerator(function* (opts) {
+    var enteringEl = opts.enteringEl;
+    var leavingEl = opts.leavingEl;
+    yield waitForReady(opts, false);
+    fireWillEvents(enteringEl, leavingEl);
+    fireDidEvents(enteringEl, leavingEl);
+    return {
+      hasCompleted: true
+    };
+  });
+
+  return function noAnimation(_x5) {
+    return _ref4.apply(this, arguments);
+  };
+}();
+
+var waitForReady = /*#__PURE__*/function () {
+  var _ref5 = _asyncToGenerator(function* (opts, defaultDeep) {
+    var deep = opts.deepWait !== undefined ? opts.deepWait : defaultDeep;
+    var promises = deep ? [deepReady(opts.enteringEl), deepReady(opts.leavingEl)] : [shallowReady(opts.enteringEl), shallowReady(opts.leavingEl)];
+    yield Promise.all(promises);
+    yield notifyViewReady(opts.viewIsReady, opts.enteringEl);
+  });
+
+  return function waitForReady(_x6, _x7) {
+    return _ref5.apply(this, arguments);
+  };
+}();
+
+var notifyViewReady = /*#__PURE__*/function () {
+  var _ref6 = _asyncToGenerator(function* (viewIsReady, enteringEl) {
+    if (viewIsReady) {
+      yield viewIsReady(enteringEl);
+    }
+  });
+
+  return function notifyViewReady(_x8, _x9) {
+    return _ref6.apply(this, arguments);
+  };
+}();
+
+var playTransition = (trans, opts) => {
+  var progressCallback = opts.progressCallback;
+  var promise = new Promise(resolve => {
+    trans.onFinish(currentStep => resolve(currentStep === 1));
+  }); // cool, let's do this, start the transition
+
+  if (progressCallback) {
+    // this is a swipe to go back, just get the transition progress ready
+    // kick off the swipe animation start
+    trans.progressStart(true);
+    progressCallback(trans);
+  } else {
+    // only the top level transition should actually start "play"
+    // kick it off and let it play through
+    // ******** DOM WRITE ****************
+    trans.play();
+  } // create a callback for when the animation is done
+
+
+  return promise;
+};
+
+var fireWillEvents = (enteringEl, leavingEl) => {
+  lifecycle(leavingEl, LIFECYCLE_WILL_LEAVE);
+  lifecycle(enteringEl, LIFECYCLE_WILL_ENTER);
+};
+
+var fireDidEvents = (enteringEl, leavingEl) => {
+  lifecycle(enteringEl, LIFECYCLE_DID_ENTER);
+  lifecycle(leavingEl, LIFECYCLE_DID_LEAVE);
+};
+
+var lifecycle = (el, eventName) => {
+  if (el) {
+    var ev = new CustomEvent(eventName, {
+      bubbles: false,
+      cancelable: false
+    });
+    el.dispatchEvent(ev);
+  }
+};
+
+var shallowReady = el => {
+  if (el && el.componentOnReady) {
+    return el.componentOnReady();
+  }
+
+  return Promise.resolve();
+};
+
+var deepReady = /*#__PURE__*/function () {
+  var _ref7 = _asyncToGenerator(function* (el) {
+    var element = el;
+
+    if (element) {
+      if (element.componentOnReady != null) {
+        var stencilEl = yield element.componentOnReady();
+
+        if (stencilEl != null) {
+          return;
+        }
+      }
+
+      yield Promise.all(Array.from(element.children).map(deepReady));
+    }
+  });
+
+  return function deepReady(_x10) {
+    return _ref7.apply(this, arguments);
+  };
+}();
+
+var setPageHidden = (el, hidden) => {
+  if (hidden) {
+    el.setAttribute('aria-hidden', 'true');
+    el.classList.add('ion-page-hidden');
+  } else {
+    el.hidden = false;
+    el.removeAttribute('aria-hidden');
+    el.classList.remove('ion-page-hidden');
+  }
+};
+
+var setZIndex = (enteringEl, leavingEl, direction) => {
+  if (enteringEl !== undefined) {
+    enteringEl.style.zIndex = direction === 'back' ? '99' : '101';
+  }
+
+  if (leavingEl !== undefined) {
+    leavingEl.style.zIndex = '100';
+  }
+};
+
+var getIonPageElement = element => {
+  if (element.classList.contains('ion-page')) {
+    return element;
+  }
+
+  var ionPage = element.querySelector(':scope > .ion-page, :scope > ion-nav, :scope > ion-tabs');
+
+  if (ionPage) {
+    return ionPage;
+  } // idk, return the original element so at least something animates and we don't have a null pointer
+
+
+  return element;
+};
+
+exports.LIFECYCLE_DID_ENTER = LIFECYCLE_DID_ENTER;
+exports.LIFECYCLE_DID_LEAVE = LIFECYCLE_DID_LEAVE;
+exports.LIFECYCLE_WILL_ENTER = LIFECYCLE_WILL_ENTER;
+exports.LIFECYCLE_WILL_LEAVE = LIFECYCLE_WILL_LEAVE;
+exports.LIFECYCLE_WILL_UNLOAD = LIFECYCLE_WILL_UNLOAD;
+exports.deepReady = deepReady;
+exports.getIonPageElement = getIonPageElement;
+exports.lifecycle = lifecycle;
+exports.setPageHidden = setPageHidden;
+exports.transition = transition;
+  })();
+});
+require.register("@ionic/core/dist/cjs/index-98d43f07.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+
+var gestureController = require('./gesture-controller-29adda71.js');
+
+var addEventListener = (el, eventName, callback, opts) => {
+  // use event listener options when supported
+  // otherwise it's just a boolean for the "capture" arg
+  var listenerOpts = supportsPassive(el) ? {
+    'capture': !!opts.capture,
+    'passive': !!opts.passive
+  } : !!opts.capture;
+  var add;
+  var remove;
+
+  if (el['__zone_symbol__addEventListener']) {
+    add = '__zone_symbol__addEventListener';
+    remove = '__zone_symbol__removeEventListener';
+  } else {
+    add = 'addEventListener';
+    remove = 'removeEventListener';
+  }
+
+  el[add](eventName, callback, listenerOpts);
+  return () => {
+    el[remove](eventName, callback, listenerOpts);
+  };
+};
+
+var supportsPassive = node => {
+  if (_sPassive === undefined) {
+    try {
+      var opts = Object.defineProperty({}, 'passive', {
+        get: () => {
+          _sPassive = true;
+        }
+      });
+      node.addEventListener('optsTest', () => {
+        return;
+      }, opts);
+    } catch (e) {
+      _sPassive = false;
+    }
+  }
+
+  return !!_sPassive;
+};
+
+var _sPassive;
+
+var MOUSE_WAIT = 2000;
+
+var createPointerEvents = (el, pointerDown, pointerMove, pointerUp, options) => {
+  var rmTouchStart;
+  var rmTouchMove;
+  var rmTouchEnd;
+  var rmTouchCancel;
+  var rmMouseStart;
+  var rmMouseMove;
+  var rmMouseUp;
+  var lastTouchEvent = 0;
+
+  var handleTouchStart = ev => {
+    lastTouchEvent = Date.now() + MOUSE_WAIT;
+
+    if (!pointerDown(ev)) {
+      return;
+    }
+
+    if (!rmTouchMove && pointerMove) {
+      rmTouchMove = addEventListener(el, 'touchmove', pointerMove, options);
+    }
+
+    if (!rmTouchEnd) {
+      rmTouchEnd = addEventListener(el, 'touchend', handleTouchEnd, options);
+    }
+
+    if (!rmTouchCancel) {
+      rmTouchCancel = addEventListener(el, 'touchcancel', handleTouchEnd, options);
+    }
+  };
+
+  var handleMouseDown = ev => {
+    if (lastTouchEvent > Date.now()) {
+      return;
+    }
+
+    if (!pointerDown(ev)) {
+      return;
+    }
+
+    if (!rmMouseMove && pointerMove) {
+      rmMouseMove = addEventListener(getDocument(el), 'mousemove', pointerMove, options);
+    }
+
+    if (!rmMouseUp) {
+      rmMouseUp = addEventListener(getDocument(el), 'mouseup', handleMouseUp, options);
+    }
+  };
+
+  var handleTouchEnd = ev => {
+    stopTouch();
+
+    if (pointerUp) {
+      pointerUp(ev);
+    }
+  };
+
+  var handleMouseUp = ev => {
+    stopMouse();
+
+    if (pointerUp) {
+      pointerUp(ev);
+    }
+  };
+
+  var stopTouch = () => {
+    if (rmTouchMove) {
+      rmTouchMove();
+    }
+
+    if (rmTouchEnd) {
+      rmTouchEnd();
+    }
+
+    if (rmTouchCancel) {
+      rmTouchCancel();
+    }
+
+    rmTouchMove = rmTouchEnd = rmTouchCancel = undefined;
+  };
+
+  var stopMouse = () => {
+    if (rmMouseMove) {
+      rmMouseMove();
+    }
+
+    if (rmMouseUp) {
+      rmMouseUp();
+    }
+
+    rmMouseMove = rmMouseUp = undefined;
+  };
+
+  var stop = () => {
+    stopTouch();
+    stopMouse();
+  };
+
+  var enable = function enable() {
+    var isEnabled = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+    if (!isEnabled) {
+      if (rmTouchStart) {
+        rmTouchStart();
+      }
+
+      if (rmMouseStart) {
+        rmMouseStart();
+      }
+
+      rmTouchStart = rmMouseStart = undefined;
+      stop();
+    } else {
+      if (!rmTouchStart) {
+        rmTouchStart = addEventListener(el, 'touchstart', handleTouchStart, options);
+      }
+
+      if (!rmMouseStart) {
+        rmMouseStart = addEventListener(el, 'mousedown', handleMouseDown, options);
+      }
+    }
+  };
+
+  var destroy = () => {
+    enable(false);
+    pointerUp = pointerMove = pointerDown = undefined;
+  };
+
+  return {
+    enable,
+    stop,
+    destroy
+  };
+};
+
+var getDocument = node => {
+  return node instanceof Document ? node : node.ownerDocument;
+};
+
+var createPanRecognizer = (direction, thresh, maxAngle) => {
+  var radians = maxAngle * (Math.PI / 180);
+  var isDirX = direction === 'x';
+  var maxCosine = Math.cos(radians);
+  var threshold = thresh * thresh;
+  var startX = 0;
+  var startY = 0;
+  var dirty = false;
+  var isPan = 0;
+  return {
+    start(x, y) {
+      startX = x;
+      startY = y;
+      isPan = 0;
+      dirty = true;
+    },
+
+    detect(x, y) {
+      if (!dirty) {
+        return false;
+      }
+
+      var deltaX = x - startX;
+      var deltaY = y - startY;
+      var distance = deltaX * deltaX + deltaY * deltaY;
+
+      if (distance < threshold) {
+        return false;
+      }
+
+      var hypotenuse = Math.sqrt(distance);
+      var cosine = (isDirX ? deltaX : deltaY) / hypotenuse;
+
+      if (cosine > maxCosine) {
+        isPan = 1;
+      } else if (cosine < -maxCosine) {
+        isPan = -1;
+      } else {
+        isPan = 0;
+      }
+
+      dirty = false;
+      return true;
+    },
+
+    isGesture() {
+      return isPan !== 0;
+    },
+
+    getDirection() {
+      return isPan;
+    }
+
+  };
+};
+
+var createGesture = config => {
+  var hasCapturedPan = false;
+  var hasStartedPan = false;
+  var hasFiredStart = true;
+  var isMoveQueued = false;
+  var finalConfig = Object.assign({
+    disableScroll: false,
+    direction: 'x',
+    gesturePriority: 0,
+    passive: true,
+    maxAngle: 40,
+    threshold: 10
+  }, config);
+  var canStart = finalConfig.canStart;
+  var onWillStart = finalConfig.onWillStart;
+  var onStart = finalConfig.onStart;
+  var onEnd = finalConfig.onEnd;
+  var notCaptured = finalConfig.notCaptured;
+  var onMove = finalConfig.onMove;
+  var threshold = finalConfig.threshold;
+  var passive = finalConfig.passive;
+  var blurOnStart = finalConfig.blurOnStart;
+  var detail = {
+    type: 'pan',
+    startX: 0,
+    startY: 0,
+    startTime: 0,
+    currentX: 0,
+    currentY: 0,
+    velocityX: 0,
+    velocityY: 0,
+    deltaX: 0,
+    deltaY: 0,
+    currentTime: 0,
+    event: undefined,
+    data: undefined
+  };
+  var pan = createPanRecognizer(finalConfig.direction, finalConfig.threshold, finalConfig.maxAngle);
+  var gesture = gestureController.GESTURE_CONTROLLER.createGesture({
+    name: config.gestureName,
+    priority: config.gesturePriority,
+    disableScroll: config.disableScroll
+  });
+
+  var pointerDown = ev => {
+    var timeStamp = now(ev);
+
+    if (hasStartedPan || !hasFiredStart) {
+      return false;
+    }
+
+    updateDetail(ev, detail);
+    detail.startX = detail.currentX;
+    detail.startY = detail.currentY;
+    detail.startTime = detail.currentTime = timeStamp;
+    detail.velocityX = detail.velocityY = detail.deltaX = detail.deltaY = 0;
+    detail.event = ev; // Check if gesture can start
+
+    if (canStart && canStart(detail) === false) {
+      return false;
+    } // Release fallback
+
+
+    gesture.release(); // Start gesture
+
+    if (!gesture.start()) {
+      return false;
+    }
+
+    hasStartedPan = true;
+
+    if (threshold === 0) {
+      return tryToCapturePan();
+    }
+
+    pan.start(detail.startX, detail.startY);
+    return true;
+  };
+
+  var pointerMove = ev => {
+    // fast path, if gesture is currently captured
+    // do minimum job to get user-land even dispatched
+    if (hasCapturedPan) {
+      if (!isMoveQueued && hasFiredStart) {
+        isMoveQueued = true;
+        calcGestureData(detail, ev);
+        requestAnimationFrame(fireOnMove);
+      }
+
+      return;
+    } // gesture is currently being detected
+
+
+    calcGestureData(detail, ev);
+
+    if (pan.detect(detail.currentX, detail.currentY)) {
+      if (!pan.isGesture() || !tryToCapturePan()) {
+        abortGesture();
+      }
+    }
+  };
+
+  var fireOnMove = () => {
+    // Since fireOnMove is called inside a RAF, onEnd() might be called,
+    // we must double check hasCapturedPan
+    if (!hasCapturedPan) {
+      return;
+    }
+
+    isMoveQueued = false;
+
+    if (onMove) {
+      onMove(detail);
+    }
+  };
+
+  var tryToCapturePan = () => {
+    if (gesture && !gesture.capture()) {
+      return false;
+    }
+
+    hasCapturedPan = true;
+    hasFiredStart = false; // reset start position since the real user-land event starts here
+    // If the pan detector threshold is big, not resetting the start position
+    // will cause a jump in the animation equal to the detector threshold.
+    // the array of positions used to calculate the gesture velocity does not
+    // need to be cleaned, more points in the positions array always results in a
+    // more accurate value of the velocity.
+
+    detail.startX = detail.currentX;
+    detail.startY = detail.currentY;
+    detail.startTime = detail.currentTime;
+
+    if (onWillStart) {
+      onWillStart(detail).then(fireOnStart);
+    } else {
+      fireOnStart();
+    }
+
+    return true;
+  };
+
+  var blurActiveElement = () => {
+    /* tslint:disable-next-line */
+    if (typeof document !== 'undefined') {
+      var activeElement = document.activeElement;
+
+      if (activeElement !== null && activeElement.blur) {
+        activeElement.blur();
+      }
+    }
+  };
+
+  var fireOnStart = () => {
+    if (blurOnStart) {
+      blurActiveElement();
+    }
+
+    if (onStart) {
+      onStart(detail);
+    }
+
+    hasFiredStart = true;
+  };
+
+  var reset = () => {
+    hasCapturedPan = false;
+    hasStartedPan = false;
+    isMoveQueued = false;
+    hasFiredStart = true;
+    gesture.release();
+  }; // END *************************
+
+
+  var pointerUp = ev => {
+    var tmpHasCaptured = hasCapturedPan;
+    var tmpHasFiredStart = hasFiredStart;
+    reset();
+
+    if (!tmpHasFiredStart) {
+      return;
+    }
+
+    calcGestureData(detail, ev); // Try to capture press
+
+    if (tmpHasCaptured) {
+      if (onEnd) {
+        onEnd(detail);
+      }
+
+      return;
+    } // Not captured any event
+
+
+    if (notCaptured) {
+      notCaptured(detail);
+    }
+  };
+
+  var pointerEvents = createPointerEvents(finalConfig.el, pointerDown, pointerMove, pointerUp, {
+    capture: false,
+    passive
+  });
+
+  var abortGesture = () => {
+    reset();
+    pointerEvents.stop();
+
+    if (notCaptured) {
+      notCaptured(detail);
+    }
+  };
+
+  return {
+    enable() {
+      var enable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+      if (!enable) {
+        if (hasCapturedPan) {
+          pointerUp(undefined);
+        }
+
+        reset();
+      }
+
+      pointerEvents.enable(enable);
+    },
+
+    destroy() {
+      gesture.destroy();
+      pointerEvents.destroy();
+    }
+
+  };
+};
+
+var calcGestureData = (detail, ev) => {
+  if (!ev) {
+    return;
+  }
+
+  var prevX = detail.currentX;
+  var prevY = detail.currentY;
+  var prevT = detail.currentTime;
+  updateDetail(ev, detail);
+  var currentX = detail.currentX;
+  var currentY = detail.currentY;
+  var timestamp = detail.currentTime = now(ev);
+  var timeDelta = timestamp - prevT;
+
+  if (timeDelta > 0 && timeDelta < 100) {
+    var velocityX = (currentX - prevX) / timeDelta;
+    var velocityY = (currentY - prevY) / timeDelta;
+    detail.velocityX = velocityX * 0.7 + detail.velocityX * 0.3;
+    detail.velocityY = velocityY * 0.7 + detail.velocityY * 0.3;
+  }
+
+  detail.deltaX = currentX - detail.startX;
+  detail.deltaY = currentY - detail.startY;
+  detail.event = ev;
+};
+
+var updateDetail = (ev, detail) => {
+  // get X coordinates for either a mouse click
+  // or a touch depending on the given event
+  var x = 0;
+  var y = 0;
+
+  if (ev) {
+    var changedTouches = ev.changedTouches;
+
+    if (changedTouches && changedTouches.length > 0) {
+      var touch = changedTouches[0];
+      x = touch.clientX;
+      y = touch.clientY;
+    } else if (ev.pageX !== undefined) {
+      x = ev.pageX;
+      y = ev.pageY;
+    }
+  }
+
+  detail.currentX = x;
+  detail.currentY = y;
+};
+
+var now = ev => {
+  return ev.timeStamp || Date.now();
+};
+
+exports.GESTURE_CONTROLLER = gestureController.GESTURE_CONTROLLER;
+exports.createGesture = createGesture;
+  })();
+});
+require.register("@ionic/core/dist/cjs/index-a35cc20f.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _interopNamespace(e) {
+  if (e && e.__esModule) return e;
+  var n = Object.create(null);
+
+  if (e) {
+    Object.keys(e).forEach(function (k) {
+      if (k !== 'default') {
+        var d = Object.getOwnPropertyDescriptor(e, k);
+        Object.defineProperty(n, k, d.get ? d : {
+          enumerable: true,
+          get: function get() {
+            return e[k];
+          }
+        });
+      }
+    });
+  }
+
+  n['default'] = e;
+  return Object.freeze(n);
+}
+
+var NAMESPACE = 'ionic';
+var scopeId;
+var contentRef;
+var hostTagName;
+var useNativeShadowDom = false;
+var checkSlotFallbackVisibility = false;
+var checkSlotRelocate = false;
+var isSvgMode = false;
+var queuePending = false;
+var win = typeof window !== 'undefined' ? window : {};
+var CSS = win.CSS;
+var doc = win.document || {
+  head: {}
+};
+var plt = {
+  $flags$: 0,
+  $resourcesUrl$: '',
+  jmp: h => h(),
+  raf: h => requestAnimationFrame(h),
+  ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
+  rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
+  ce: (eventName, opts) => new CustomEvent(eventName, opts)
+};
+
+var supportsShadow = /*@__PURE__*/(() => (doc.head.attachShadow + '').indexOf('[native') > -1)();
+
+var promiseResolve = v => Promise.resolve(v);
+
+var supportsConstructibleStylesheets = /*@__PURE__*/(() => {
+  try {
+    new CSSStyleSheet();
+    return true;
+  } catch (e) {}
+
+  return false;
+})();
+
+var addHostEventListeners = (elm, hostRef, listeners, attachParentListeners) => {
+  if (listeners) {
+    listeners.map((_ref) => {
+      var [flags, name, method] = _ref;
+      var target = getHostListenerTarget(elm, flags);
+      var handler = hostListenerProxy(hostRef, method);
+      var opts = hostListenerOpts(flags);
+      plt.ael(target, name, handler, opts);
+      (hostRef.$rmListeners$ = hostRef.$rmListeners$ || []).push(() => plt.rel(target, name, handler, opts));
+    });
+  }
+};
+
+var hostListenerProxy = (hostRef, methodName) => ev => {
+  try {
+    {
+      if (hostRef.$flags$ & 256
+      /* isListenReady */
+      ) {
+          // instance is ready, let's call it's member method for this event
+          hostRef.$lazyInstance$[methodName](ev);
+        } else {
+        (hostRef.$queuedListeners$ = hostRef.$queuedListeners$ || []).push([methodName, ev]);
+      }
+    }
+  } catch (e) {
+    consoleError(e);
+  }
+};
+
+var getHostListenerTarget = (elm, flags) => {
+  if (flags & 4
+  /* TargetDocument */
+  ) return doc;
+  if (flags & 8
+  /* TargetWindow */
+  ) return win;
+  if (flags & 16
+  /* TargetBody */
+  ) return doc.body;
+  return elm;
+}; // prettier-ignore
+
+
+var hostListenerOpts = flags => (flags & 2
+/* Capture */
+) !== 0;
+
+var CONTENT_REF_ID = 'r';
+var ORG_LOCATION_ID = 'o';
+var SLOT_NODE_ID = 's';
+var TEXT_NODE_ID = 't';
+var HYDRATE_ID = 's-id';
+var HYDRATED_STYLE_ID = 'sty-id';
+var HYDRATE_CHILD_ID = 'c-id';
+var HYDRATED_CSS = '{visibility:hidden}.hydrated{visibility:inherit}';
+var XLINK_NS = 'http://www.w3.org/1999/xlink';
+
+var createTime = function createTime(fnName) {
+  var tagName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  {
+    return () => {
+      return;
+    };
+  }
+};
+
+var uniqueTime = (key, measureText) => {
+  {
+    return () => {
+      return;
+    };
+  }
+};
+
+var rootAppliedStyles = new WeakMap();
+
+var registerStyle = (scopeId, cssText, allowCS) => {
+  var style = styles.get(scopeId);
+
+  if (supportsConstructibleStylesheets && allowCS) {
+    style = style || new CSSStyleSheet();
+    style.replace(cssText);
+  } else {
+    style = cssText;
+  }
+
+  styles.set(scopeId, style);
+};
+
+var addStyle = (styleContainerNode, cmpMeta, mode, hostElm) => {
+  var scopeId = getScopeId(cmpMeta, mode);
+  var style = styles.get(scopeId); // if an element is NOT connected then getRootNode() will return the wrong root node
+  // so the fallback is to always use the document for the root node in those cases
+
+  styleContainerNode = styleContainerNode.nodeType === 11
+  /* DocumentFragment */
+  ? styleContainerNode : doc;
+
+  if (style) {
+    if (typeof style === 'string') {
+      styleContainerNode = styleContainerNode.head || styleContainerNode;
+      var appliedStyles = rootAppliedStyles.get(styleContainerNode);
+      var styleElm;
+
+      if (!appliedStyles) {
+        rootAppliedStyles.set(styleContainerNode, appliedStyles = new Set());
+      }
+
+      if (!appliedStyles.has(scopeId)) {
+        if (styleContainerNode.host && (styleElm = styleContainerNode.querySelector("[".concat(HYDRATED_STYLE_ID, "=\"").concat(scopeId, "\"]")))) {
+          // This is only happening on native shadow-dom, do not needs CSS var shim
+          styleElm.innerHTML = style;
+        } else {
+          if (plt.$cssShim$) {
+            styleElm = plt.$cssShim$.createHostStyle(hostElm, scopeId, style, !!(cmpMeta.$flags$ & 10
+            /* needsScopedEncapsulation */
+            ));
+            var newScopeId = styleElm['s-sc'];
+
+            if (newScopeId) {
+              scopeId = newScopeId; // we don't want to add this styleID to the appliedStyles Set
+              // since the cssVarShim might need to apply several different
+              // stylesheets for the same component
+
+              appliedStyles = null;
+            }
+          } else {
+            styleElm = doc.createElement('style');
+            styleElm.innerHTML = style;
+          }
+
+          styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
+        }
+
+        if (appliedStyles) {
+          appliedStyles.add(scopeId);
+        }
+      }
+    } else if (!styleContainerNode.adoptedStyleSheets.includes(style)) {
+      styleContainerNode.adoptedStyleSheets = [...styleContainerNode.adoptedStyleSheets, style];
+    }
+  }
+
+  return scopeId;
+};
+
+var attachStyles = hostRef => {
+  var cmpMeta = hostRef.$cmpMeta$;
+  var elm = hostRef.$hostElement$;
+  var flags = cmpMeta.$flags$;
+  var endAttachStyles = createTime('attachStyles', cmpMeta.$tagName$);
+  var scopeId = addStyle(supportsShadow && elm.shadowRoot ? elm.shadowRoot : elm.getRootNode(), cmpMeta, hostRef.$modeName$, elm);
+
+  if (flags & 10
+  /* needsScopedEncapsulation */
+  ) {
+      // only required when we're NOT using native shadow dom (slot)
+      // or this browser doesn't support native shadow dom
+      // and this host element was NOT created with SSR
+      // let's pick out the inner content for slot projection
+      // create a node to represent where the original
+      // content was first placed, which is useful later on
+      // DOM WRITE!!
+      elm['s-sc'] = scopeId;
+      elm.classList.add(scopeId + '-h');
+
+      if (flags & 2
+      /* scopedCssEncapsulation */
+      ) {
+          elm.classList.add(scopeId + '-s');
+        }
+    }
+
+  endAttachStyles();
+};
+
+var getScopeId = (cmp, mode) => 'sc-' + (mode && cmp.$flags$ & 32
+/* hasMode */
+? cmp.$tagName$ + '-' + mode : cmp.$tagName$);
+
+var convertScopedToShadow = css => css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{'); // Private
+
+
+var computeMode = elm => modeResolutionChain.map(h => h(elm)).find(m => !!m); // Public
+
+
+var setMode = handler => modeResolutionChain.push(handler);
+
+var getMode = ref => getHostRef(ref).$modeName$;
+/**
+ * Default style mode id
+ */
+
+/**
+ * Reusable empty obj/array
+ * Don't add values to these!!
+ */
+
+
+var EMPTY_OBJ = {};
+/**
+ * Namespaces
+ */
+
+var SVG_NS = 'http://www.w3.org/2000/svg';
+var HTML_NS = 'http://www.w3.org/1999/xhtml';
+
+var isDef = v => v != null;
+
+var isComplexType = o => {
+  // https://jsperf.com/typeof-fn-object/5
+  o = typeof o;
+  return o === 'object' || o === 'function';
+};
+/**
+ * Production h() function based on Preact by
+ * Jason Miller (@developit)
+ * Licensed under the MIT License
+ * https://github.com/developit/preact/blob/master/LICENSE
+ *
+ * Modified for Stencil's compiler and vdom
+ */
+// const stack: any[] = [];
+// export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, child?: d.ChildType): d.VNode;
+// export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
+
+
+var h = function h(nodeName, vnodeData) {
+  var child = null;
+  var key = null;
+  var slotName = null;
+  var simple = false;
+  var lastSimple = false;
+  var vNodeChildren = [];
+
+  var walk = c => {
+    for (var i = 0; i < c.length; i++) {
+      child = c[i];
+
+      if (Array.isArray(child)) {
+        walk(child);
+      } else if (child != null && typeof child !== 'boolean') {
+        if (simple = typeof nodeName !== 'function' && !isComplexType(child)) {
+          child = String(child);
+        }
+
+        if (simple && lastSimple) {
+          // If the previous child was simple (string), we merge both
+          vNodeChildren[vNodeChildren.length - 1].$text$ += child;
+        } else {
+          // Append a new vNode, if it's text, we create a text vNode
+          vNodeChildren.push(simple ? newVNode(null, child) : child);
+        }
+
+        lastSimple = simple;
+      }
+    }
+  };
+
+  for (var _len = arguments.length, children = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+    children[_key - 2] = arguments[_key];
+  }
+
+  walk(children);
+
+  if (vnodeData) {
+    // normalize class / classname attributes
+    if (vnodeData.key) {
+      key = vnodeData.key;
+    }
+
+    if (vnodeData.name) {
+      slotName = vnodeData.name;
+    }
+
+    {
+      var classData = vnodeData.className || vnodeData.class;
+
+      if (classData) {
+        vnodeData.class = typeof classData !== 'object' ? classData : Object.keys(classData).filter(k => classData[k]).join(' ');
+      }
+    }
+  }
+
+  if (typeof nodeName === 'function') {
+    // nodeName is a functional component
+    return nodeName(vnodeData === null ? {} : vnodeData, vNodeChildren, vdomFnUtils);
+  }
+
+  var vnode = newVNode(nodeName, null);
+  vnode.$attrs$ = vnodeData;
+
+  if (vNodeChildren.length > 0) {
+    vnode.$children$ = vNodeChildren;
+  }
+
+  {
+    vnode.$key$ = key;
+  }
+  {
+    vnode.$name$ = slotName;
+  }
+  return vnode;
+};
+
+var newVNode = (tag, text) => {
+  var vnode = {
+    $flags$: 0,
+    $tag$: tag,
+    $text$: text,
+    $elm$: null,
+    $children$: null
+  };
+  {
+    vnode.$attrs$ = null;
+  }
+  {
+    vnode.$key$ = null;
+  }
+  {
+    vnode.$name$ = null;
+  }
+  return vnode;
+};
+
+var Host = {};
+
+var isHost = node => node && node.$tag$ === Host;
+
+var vdomFnUtils = {
+  forEach: (children, cb) => children.map(convertToPublic).forEach(cb),
+  map: (children, cb) => children.map(convertToPublic).map(cb).map(convertToPrivate)
+};
+
+var convertToPublic = node => ({
+  vattrs: node.$attrs$,
+  vchildren: node.$children$,
+  vkey: node.$key$,
+  vname: node.$name$,
+  vtag: node.$tag$,
+  vtext: node.$text$
+});
+
+var convertToPrivate = node => {
+  if (typeof node.vtag === 'function') {
+    var vnodeData = Object.assign({}, node.vattrs);
+
+    if (node.vkey) {
+      vnodeData.key = node.vkey;
+    }
+
+    if (node.vname) {
+      vnodeData.name = node.vname;
+    }
+
+    return h(node.vtag, vnodeData, ...(node.vchildren || []));
+  }
+
+  var vnode = newVNode(node.vtag, node.vtext);
+  vnode.$attrs$ = node.vattrs;
+  vnode.$children$ = node.vchildren;
+  vnode.$key$ = node.vkey;
+  vnode.$name$ = node.vname;
+  return vnode;
+};
+/**
+ * Production setAccessor() function based on Preact by
+ * Jason Miller (@developit)
+ * Licensed under the MIT License
+ * https://github.com/developit/preact/blob/master/LICENSE
+ *
+ * Modified for Stencil's compiler and vdom
+ */
+
+
+var setAccessor = (elm, memberName, oldValue, newValue, isSvg, flags) => {
+  if (oldValue !== newValue) {
+    var isProp = isMemberInElement(elm, memberName);
+    var ln = memberName.toLowerCase();
+
+    if (memberName === 'class') {
+      var classList = elm.classList;
+      var oldClasses = parseClassList(oldValue);
+      var newClasses = parseClassList(newValue);
+      classList.remove(...oldClasses.filter(c => c && !newClasses.includes(c)));
+      classList.add(...newClasses.filter(c => c && !oldClasses.includes(c)));
+    } else if (memberName === 'style') {
+      // update style attribute, css properties and values
+      {
+        for (var prop in oldValue) {
+          if (!newValue || newValue[prop] == null) {
+            if (prop.includes('-')) {
+              elm.style.removeProperty(prop);
+            } else {
+              elm.style[prop] = '';
+            }
+          }
+        }
+      }
+
+      for (var _prop in newValue) {
+        if (!oldValue || newValue[_prop] !== oldValue[_prop]) {
+          if (_prop.includes('-')) {
+            elm.style.setProperty(_prop, newValue[_prop]);
+          } else {
+            elm.style[_prop] = newValue[_prop];
+          }
+        }
+      }
+    } else if (memberName === 'key') ;else if (memberName === 'ref') {
+      // minifier will clean this up
+      if (newValue) {
+        newValue(elm);
+      }
+    } else if (!isProp && memberName[0] === 'o' && memberName[1] === 'n') {
+      // Event Handlers
+      // so if the member name starts with "on" and the 3rd characters is
+      // a capital letter, and it's not already a member on the element,
+      // then we're assuming it's an event listener
+      if (memberName[2] === '-') {
+        // on- prefixed events
+        // allows to be explicit about the dom event to listen without any magic
+        // under the hood:
+        // <my-cmp on-click> // listens for "click"
+        // <my-cmp on-Click> // listens for "Click"
+        // <my-cmp on-ionChange> // listens for "ionChange"
+        // <my-cmp on-EVENTS> // listens for "EVENTS"
+        memberName = memberName.slice(3);
+      } else if (isMemberInElement(win, ln)) {
+        // standard event
+        // the JSX attribute could have been "onMouseOver" and the
+        // member name "onmouseover" is on the window's prototype
+        // so let's add the listener "mouseover", which is all lowercased
+        memberName = ln.slice(2);
+      } else {
+        // custom event
+        // the JSX attribute could have been "onMyCustomEvent"
+        // so let's trim off the "on" prefix and lowercase the first character
+        // and add the listener "myCustomEvent"
+        // except for the first character, we keep the event name case
+        memberName = ln[2] + memberName.slice(3);
+      }
+
+      if (oldValue) {
+        plt.rel(elm, memberName, oldValue, false);
+      }
+
+      if (newValue) {
+        plt.ael(elm, memberName, newValue, false);
+      }
+    } else {
+      // Set property if it exists and it's not a SVG
+      var isComplex = isComplexType(newValue);
+
+      if ((isProp || isComplex && newValue !== null) && !isSvg) {
+        try {
+          if (!elm.tagName.includes('-')) {
+            var n = newValue == null ? '' : newValue; // Workaround for Safari, moving the <input> caret when re-assigning the same valued
+
+            if (memberName === 'list') {
+              isProp = false; // tslint:disable-next-line: triple-equals
+            } else if (oldValue == null || elm[memberName] != n) {
+              elm[memberName] = n;
+            }
+          } else {
+            elm[memberName] = newValue;
+          }
+        } catch (e) {}
+      }
+      /**
+       * Need to manually update attribute if:
+       * - memberName is not an attribute
+       * - if we are rendering the host element in order to reflect attribute
+       * - if it's a SVG, since properties might not work in <svg>
+       * - if the newValue is null/undefined or 'false'.
+       */
+
+
+      var xlink = false;
+      {
+        if (ln !== (ln = ln.replace(/^xlink\:?/, ''))) {
+          memberName = ln;
+          xlink = true;
+        }
+      }
+
+      if (newValue == null || newValue === false) {
+        if (newValue !== false || elm.getAttribute(memberName) === '') {
+          if (xlink) {
+            elm.removeAttributeNS(XLINK_NS, memberName);
+          } else {
+            elm.removeAttribute(memberName);
+          }
+        }
+      } else if ((!isProp || flags & 4
+      /* isHost */
+      || isSvg) && !isComplex) {
+        newValue = newValue === true ? '' : newValue;
+
+        if (xlink) {
+          elm.setAttributeNS(XLINK_NS, memberName, newValue);
+        } else {
+          elm.setAttribute(memberName, newValue);
+        }
+      }
+    }
+  }
+};
+
+var parseClassListRegex = /\s/;
+
+var parseClassList = value => !value ? [] : value.split(parseClassListRegex);
+
+var updateElement = (oldVnode, newVnode, isSvgMode, memberName) => {
+  // if the element passed in is a shadow root, which is a document fragment
+  // then we want to be adding attrs/props to the shadow root's "host" element
+  // if it's not a shadow root, then we add attrs/props to the same element
+  var elm = newVnode.$elm$.nodeType === 11
+  /* DocumentFragment */
+  && newVnode.$elm$.host ? newVnode.$elm$.host : newVnode.$elm$;
+  var oldVnodeAttrs = oldVnode && oldVnode.$attrs$ || EMPTY_OBJ;
+  var newVnodeAttrs = newVnode.$attrs$ || EMPTY_OBJ;
+  {
+    // remove attributes no longer present on the vnode by setting them to undefined
+    for (memberName in oldVnodeAttrs) {
+      if (!(memberName in newVnodeAttrs)) {
+        setAccessor(elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode, newVnode.$flags$);
+      }
+    }
+  } // add new & update changed attributes
+
+  for (memberName in newVnodeAttrs) {
+    setAccessor(elm, memberName, oldVnodeAttrs[memberName], newVnodeAttrs[memberName], isSvgMode, newVnode.$flags$);
+  }
+};
+
+var createElm = (oldParentVNode, newParentVNode, childIndex, parentElm) => {
+  // tslint:disable-next-line: prefer-const
+  var newVNode = newParentVNode.$children$[childIndex];
+  var i = 0;
+  var elm;
+  var childNode;
+  var oldVNode;
+
+  if (!useNativeShadowDom) {
+    // remember for later we need to check to relocate nodes
+    checkSlotRelocate = true;
+
+    if (newVNode.$tag$ === 'slot') {
+      if (scopeId) {
+        // scoped css needs to add its scoped id to the parent element
+        parentElm.classList.add(scopeId + '-s');
+      }
+
+      newVNode.$flags$ |= newVNode.$children$ ? // slot element has fallback content
+      2
+      /* isSlotFallback */
+      : // slot element does not have fallback content
+      1
+      /* isSlotReference */
+      ;
+    }
+  }
+
+  if (newVNode.$text$ !== null) {
+    // create text node
+    elm = newVNode.$elm$ = doc.createTextNode(newVNode.$text$);
+  } else if (newVNode.$flags$ & 1
+  /* isSlotReference */
+  ) {
+      // create a slot reference node
+      elm = newVNode.$elm$ = doc.createTextNode('');
+    } else {
+    if (!isSvgMode) {
+      isSvgMode = newVNode.$tag$ === 'svg';
+    } // create element
+
+
+    elm = newVNode.$elm$ = doc.createElementNS(isSvgMode ? SVG_NS : HTML_NS, newVNode.$flags$ & 2
+    /* isSlotFallback */
+    ? 'slot-fb' : newVNode.$tag$);
+
+    if (isSvgMode && newVNode.$tag$ === 'foreignObject') {
+      isSvgMode = false;
+    } // add css classes, attrs, props, listeners, etc.
+
+
+    {
+      updateElement(null, newVNode, isSvgMode);
+    }
+
+    if (isDef(scopeId) && elm['s-si'] !== scopeId) {
+      // if there is a scopeId and this is the initial render
+      // then let's add the scopeId as a css class
+      elm.classList.add(elm['s-si'] = scopeId);
+    }
+
+    if (newVNode.$children$) {
+      for (i = 0; i < newVNode.$children$.length; ++i) {
+        // create the node
+        childNode = createElm(oldParentVNode, newVNode, i, elm); // return node could have been null
+
+        if (childNode) {
+          // append our new node
+          elm.appendChild(childNode);
+        }
+      }
+    }
+
+    {
+      if (newVNode.$tag$ === 'svg') {
+        // Only reset the SVG context when we're exiting <svg> element
+        isSvgMode = false;
+      } else if (elm.tagName === 'foreignObject') {
+        // Reenter SVG context when we're exiting <foreignObject> element
+        isSvgMode = true;
+      }
+    }
+  }
+
+  {
+    elm['s-hn'] = hostTagName;
+
+    if (newVNode.$flags$ & (2
+    /* isSlotFallback */
+    | 1
+    /* isSlotReference */
+    )) {
+      // remember the content reference comment
+      elm['s-sr'] = true; // remember the content reference comment
+
+      elm['s-cr'] = contentRef; // remember the slot name, or empty string for default slot
+
+      elm['s-sn'] = newVNode.$name$ || ''; // check if we've got an old vnode for this slot
+
+      oldVNode = oldParentVNode && oldParentVNode.$children$ && oldParentVNode.$children$[childIndex];
+
+      if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode.$elm$) {
+        // we've got an old slot vnode and the wrapper is being replaced
+        // so let's move the old slot content back to it's original location
+        putBackInOriginalLocation(oldParentVNode.$elm$, false);
+      }
+    }
+  }
+  return elm;
+};
+
+var putBackInOriginalLocation = (parentElm, recursive) => {
+  plt.$flags$ |= 1
+  /* isTmpDisconnected */
+  ;
+  var oldSlotChildNodes = parentElm.childNodes;
+
+  for (var i = oldSlotChildNodes.length - 1; i >= 0; i--) {
+    var childNode = oldSlotChildNodes[i];
+
+    if (childNode['s-hn'] !== hostTagName && childNode['s-ol']) {
+      // // this child node in the old element is from another component
+      // // remove this node from the old slot's parent
+      // childNode.remove();
+      // and relocate it back to it's original location
+      parentReferenceNode(childNode).insertBefore(childNode, referenceNode(childNode)); // remove the old original location comment entirely
+      // later on the patch function will know what to do
+      // and move this to the correct spot in need be
+
+      childNode['s-ol'].remove();
+      childNode['s-ol'] = undefined;
+      checkSlotRelocate = true;
+    }
+
+    if (recursive) {
+      putBackInOriginalLocation(childNode, recursive);
+    }
+  }
+
+  plt.$flags$ &= ~1
+  /* isTmpDisconnected */
+  ;
+};
+
+var addVnodes = (parentElm, before, parentVNode, vnodes, startIdx, endIdx) => {
+  var containerElm = parentElm['s-cr'] && parentElm['s-cr'].parentNode || parentElm;
+  var childNode;
+
+  if (containerElm.shadowRoot && containerElm.tagName === hostTagName) {
+    containerElm = containerElm.shadowRoot;
+  }
+
+  for (; startIdx <= endIdx; ++startIdx) {
+    if (vnodes[startIdx]) {
+      childNode = createElm(null, parentVNode, startIdx, parentElm);
+
+      if (childNode) {
+        vnodes[startIdx].$elm$ = childNode;
+        containerElm.insertBefore(childNode, referenceNode(before));
+      }
+    }
+  }
+};
+
+var removeVnodes = (vnodes, startIdx, endIdx, vnode, elm) => {
+  for (; startIdx <= endIdx; ++startIdx) {
+    if (vnode = vnodes[startIdx]) {
+      elm = vnode.$elm$;
+      callNodeRefs(vnode);
+      {
+        // we're removing this element
+        // so it's possible we need to show slot fallback content now
+        checkSlotFallbackVisibility = true;
+
+        if (elm['s-ol']) {
+          // remove the original location comment
+          elm['s-ol'].remove();
+        } else {
+          // it's possible that child nodes of the node
+          // that's being removed are slot nodes
+          putBackInOriginalLocation(elm, true);
+        }
+      } // remove the vnode's element from the dom
+
+      elm.remove();
+    }
+  }
+};
+
+var updateChildren = (parentElm, oldCh, newVNode, newCh) => {
+  var oldStartIdx = 0;
+  var newStartIdx = 0;
+  var idxInOld = 0;
+  var i = 0;
+  var oldEndIdx = oldCh.length - 1;
+  var oldStartVnode = oldCh[0];
+  var oldEndVnode = oldCh[oldEndIdx];
+  var newEndIdx = newCh.length - 1;
+  var newStartVnode = newCh[0];
+  var newEndVnode = newCh[newEndIdx];
+  var node;
+  var elmToMove;
+
+  while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
+    if (oldStartVnode == null) {
+      // Vnode might have been moved left
+      oldStartVnode = oldCh[++oldStartIdx];
+    } else if (oldEndVnode == null) {
+      oldEndVnode = oldCh[--oldEndIdx];
+    } else if (newStartVnode == null) {
+      newStartVnode = newCh[++newStartIdx];
+    } else if (newEndVnode == null) {
+      newEndVnode = newCh[--newEndIdx];
+    } else if (isSameVnode(oldStartVnode, newStartVnode)) {
+      patch(oldStartVnode, newStartVnode);
+      oldStartVnode = oldCh[++oldStartIdx];
+      newStartVnode = newCh[++newStartIdx];
+    } else if (isSameVnode(oldEndVnode, newEndVnode)) {
+      patch(oldEndVnode, newEndVnode);
+      oldEndVnode = oldCh[--oldEndIdx];
+      newEndVnode = newCh[--newEndIdx];
+    } else if (isSameVnode(oldStartVnode, newEndVnode)) {
+      // Vnode moved right
+      if (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot') {
+        putBackInOriginalLocation(oldStartVnode.$elm$.parentNode, false);
+      }
+
+      patch(oldStartVnode, newEndVnode);
+      parentElm.insertBefore(oldStartVnode.$elm$, oldEndVnode.$elm$.nextSibling);
+      oldStartVnode = oldCh[++oldStartIdx];
+      newEndVnode = newCh[--newEndIdx];
+    } else if (isSameVnode(oldEndVnode, newStartVnode)) {
+      // Vnode moved left
+      if (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot') {
+        putBackInOriginalLocation(oldEndVnode.$elm$.parentNode, false);
+      }
+
+      patch(oldEndVnode, newStartVnode);
+      parentElm.insertBefore(oldEndVnode.$elm$, oldStartVnode.$elm$);
+      oldEndVnode = oldCh[--oldEndIdx];
+      newStartVnode = newCh[++newStartIdx];
+    } else {
+      // createKeyToOldIdx
+      idxInOld = -1;
+      {
+        for (i = oldStartIdx; i <= oldEndIdx; ++i) {
+          if (oldCh[i] && oldCh[i].$key$ !== null && oldCh[i].$key$ === newStartVnode.$key$) {
+            idxInOld = i;
+            break;
+          }
+        }
+      }
+
+      if (idxInOld >= 0) {
+        elmToMove = oldCh[idxInOld];
+
+        if (elmToMove.$tag$ !== newStartVnode.$tag$) {
+          node = createElm(oldCh && oldCh[newStartIdx], newVNode, idxInOld, parentElm);
+        } else {
+          patch(elmToMove, newStartVnode);
+          oldCh[idxInOld] = undefined;
+          node = elmToMove.$elm$;
+        }
+
+        newStartVnode = newCh[++newStartIdx];
+      } else {
+        // new element
+        node = createElm(oldCh && oldCh[newStartIdx], newVNode, newStartIdx, parentElm);
+        newStartVnode = newCh[++newStartIdx];
+      }
+
+      if (node) {
+        {
+          parentReferenceNode(oldStartVnode.$elm$).insertBefore(node, referenceNode(oldStartVnode.$elm$));
+        }
+      }
+    }
+  }
+
+  if (oldStartIdx > oldEndIdx) {
+    addVnodes(parentElm, newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].$elm$, newVNode, newCh, newStartIdx, newEndIdx);
+  } else if (newStartIdx > newEndIdx) {
+    removeVnodes(oldCh, oldStartIdx, oldEndIdx);
+  }
+};
+
+var isSameVnode = (vnode1, vnode2) => {
+  // compare if two vnode to see if they're "technically" the same
+  // need to have the same element tag, and same key to be the same
+  if (vnode1.$tag$ === vnode2.$tag$) {
+    if (vnode1.$tag$ === 'slot') {
+      return vnode1.$name$ === vnode2.$name$;
+    }
+
+    {
+      return vnode1.$key$ === vnode2.$key$;
+    }
+  }
+
+  return false;
+};
+
+var referenceNode = node => {
+  // this node was relocated to a new location in the dom
+  // because of some other component's slot
+  // but we still have an html comment in place of where
+  // it's original location was according to it's original vdom
+  return node && node['s-ol'] || node;
+};
+
+var parentReferenceNode = node => (node['s-ol'] ? node['s-ol'] : node).parentNode;
+
+var patch = (oldVNode, newVNode) => {
+  var elm = newVNode.$elm$ = oldVNode.$elm$;
+  var oldChildren = oldVNode.$children$;
+  var newChildren = newVNode.$children$;
+  var tag = newVNode.$tag$;
+  var text = newVNode.$text$;
+  var defaultHolder;
+
+  if (text === null) {
+    {
+      // test if we're rendering an svg element, or still rendering nodes inside of one
+      // only add this to the when the compiler sees we're using an svg somewhere
+      isSvgMode = tag === 'svg' ? true : tag === 'foreignObject' ? false : isSvgMode;
+    } // element node
+
+    {
+      if (tag === 'slot') ;else {
+        // either this is the first render of an element OR it's an update
+        // AND we already know it's possible it could have changed
+        // this updates the element's css classes, attrs, props, listeners, etc.
+        updateElement(oldVNode, newVNode, isSvgMode);
+      }
+    }
+
+    if (oldChildren !== null && newChildren !== null) {
+      // looks like there's child vnodes for both the old and new vnodes
+      updateChildren(elm, oldChildren, newVNode, newChildren);
+    } else if (newChildren !== null) {
+      // no old child vnodes, but there are new child vnodes to add
+      if (oldVNode.$text$ !== null) {
+        // the old vnode was text, so be sure to clear it out
+        elm.textContent = '';
+      } // add the new vnode children
+
+
+      addVnodes(elm, null, newVNode, newChildren, 0, newChildren.length - 1);
+    } else if (oldChildren !== null) {
+      // no new child vnodes, but there are old child vnodes to remove
+      removeVnodes(oldChildren, 0, oldChildren.length - 1);
+    }
+
+    if (isSvgMode && tag === 'svg') {
+      isSvgMode = false;
+    }
+  } else if (defaultHolder = elm['s-cr']) {
+    // this element has slotted content
+    defaultHolder.parentNode.textContent = text;
+  } else if (oldVNode.$text$ !== text) {
+    // update the text content for the text only vnode
+    // and also only if the text is different than before
+    elm.data = text;
+  }
+};
+
+var updateFallbackSlotVisibility = elm => {
+  // tslint:disable-next-line: prefer-const
+  var childNodes = elm.childNodes;
+  var childNode;
+  var i;
+  var ilen;
+  var j;
+  var slotNameAttr;
+  var nodeType;
+
+  for (i = 0, ilen = childNodes.length; i < ilen; i++) {
+    childNode = childNodes[i];
+
+    if (childNode.nodeType === 1
+    /* ElementNode */
+    ) {
+        if (childNode['s-sr']) {
+          // this is a slot fallback node
+          // get the slot name for this slot reference node
+          slotNameAttr = childNode['s-sn']; // by default always show a fallback slot node
+          // then hide it if there are other slots in the light dom
+
+          childNode.hidden = false;
+
+          for (j = 0; j < ilen; j++) {
+            if (childNodes[j]['s-hn'] !== childNode['s-hn']) {
+              // this sibling node is from a different component
+              nodeType = childNodes[j].nodeType;
+
+              if (slotNameAttr !== '') {
+                // this is a named fallback slot node
+                if (nodeType === 1
+                /* ElementNode */
+                && slotNameAttr === childNodes[j].getAttribute('slot')) {
+                  childNode.hidden = true;
+                  break;
+                }
+              } else {
+                // this is a default fallback slot node
+                // any element or text node (with content)
+                // should hide the default fallback slot node
+                if (nodeType === 1
+                /* ElementNode */
+                || nodeType === 3
+                /* TextNode */
+                && childNodes[j].textContent.trim() !== '') {
+                  childNode.hidden = true;
+                  break;
+                }
+              }
+            }
+          }
+        } // keep drilling down
+
+
+        updateFallbackSlotVisibility(childNode);
+      }
+  }
+};
+
+var relocateNodes = [];
+
+var relocateSlotContent = elm => {
+  // tslint:disable-next-line: prefer-const
+  var childNode;
+  var node;
+  var hostContentNodes;
+  var slotNameAttr;
+  var relocateNodeData;
+  var j;
+  var i = 0;
+  var childNodes = elm.childNodes;
+  var ilen = childNodes.length;
+
+  for (; i < ilen; i++) {
+    childNode = childNodes[i];
+
+    if (childNode['s-sr'] && (node = childNode['s-cr'])) {
+      // first got the content reference comment node
+      // then we got it's parent, which is where all the host content is in now
+      hostContentNodes = node.parentNode.childNodes;
+      slotNameAttr = childNode['s-sn'];
+
+      for (j = hostContentNodes.length - 1; j >= 0; j--) {
+        node = hostContentNodes[j];
+
+        if (!node['s-cn'] && !node['s-nr'] && node['s-hn'] !== childNode['s-hn']) {
+          // let's do some relocating to its new home
+          // but never relocate a content reference node
+          // that is suppose to always represent the original content location
+          if (isNodeLocatedInSlot(node, slotNameAttr)) {
+            // it's possible we've already decided to relocate this node
+            relocateNodeData = relocateNodes.find(r => r.$nodeToRelocate$ === node); // made some changes to slots
+            // let's make sure we also double check
+            // fallbacks are correctly hidden or shown
+
+            checkSlotFallbackVisibility = true;
+            node['s-sn'] = node['s-sn'] || slotNameAttr;
+
+            if (relocateNodeData) {
+              // previously we never found a slot home for this node
+              // but turns out we did, so let's remember it now
+              relocateNodeData.$slotRefNode$ = childNode;
+            } else {
+              // add to our list of nodes to relocate
+              relocateNodes.push({
+                $slotRefNode$: childNode,
+                $nodeToRelocate$: node
+              });
+            }
+
+            if (node['s-sr']) {
+              relocateNodes.map(relocateNode => {
+                if (isNodeLocatedInSlot(relocateNode.$nodeToRelocate$, node['s-sn'])) {
+                  relocateNodeData = relocateNodes.find(r => r.$nodeToRelocate$ === node);
+
+                  if (relocateNodeData && !relocateNode.$slotRefNode$) {
+                    relocateNode.$slotRefNode$ = relocateNodeData.$slotRefNode$;
+                  }
+                }
+              });
+            }
+          } else if (!relocateNodes.some(r => r.$nodeToRelocate$ === node)) {
+            // so far this element does not have a slot home, not setting slotRefNode on purpose
+            // if we never find a home for this element then we'll need to hide it
+            relocateNodes.push({
+              $nodeToRelocate$: node
+            });
+          }
+        }
+      }
+    }
+
+    if (childNode.nodeType === 1
+    /* ElementNode */
+    ) {
+        relocateSlotContent(childNode);
+      }
+  }
+};
+
+var isNodeLocatedInSlot = (nodeToRelocate, slotNameAttr) => {
+  if (nodeToRelocate.nodeType === 1
+  /* ElementNode */
+  ) {
+      if (nodeToRelocate.getAttribute('slot') === null && slotNameAttr === '') {
+        return true;
+      }
+
+      if (nodeToRelocate.getAttribute('slot') === slotNameAttr) {
+        return true;
+      }
+
+      return false;
+    }
+
+  if (nodeToRelocate['s-sn'] === slotNameAttr) {
+    return true;
+  }
+
+  return slotNameAttr === '';
+};
+
+var callNodeRefs = vNode => {
+  {
+    vNode.$attrs$ && vNode.$attrs$.ref && vNode.$attrs$.ref(null);
+    vNode.$children$ && vNode.$children$.map(callNodeRefs);
+  }
+};
+
+var renderVdom = (hostRef, renderFnResults) => {
+  var hostElm = hostRef.$hostElement$;
+  var cmpMeta = hostRef.$cmpMeta$;
+  var oldVNode = hostRef.$vnode$ || newVNode(null, null);
+  var rootVnode = isHost(renderFnResults) ? renderFnResults : h(null, null, renderFnResults);
+  hostTagName = hostElm.tagName;
+
+  if (cmpMeta.$attrsToReflect$) {
+    rootVnode.$attrs$ = rootVnode.$attrs$ || {};
+    cmpMeta.$attrsToReflect$.map((_ref2) => {
+      var [propName, attribute] = _ref2;
+      return rootVnode.$attrs$[attribute] = hostElm[propName];
+    });
+  }
+
+  rootVnode.$tag$ = null;
+  rootVnode.$flags$ |= 4
+  /* isHost */
+  ;
+  hostRef.$vnode$ = rootVnode;
+  rootVnode.$elm$ = oldVNode.$elm$ = hostElm.shadowRoot || hostElm;
+  {
+    scopeId = hostElm['s-sc'];
+  }
+  {
+    contentRef = hostElm['s-cr'];
+    useNativeShadowDom = supportsShadow && (cmpMeta.$flags$ & 1
+    /* shadowDomEncapsulation */
+    ) !== 0; // always reset
+
+    checkSlotFallbackVisibility = false;
+  } // synchronous patch
+
+  patch(oldVNode, rootVnode);
+  {
+    // while we're moving nodes around existing nodes, temporarily disable
+    // the disconnectCallback from working
+    plt.$flags$ |= 1
+    /* isTmpDisconnected */
+    ;
+
+    if (checkSlotRelocate) {
+      relocateSlotContent(rootVnode.$elm$);
+      var relocateData;
+      var nodeToRelocate;
+      var orgLocationNode;
+      var parentNodeRef;
+      var insertBeforeNode;
+      var refNode;
+      var i = 0;
+
+      for (; i < relocateNodes.length; i++) {
+        relocateData = relocateNodes[i];
+        nodeToRelocate = relocateData.$nodeToRelocate$;
+
+        if (!nodeToRelocate['s-ol']) {
+          // add a reference node marking this node's original location
+          // keep a reference to this node for later lookups
+          orgLocationNode = doc.createTextNode('');
+          orgLocationNode['s-nr'] = nodeToRelocate;
+          nodeToRelocate.parentNode.insertBefore(nodeToRelocate['s-ol'] = orgLocationNode, nodeToRelocate);
+        }
+      }
+
+      for (i = 0; i < relocateNodes.length; i++) {
+        relocateData = relocateNodes[i];
+        nodeToRelocate = relocateData.$nodeToRelocate$;
+
+        if (relocateData.$slotRefNode$) {
+          // by default we're just going to insert it directly
+          // after the slot reference node
+          parentNodeRef = relocateData.$slotRefNode$.parentNode;
+          insertBeforeNode = relocateData.$slotRefNode$.nextSibling;
+          orgLocationNode = nodeToRelocate['s-ol'];
+
+          while (orgLocationNode = orgLocationNode.previousSibling) {
+            refNode = orgLocationNode['s-nr'];
+
+            if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
+              refNode = refNode.nextSibling;
+
+              if (!refNode || !refNode['s-nr']) {
+                insertBeforeNode = refNode;
+                break;
+              }
+            }
+          }
+
+          if (!insertBeforeNode && parentNodeRef !== nodeToRelocate.parentNode || nodeToRelocate.nextSibling !== insertBeforeNode) {
+            // we've checked that it's worth while to relocate
+            // since that the node to relocate
+            // has a different next sibling or parent relocated
+            if (nodeToRelocate !== insertBeforeNode) {
+              if (!nodeToRelocate['s-hn'] && nodeToRelocate['s-ol']) {
+                // probably a component in the index.html that doesn't have it's hostname set
+                nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
+              } // add it back to the dom but in its new home
+
+
+              parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
+            }
+          }
+        } else {
+          // this node doesn't have a slot home to go to, so let's hide it
+          if (nodeToRelocate.nodeType === 1
+          /* ElementNode */
+          ) {
+              nodeToRelocate.hidden = true;
+            }
+        }
+      }
+    }
+
+    if (checkSlotFallbackVisibility) {
+      updateFallbackSlotVisibility(rootVnode.$elm$);
+    } // done moving nodes around
+    // allow the disconnect callback to work again
+
+
+    plt.$flags$ &= ~1
+    /* isTmpDisconnected */
+    ; // always reset
+
+    relocateNodes.length = 0;
+  }
+};
+
+var getElement = ref => getHostRef(ref).$hostElement$;
+
+var createEvent = (ref, name, flags) => {
+  var elm = getElement(ref);
+  return {
+    emit: detail => {
+      return emitEvent(elm, name, {
+        bubbles: !!(flags & 4
+        /* Bubbles */
+        ),
+        composed: !!(flags & 2
+        /* Composed */
+        ),
+        cancelable: !!(flags & 1
+        /* Cancellable */
+        ),
+        detail
+      });
+    }
+  };
+};
+
+var emitEvent = (elm, name, opts) => {
+  var ev = plt.ce(name, opts);
+  elm.dispatchEvent(ev);
+  return ev;
+};
+
+var attachToAncestor = (hostRef, ancestorComponent) => {
+  if (ancestorComponent && !hostRef.$onRenderResolve$ && ancestorComponent['s-p']) {
+    ancestorComponent['s-p'].push(new Promise(r => hostRef.$onRenderResolve$ = r));
+  }
+};
+
+var scheduleUpdate = (hostRef, isInitialLoad) => {
+  {
+    hostRef.$flags$ |= 16
+    /* isQueuedForUpdate */
+    ;
+  }
+
+  if (hostRef.$flags$ & 4
+  /* isWaitingForChildren */
+  ) {
+      hostRef.$flags$ |= 512
+      /* needsRerender */
+      ;
+      return;
+    }
+
+  attachToAncestor(hostRef, hostRef.$ancestorComponent$); // there is no ancestor component or the ancestor component
+  // has already fired off its lifecycle update then
+  // fire off the initial update
+
+  var dispatch = () => dispatchHooks(hostRef, isInitialLoad);
+
+  return writeTask(dispatch);
+};
+
+var dispatchHooks = (hostRef, isInitialLoad) => {
+  var endSchedule = createTime('scheduleUpdate', hostRef.$cmpMeta$.$tagName$);
+  var instance = hostRef.$lazyInstance$;
+  var promise;
+
+  if (isInitialLoad) {
+    {
+      hostRef.$flags$ |= 256
+      /* isListenReady */
+      ;
+
+      if (hostRef.$queuedListeners$) {
+        hostRef.$queuedListeners$.map((_ref3) => {
+          var [methodName, event] = _ref3;
+          return safeCall(instance, methodName, event);
+        });
+        hostRef.$queuedListeners$ = null;
+      }
+    }
+    {
+      promise = safeCall(instance, 'componentWillLoad');
+    }
+  }
+
+  {
+    promise = then(promise, () => safeCall(instance, 'componentWillRender'));
+  }
+  endSchedule();
+  return then(promise, () => updateComponent(hostRef, instance, isInitialLoad));
+};
+
+var updateComponent = /*#__PURE__*/function () {
+  var _ref4 = _asyncToGenerator(function* (hostRef, instance, isInitialLoad) {
+    // updateComponent
+    var elm = hostRef.$hostElement$;
+    var endUpdate = createTime('update', hostRef.$cmpMeta$.$tagName$);
+    var rc = elm['s-rc'];
+
+    if (isInitialLoad) {
+      // DOM WRITE!
+      attachStyles(hostRef);
+    }
+
+    var endRender = createTime('render', hostRef.$cmpMeta$.$tagName$);
+    {
+      {
+        // looks like we've got child nodes to render into this host element
+        // or we need to update the css class/attrs on the host element
+        // DOM WRITE!
+        {
+          renderVdom(hostRef, callRender(hostRef, instance));
+        }
+      }
+    }
+
+    if (plt.$cssShim$) {
+      plt.$cssShim$.updateHost(elm);
+    }
+
+    if (rc) {
+      // ok, so turns out there are some child host elements
+      // waiting on this parent element to load
+      // let's fire off all update callbacks waiting
+      rc.map(cb => cb());
+      elm['s-rc'] = undefined;
+    }
+
+    endRender();
+    endUpdate();
+    {
+      var childrenPromises = elm['s-p'];
+
+      var postUpdate = () => postUpdateComponent(hostRef);
+
+      if (childrenPromises.length === 0) {
+        postUpdate();
+      } else {
+        Promise.all(childrenPromises).then(postUpdate);
+        hostRef.$flags$ |= 4
+        /* isWaitingForChildren */
+        ;
+        childrenPromises.length = 0;
+      }
+    }
+  });
+
+  return function updateComponent(_x, _x2, _x3) {
+    return _ref4.apply(this, arguments);
+  };
+}();
+
+var callRender = (hostRef, instance) => {
+  try {
+    instance = instance.render && instance.render();
+    {
+      hostRef.$flags$ &= ~16
+      /* isQueuedForUpdate */
+      ;
+    }
+    {
+      hostRef.$flags$ |= 2
+      /* hasRendered */
+      ;
+    }
+  } catch (e) {
+    consoleError(e, hostRef.$hostElement$);
+  }
+
+  return instance;
+};
+
+var postUpdateComponent = hostRef => {
+  var tagName = hostRef.$cmpMeta$.$tagName$;
+  var elm = hostRef.$hostElement$;
+  var endPostUpdate = createTime('postUpdate', tagName);
+  var instance = hostRef.$lazyInstance$;
+  var ancestorComponent = hostRef.$ancestorComponent$;
+
+  if (!(hostRef.$flags$ & 64
+  /* hasLoadedComponent */
+  )) {
+    hostRef.$flags$ |= 64
+    /* hasLoadedComponent */
+    ;
+    {
+      // DOM WRITE!
+      addHydratedFlag(elm);
+    }
+    {
+      safeCall(instance, 'componentDidLoad');
+    }
+    endPostUpdate();
+    {
+      hostRef.$onReadyResolve$(elm);
+
+      if (!ancestorComponent) {
+        appDidLoad();
+      }
+    }
+  } else {
+    {
+      safeCall(instance, 'componentDidUpdate');
+    }
+    endPostUpdate();
+  }
+
+  {
+    hostRef.$onInstanceResolve$(elm);
+  } // load events fire from bottom to top
+  // the deepest elements load first then bubbles up
+
+  {
+    if (hostRef.$onRenderResolve$) {
+      hostRef.$onRenderResolve$();
+      hostRef.$onRenderResolve$ = undefined;
+    }
+
+    if (hostRef.$flags$ & 512
+    /* needsRerender */
+    ) {
+        nextTick(() => scheduleUpdate(hostRef, false));
+      }
+
+    hostRef.$flags$ &= ~(4
+    /* isWaitingForChildren */
+    | 512
+    /* needsRerender */
+    );
+  } // ( •_•)
+  // ( •_•)>⌐■-■
+  // (⌐■_■)
+};
+
+var forceUpdate = ref => {
+  {
+    var hostRef = getHostRef(ref);
+    var isConnected = hostRef.$hostElement$.isConnected;
+
+    if (isConnected && (hostRef.$flags$ & (2
+    /* hasRendered */
+    | 16
+    /* isQueuedForUpdate */
+    )) === 2
+    /* hasRendered */
+    ) {
+        scheduleUpdate(hostRef, false);
+      } // Returns "true" when the forced update was successfully scheduled
+
+
+    return isConnected;
+  }
+};
+
+var appDidLoad = who => {
+  // on appload
+  // we have finish the first big initial render
+  {
+    addHydratedFlag(doc.documentElement);
+  }
+  nextTick(() => emitEvent(win, 'appload', {
+    detail: {
+      namespace: NAMESPACE
+    }
+  }));
+};
+
+var safeCall = (instance, method, arg) => {
+  if (instance && instance[method]) {
+    try {
+      return instance[method](arg);
+    } catch (e) {
+      consoleError(e);
+    }
+  }
+
+  return undefined;
+};
+
+var then = (promise, thenFn) => {
+  return promise && promise.then ? promise.then(thenFn) : thenFn();
+};
+
+var addHydratedFlag = elm => elm.classList.add('hydrated');
+
+var initializeClientHydrate = (hostElm, tagName, hostId, hostRef) => {
+  var endHydrate = createTime('hydrateClient', tagName);
+  var shadowRoot = hostElm.shadowRoot;
+  var childRenderNodes = [];
+  var slotNodes = [];
+  var shadowRootNodes = shadowRoot ? [] : null;
+  var vnode = hostRef.$vnode$ = newVNode(tagName, null);
+
+  if (!plt.$orgLocNodes$) {
+    initializeDocumentHydrate(doc.body, plt.$orgLocNodes$ = new Map());
+  }
+
+  hostElm[HYDRATE_ID] = hostId;
+  hostElm.removeAttribute(HYDRATE_ID);
+  clientHydrate(vnode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, hostElm, hostId);
+  childRenderNodes.map(c => {
+    var orgLocationId = c.$hostId$ + '.' + c.$nodeId$;
+    var orgLocationNode = plt.$orgLocNodes$.get(orgLocationId);
+    var node = c.$elm$;
+
+    if (orgLocationNode && supportsShadow && orgLocationNode['s-en'] === '') {
+      orgLocationNode.parentNode.insertBefore(node, orgLocationNode.nextSibling);
+    }
+
+    if (!shadowRoot) {
+      node['s-hn'] = tagName;
+
+      if (orgLocationNode) {
+        node['s-ol'] = orgLocationNode;
+        node['s-ol']['s-nr'] = node;
+      }
+    }
+
+    plt.$orgLocNodes$.delete(orgLocationId);
+  });
+
+  if (shadowRoot) {
+    shadowRootNodes.map(shadowRootNode => {
+      if (shadowRootNode) {
+        shadowRoot.appendChild(shadowRootNode);
+      }
+    });
+  }
+
+  endHydrate();
+};
+
+var clientHydrate = (parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node, hostId) => {
+  var childNodeType;
+  var childIdSplt;
+  var childVNode;
+  var i;
+
+  if (node.nodeType === 1
+  /* ElementNode */
+  ) {
+      childNodeType = node.getAttribute(HYDRATE_CHILD_ID);
+
+      if (childNodeType) {
+        // got the node data from the element's attribute
+        // `${hostId}.${nodeId}.${depth}.${index}`
+        childIdSplt = childNodeType.split('.');
+
+        if (childIdSplt[0] === hostId || childIdSplt[0] === '0') {
+          childVNode = {
+            $flags$: 0,
+            $hostId$: childIdSplt[0],
+            $nodeId$: childIdSplt[1],
+            $depth$: childIdSplt[2],
+            $index$: childIdSplt[3],
+            $tag$: node.tagName.toLowerCase(),
+            $elm$: node,
+            $attrs$: null,
+            $children$: null,
+            $key$: null,
+            $name$: null,
+            $text$: null
+          };
+          childRenderNodes.push(childVNode);
+          node.removeAttribute(HYDRATE_CHILD_ID); // this is a new child vnode
+          // so ensure its parent vnode has the vchildren array
+
+          if (!parentVNode.$children$) {
+            parentVNode.$children$ = [];
+          } // add our child vnode to a specific index of the vnode's children
+
+
+          parentVNode.$children$[childVNode.$index$] = childVNode; // this is now the new parent vnode for all the next child checks
+
+          parentVNode = childVNode;
+
+          if (shadowRootNodes && childVNode.$depth$ === '0') {
+            shadowRootNodes[childVNode.$index$] = childVNode.$elm$;
+          }
+        }
+      } // recursively drill down, end to start so we can remove nodes
+
+
+      for (i = node.childNodes.length - 1; i >= 0; i--) {
+        clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.childNodes[i], hostId);
+      }
+
+      if (node.shadowRoot) {
+        // keep drilling down through the shadow root nodes
+        for (i = node.shadowRoot.childNodes.length - 1; i >= 0; i--) {
+          clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.shadowRoot.childNodes[i], hostId);
+        }
+      }
+    } else if (node.nodeType === 8
+  /* CommentNode */
+  ) {
+      // `${COMMENT_TYPE}.${hostId}.${nodeId}.${depth}.${index}`
+      childIdSplt = node.nodeValue.split('.');
+
+      if (childIdSplt[1] === hostId || childIdSplt[1] === '0') {
+        // comment node for either the host id or a 0 host id
+        childNodeType = childIdSplt[0];
+        childVNode = {
+          $flags$: 0,
+          $hostId$: childIdSplt[1],
+          $nodeId$: childIdSplt[2],
+          $depth$: childIdSplt[3],
+          $index$: childIdSplt[4],
+          $elm$: node,
+          $attrs$: null,
+          $children$: null,
+          $key$: null,
+          $name$: null,
+          $tag$: null,
+          $text$: null
+        };
+
+        if (childNodeType === TEXT_NODE_ID) {
+          childVNode.$elm$ = node.nextSibling;
+
+          if (childVNode.$elm$ && childVNode.$elm$.nodeType === 3
+          /* TextNode */
+          ) {
+              childVNode.$text$ = childVNode.$elm$.textContent;
+              childRenderNodes.push(childVNode); // remove the text comment since it's no longer needed
+
+              node.remove();
+
+              if (!parentVNode.$children$) {
+                parentVNode.$children$ = [];
+              }
+
+              parentVNode.$children$[childVNode.$index$] = childVNode;
+
+              if (shadowRootNodes && childVNode.$depth$ === '0') {
+                shadowRootNodes[childVNode.$index$] = childVNode.$elm$;
+              }
+            }
+        } else if (childVNode.$hostId$ === hostId) {
+          // this comment node is specifcally for this host id
+          if (childNodeType === SLOT_NODE_ID) {
+            // `${SLOT_NODE_ID}.${hostId}.${nodeId}.${depth}.${index}.${slotName}`;
+            childVNode.$tag$ = 'slot';
+
+            if (childIdSplt[5]) {
+              node['s-sn'] = childVNode.$name$ = childIdSplt[5];
+            } else {
+              node['s-sn'] = '';
+            }
+
+            node['s-sr'] = true;
+
+            if (shadowRootNodes) {
+              // browser support shadowRoot and this is a shadow dom component
+              // create an actual slot element
+              childVNode.$elm$ = doc.createElement(childVNode.$tag$);
+
+              if (childVNode.$name$) {
+                // add the slot name attribute
+                childVNode.$elm$.setAttribute('name', childVNode.$name$);
+              } // insert the new slot element before the slot comment
+
+
+              node.parentNode.insertBefore(childVNode.$elm$, node); // remove the slot comment since it's not needed for shadow
+
+              node.remove();
+
+              if (childVNode.$depth$ === '0') {
+                shadowRootNodes[childVNode.$index$] = childVNode.$elm$;
+              }
+            }
+
+            slotNodes.push(childVNode);
+
+            if (!parentVNode.$children$) {
+              parentVNode.$children$ = [];
+            }
+
+            parentVNode.$children$[childVNode.$index$] = childVNode;
+          } else if (childNodeType === CONTENT_REF_ID) {
+            // `${CONTENT_REF_ID}.${hostId}`;
+            if (shadowRootNodes) {
+              // remove the content ref comment since it's not needed for shadow
+              node.remove();
+            } else {
+              hostElm['s-cr'] = node;
+              node['s-cn'] = true;
+            }
+          }
+        }
+      }
+    } else if (parentVNode && parentVNode.$tag$ === 'style') {
+    var vnode = newVNode(null, node.textContent);
+    vnode.$elm$ = node;
+    vnode.$index$ = '0';
+    parentVNode.$children$ = [vnode];
+  }
+};
+
+var initializeDocumentHydrate = (node, orgLocNodes) => {
+  if (node.nodeType === 1
+  /* ElementNode */
+  ) {
+      var i = 0;
+
+      for (; i < node.childNodes.length; i++) {
+        initializeDocumentHydrate(node.childNodes[i], orgLocNodes);
+      }
+
+      if (node.shadowRoot) {
+        for (i = 0; i < node.shadowRoot.childNodes.length; i++) {
+          initializeDocumentHydrate(node.shadowRoot.childNodes[i], orgLocNodes);
+        }
+      }
+    } else if (node.nodeType === 8
+  /* CommentNode */
+  ) {
+      var childIdSplt = node.nodeValue.split('.');
+
+      if (childIdSplt[0] === ORG_LOCATION_ID) {
+        orgLocNodes.set(childIdSplt[1] + '.' + childIdSplt[2], node);
+        node.nodeValue = ''; // useful to know if the original location is
+        // the root light-dom of a shadow dom component
+
+        node['s-en'] = childIdSplt[3];
+      }
+    }
+};
+
+var parsePropertyValue = (propValue, propType) => {
+  // ensure this value is of the correct prop type
+  if (propValue != null && !isComplexType(propValue)) {
+    if (propType & 4
+    /* Boolean */
+    ) {
+        // per the HTML spec, any string value means it is a boolean true value
+        // but we'll cheat here and say that the string "false" is the boolean false
+        return propValue === 'false' ? false : propValue === '' || !!propValue;
+      }
+
+    if (propType & 2
+    /* Number */
+    ) {
+        // force it to be a number
+        return parseFloat(propValue);
+      }
+
+    if (propType & 1
+    /* String */
+    ) {
+        // could have been passed as a number or boolean
+        // but we still want it as a string
+        return String(propValue);
+      } // redundant return here for better minification
+
+
+    return propValue;
+  } // not sure exactly what type we want
+  // so no need to change to a different type
+
+
+  return propValue;
+};
+
+var getValue = (ref, propName) => getHostRef(ref).$instanceValues$.get(propName);
+
+var setValue = (ref, propName, newVal, cmpMeta) => {
+  // check our new property value against our internal value
+  var hostRef = getHostRef(ref);
+  var elm = hostRef.$hostElement$;
+  var oldVal = hostRef.$instanceValues$.get(propName);
+  var flags = hostRef.$flags$;
+  var instance = hostRef.$lazyInstance$;
+  newVal = parsePropertyValue(newVal, cmpMeta.$members$[propName][0]);
+
+  if ((!(flags & 8
+  /* isConstructingInstance */
+  ) || oldVal === undefined) && newVal !== oldVal) {
+    // gadzooks! the property's value has changed!!
+    // set our new value!
+    hostRef.$instanceValues$.set(propName, newVal);
+
+    if (instance) {
+      // get an array of method names of watch functions to call
+      if (cmpMeta.$watchers$ && flags & 128
+      /* isWatchReady */
+      ) {
+          var watchMethods = cmpMeta.$watchers$[propName];
+
+          if (watchMethods) {
+            // this instance is watching for when this property changed
+            watchMethods.map(watchMethodName => {
+              try {
+                // fire off each of the watch methods that are watching this property
+                instance[watchMethodName](newVal, oldVal, propName);
+              } catch (e) {
+                consoleError(e, elm);
+              }
+            });
+          }
+        }
+
+      if ((flags & (2
+      /* hasRendered */
+      | 16
+      /* isQueuedForUpdate */
+      )) === 2
+      /* hasRendered */
+      ) {
+          // looks like this value actually changed, so we've got work to do!
+          // but only if we've already rendered, otherwise just chill out
+          // queue that we need to do an update, but don't worry about queuing
+          // up millions cuz this function ensures it only runs once
+          scheduleUpdate(hostRef, false);
+        }
+    }
+  }
+};
+
+var proxyComponent = (Cstr, cmpMeta, flags) => {
+  if (cmpMeta.$members$) {
+    if (Cstr.watchers) {
+      cmpMeta.$watchers$ = Cstr.watchers;
+    } // It's better to have a const than two Object.entries()
+
+
+    var members = Object.entries(cmpMeta.$members$);
+    var prototype = Cstr.prototype;
+    members.map((_ref5) => {
+      var [memberName, [memberFlags]] = _ref5;
+
+      if (memberFlags & 31
+      /* Prop */
+      || flags & 2
+      /* proxyState */
+      && memberFlags & 32
+      /* State */
+      ) {
+        // proxyComponent - prop
+        Object.defineProperty(prototype, memberName, {
+          get() {
+            // proxyComponent, get value
+            return getValue(this, memberName);
+          },
+
+          set(newValue) {
+            // proxyComponent, set value
+            setValue(this, memberName, newValue, cmpMeta);
+          },
+
+          configurable: true,
+          enumerable: true
+        });
+      } else if (flags & 1
+      /* isElementConstructor */
+      && memberFlags & 64
+      /* Method */
+      ) {
+          // proxyComponent - method
+          Object.defineProperty(prototype, memberName, {
+            value() {
+              for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                args[_key2] = arguments[_key2];
+              }
+
+              var ref = getHostRef(this);
+              return ref.$onInstancePromise$.then(() => ref.$lazyInstance$[memberName](...args));
+            }
+
+          });
+        }
+    });
+
+    if (flags & 1
+    /* isElementConstructor */
+    ) {
+        var attrNameToPropName = new Map();
+
+        prototype.attributeChangedCallback = function (attrName, _oldValue, newValue) {
+          plt.jmp(() => {
+            var propName = attrNameToPropName.get(attrName);
+            this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
+          });
+        }; // create an array of attributes to observe
+        // and also create a map of html attribute name to js property name
+
+
+        Cstr.observedAttributes = members.filter((_ref6) => {
+          var [_, m] = _ref6;
+          return m[0] & 15;
+        }
+        /* HasAttribute */
+        ) // filter to only keep props that should match attributes
+        .map((_ref7) => {
+          var [propName, m] = _ref7;
+          var attrName = m[1] || propName;
+          attrNameToPropName.set(attrName, propName);
+
+          if (m[0] & 512
+          /* ReflectAttr */
+          ) {
+              cmpMeta.$attrsToReflect$.push([propName, attrName]);
+            }
+
+          return attrName;
+        });
+      }
+  }
+
+  return Cstr;
+};
+
+var initializeComponent = /*#__PURE__*/function () {
+  var _ref8 = _asyncToGenerator(function* (elm, hostRef, cmpMeta, hmrVersionId, Cstr) {
+    // initializeComponent
+    if ((hostRef.$flags$ & 32
+    /* hasInitializedComponent */
+    ) === 0) {
+      {
+        // we haven't initialized this element yet
+        hostRef.$flags$ |= 32
+        /* hasInitializedComponent */
+        ; // lazy loaded components
+        // request the component's implementation to be
+        // wired up with the host element
+
+        Cstr = loadModule(cmpMeta);
+
+        if (Cstr.then) {
+          // Await creates a micro-task avoid if possible
+          var endLoad = uniqueTime();
+          Cstr = yield Cstr;
+          endLoad();
+        }
+
+        if (!Cstr.isProxied) {
+          // we'eve never proxied this Constructor before
+          // let's add the getters/setters to its prototype before
+          // the first time we create an instance of the implementation
+          {
+            cmpMeta.$watchers$ = Cstr.watchers;
+          }
+          proxyComponent(Cstr, cmpMeta, 2
+          /* proxyState */
+          );
+          Cstr.isProxied = true;
+        }
+
+        var endNewInstance = createTime('createInstance', cmpMeta.$tagName$); // ok, time to construct the instance
+        // but let's keep track of when we start and stop
+        // so that the getters/setters don't incorrectly step on data
+
+        {
+          hostRef.$flags$ |= 8
+          /* isConstructingInstance */
+          ;
+        } // construct the lazy-loaded component implementation
+        // passing the hostRef is very important during
+        // construction in order to directly wire together the
+        // host element and the lazy-loaded instance
+
+        try {
+          new Cstr(hostRef);
+        } catch (e) {
+          consoleError(e);
+        }
+
+        {
+          hostRef.$flags$ &= ~8
+          /* isConstructingInstance */
+          ;
+        }
+        {
+          hostRef.$flags$ |= 128
+          /* isWatchReady */
+          ;
+        }
+        endNewInstance();
+        fireConnectedCallback(hostRef.$lazyInstance$);
+      }
+
+      if (Cstr.style) {
+        // this component has styles but we haven't registered them yet
+        var style = Cstr.style;
+
+        if (typeof style !== 'string') {
+          style = style[hostRef.$modeName$ = computeMode(elm)];
+        }
+
+        var _scopeId = getScopeId(cmpMeta, hostRef.$modeName$);
+
+        if (!styles.has(_scopeId)) {
+          var endRegisterStyles = createTime('registerStyles', cmpMeta.$tagName$);
+
+          if (cmpMeta.$flags$ & 8
+          /* needsShadowDomShim */
+          ) {
+              style = yield Promise.resolve().then(function () {
+                return require('./shadow-css-476b8fcf.js');
+              }).then(m => m.scopeCss(style, _scopeId, false));
+            }
+
+          registerStyle(_scopeId, style, !!(cmpMeta.$flags$ & 1
+          /* shadowDomEncapsulation */
+          ));
+          endRegisterStyles();
+        }
+      }
+    } // we've successfully created a lazy instance
+
+
+    var ancestorComponent = hostRef.$ancestorComponent$;
+
+    var schedule = () => scheduleUpdate(hostRef, true);
+
+    if (ancestorComponent && ancestorComponent['s-rc']) {
+      // this is the intial load and this component it has an ancestor component
+      // but the ancestor component has NOT fired its will update lifecycle yet
+      // so let's just cool our jets and wait for the ancestor to continue first
+      // this will get fired off when the ancestor component
+      // finally gets around to rendering its lazy self
+      // fire off the initial update
+      ancestorComponent['s-rc'].push(schedule);
+    } else {
+      schedule();
+    }
+  });
+
+  return function initializeComponent(_x4, _x5, _x6, _x7, _x8) {
+    return _ref8.apply(this, arguments);
+  };
+}();
+
+var fireConnectedCallback = instance => {
+  {
+    safeCall(instance, 'connectedCallback');
+  }
+};
+
+var connectedCallback = elm => {
+  if ((plt.$flags$ & 1
+  /* isTmpDisconnected */
+  ) === 0) {
+    var hostRef = getHostRef(elm);
+    var cmpMeta = hostRef.$cmpMeta$;
+    var endConnected = createTime('connectedCallback', cmpMeta.$tagName$);
+
+    if (!(hostRef.$flags$ & 1
+    /* hasConnected */
+    )) {
+      // first time this component has connected
+      hostRef.$flags$ |= 1
+      /* hasConnected */
+      ;
+      var hostId;
+      {
+        hostId = elm.getAttribute(HYDRATE_ID);
+
+        if (hostId) {
+          if (supportsShadow && cmpMeta.$flags$ & 1
+          /* shadowDomEncapsulation */
+          ) {
+              var _scopeId2 = addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode'));
+
+              elm.classList.remove(_scopeId2 + '-h', _scopeId2 + '-s');
+            }
+
+          initializeClientHydrate(elm, cmpMeta.$tagName$, hostId, hostRef);
+        }
+      }
+
+      if (!hostId) {
+        // initUpdate
+        // if the slot polyfill is required we'll need to put some nodes
+        // in here to act as original content anchors as we move nodes around
+        // host element has been connected to the DOM
+        if (cmpMeta.$flags$ & (4
+        /* hasSlotRelocation */
+        | 8
+        /* needsShadowDomShim */
+        )) {
+          setContentReference(elm);
+        }
+      }
+
+      {
+        // find the first ancestor component (if there is one) and register
+        // this component as one of the actively loading child components for its ancestor
+        var ancestorComponent = elm;
+
+        while (ancestorComponent = ancestorComponent.parentNode || ancestorComponent.host) {
+          // climb up the ancestors looking for the first
+          // component that hasn't finished its lifecycle update yet
+          if (ancestorComponent.nodeType === 1
+          /* ElementNode */
+          && ancestorComponent.hasAttribute('s-id') && ancestorComponent['s-p'] || ancestorComponent['s-p']) {
+            // we found this components first ancestor component
+            // keep a reference to this component's ancestor component
+            attachToAncestor(hostRef, hostRef.$ancestorComponent$ = ancestorComponent);
+            break;
+          }
+        }
+      } // Lazy properties
+      // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
+
+      if (cmpMeta.$members$) {
+        Object.entries(cmpMeta.$members$).map((_ref9) => {
+          var [memberName, [memberFlags]] = _ref9;
+
+          if (memberFlags & 31
+          /* Prop */
+          && elm.hasOwnProperty(memberName)) {
+            var value = elm[memberName];
+            delete elm[memberName];
+            elm[memberName] = value;
+          }
+        });
+      }
+
+      {
+        // connectedCallback, taskQueue, initialLoad
+        // angular sets attribute AFTER connectCallback
+        // https://github.com/angular/angular/issues/18909
+        // https://github.com/angular/angular/issues/19940
+        nextTick(() => initializeComponent(elm, hostRef, cmpMeta));
+      }
+    } else {
+      // not the first time this has connected
+      // reattach any event listeners to the host
+      // since they would have been removed when disconnected
+      addHostEventListeners(elm, hostRef, cmpMeta.$listeners$); // fire off connectedCallback() on component instance
+
+      fireConnectedCallback(hostRef.$lazyInstance$);
+    }
+
+    endConnected();
+  }
+};
+
+var setContentReference = elm => {
+  // only required when we're NOT using native shadow dom (slot)
+  // or this browser doesn't support native shadow dom
+  // and this host element was NOT created with SSR
+  // let's pick out the inner content for slot projection
+  // create a node to represent where the original
+  // content was first placed, which is useful later on
+  var contentRefElm = elm['s-cr'] = doc.createComment('');
+  contentRefElm['s-cn'] = true;
+  elm.insertBefore(contentRefElm, elm.firstChild);
+};
+
+var disconnectedCallback = elm => {
+  if ((plt.$flags$ & 1
+  /* isTmpDisconnected */
+  ) === 0) {
+    var hostRef = getHostRef(elm);
+    var instance = hostRef.$lazyInstance$;
+    {
+      if (hostRef.$rmListeners$) {
+        hostRef.$rmListeners$.map(rmListener => rmListener());
+        hostRef.$rmListeners$ = undefined;
+      }
+    } // clear CSS var-shim tracking
+
+    if (plt.$cssShim$) {
+      plt.$cssShim$.removeHost(elm);
+    }
+
+    {
+      safeCall(instance, 'disconnectedCallback');
+    }
+  }
+};
+
+var bootstrapLazy = function bootstrapLazy(lazyBundles) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var endBootstrap = createTime();
+  var cmpTags = [];
+  var exclude = options.exclude || [];
+  var customElements = win.customElements;
+  var head = doc.head;
+  var metaCharset = /*@__PURE__*/head.querySelector('meta[charset]');
+  var visibilityStyle = /*@__PURE__*/doc.createElement('style');
+  var deferredConnectedCallbacks = [];
+  var styles = /*@__PURE__*/doc.querySelectorAll("[".concat(HYDRATED_STYLE_ID, "]"));
+  var appLoadFallback;
+  var isBootstrapping = true;
+  var i = 0;
+  Object.assign(plt, options);
+  plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
+  {
+    // If the app is already hydrated there is not point to disable the
+    // async queue. This will improve the first input delay
+    plt.$flags$ |= 2
+    /* appLoaded */
+    ;
+  }
+  {
+    for (; i < styles.length; i++) {
+      registerStyle(styles[i].getAttribute(HYDRATED_STYLE_ID), convertScopedToShadow(styles[i].innerHTML), true);
+    }
+  }
+  lazyBundles.map(lazyBundle => lazyBundle[1].map(compactMeta => {
+    var cmpMeta = {
+      $flags$: compactMeta[0],
+      $tagName$: compactMeta[1],
+      $members$: compactMeta[2],
+      $listeners$: compactMeta[3]
+    };
+    {
+      cmpMeta.$members$ = compactMeta[2];
+    }
+    {
+      cmpMeta.$listeners$ = compactMeta[3];
+    }
+    {
+      cmpMeta.$attrsToReflect$ = [];
+    }
+    {
+      cmpMeta.$watchers$ = {};
+    }
+
+    if (!supportsShadow && cmpMeta.$flags$ & 1
+    /* shadowDomEncapsulation */
+    ) {
+        cmpMeta.$flags$ |= 8
+        /* needsShadowDomShim */
+        ;
+      }
+
+    var tagName = cmpMeta.$tagName$;
+    var HostElement = class extends HTMLElement {
+      // StencilLazyHost
+      constructor(self) {
+        // @ts-ignore
+        super(self);
+        self = this;
+        registerHost(self, cmpMeta);
+
+        if (cmpMeta.$flags$ & 1
+        /* shadowDomEncapsulation */
+        ) {
+            // this component is using shadow dom
+            // and this browser supports shadow dom
+            // add the read-only property "shadowRoot" to the host element
+            // adding the shadow root build conditionals to minimize runtime
+            if (supportsShadow) {
+              {
+                self.attachShadow({
+                  mode: 'open',
+                  delegatesFocus: !!(cmpMeta.$flags$ & 16
+                  /* shadowDelegatesFocus */
+                  )
+                });
+              }
+            } else if (!('shadowRoot' in self)) {
+              self.shadowRoot = self;
+            }
+          }
+      }
+
+      connectedCallback() {
+        if (appLoadFallback) {
+          clearTimeout(appLoadFallback);
+          appLoadFallback = null;
+        }
+
+        if (isBootstrapping) {
+          // connectedCallback will be processed once all components have been registered
+          deferredConnectedCallbacks.push(this);
+        } else {
+          plt.jmp(() => connectedCallback(this));
+        }
+      }
+
+      disconnectedCallback() {
+        plt.jmp(() => disconnectedCallback(this));
+      }
+
+      componentOnReady() {
+        return getHostRef(this).$onReadyPromise$;
+      }
+
+    };
+    cmpMeta.$lazyBundleId$ = lazyBundle[0];
+
+    if (!exclude.includes(tagName) && !customElements.get(tagName)) {
+      cmpTags.push(tagName);
+      customElements.define(tagName, proxyComponent(HostElement, cmpMeta, 1
+      /* isElementConstructor */
+      ));
+    }
+  }));
+  {
+    visibilityStyle.innerHTML = cmpTags + HYDRATED_CSS;
+    visibilityStyle.setAttribute('data-styles', '');
+    head.insertBefore(visibilityStyle, metaCharset ? metaCharset.nextSibling : head.firstChild);
+  } // Process deferred connectedCallbacks now all components have been registered
+
+  isBootstrapping = false;
+
+  if (deferredConnectedCallbacks.length) {
+    deferredConnectedCallbacks.map(host => host.connectedCallback());
+  } else {
+    {
+      plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30));
+    }
+  } // Fallback appLoad event
+
+
+  endBootstrap();
+};
+
+var getAssetPath = path => {
+  var assetUrl = new URL(path, plt.$resourcesUrl$);
+  return assetUrl.origin !== win.location.origin ? assetUrl.href : assetUrl.pathname;
+};
+
+var hostRefs = new WeakMap();
+
+var getHostRef = ref => hostRefs.get(ref);
+
+var registerInstance = (lazyInstance, hostRef) => hostRefs.set(hostRef.$lazyInstance$ = lazyInstance, hostRef);
+
+var registerHost = (elm, cmpMeta) => {
+  var hostRef = {
+    $flags$: 0,
+    $hostElement$: elm,
+    $cmpMeta$: cmpMeta,
+    $instanceValues$: new Map()
+  };
+  {
+    hostRef.$onInstancePromise$ = new Promise(r => hostRef.$onInstanceResolve$ = r);
+  }
+  {
+    hostRef.$onReadyPromise$ = new Promise(r => hostRef.$onReadyResolve$ = r);
+    elm['s-p'] = [];
+    elm['s-rc'] = [];
+  }
+  addHostEventListeners(elm, hostRef, cmpMeta.$listeners$);
+  return hostRefs.set(elm, hostRef);
+};
+
+var isMemberInElement = (elm, memberName) => memberName in elm;
+
+var consoleError = (e, el) => (0, console.error)(e, el);
+
+var cmpModules = /*@__PURE__*/new Map();
+
+var loadModule = (cmpMeta, hostRef, hmrVersionId) => {
+  // loadModuleImport
+  var exportName = cmpMeta.$tagName$.replace(/-/g, '_');
+  var bundleId = cmpMeta.$lazyBundleId$;
+  var module = cmpModules.get(bundleId);
+
+  if (module) {
+    return module[exportName];
+  }
+
+  return Promise.resolve().then(function () {
+    return /*#__PURE__*/_interopNamespace(require(
+    /* webpackInclude: /\.entry\.js$/ */
+
+    /* webpackExclude: /\.system\.entry\.js$/ */
+
+    /* webpackMode: "lazy" */
+    "./".concat(bundleId, ".entry.js")));
+  }).then(importedModule => {
+    {
+      cmpModules.set(bundleId, importedModule);
+    }
+    return importedModule[exportName];
+  }, consoleError);
+};
+
+var styles = new Map();
+var modeResolutionChain = [];
+var queueDomReads = [];
+var queueDomWrites = [];
+
+var queueTask = (queue, write) => cb => {
+  queue.push(cb);
+
+  if (!queuePending) {
+    queuePending = true;
+
+    if (write && plt.$flags$ & 4
+    /* queueSync */
+    ) {
+        nextTick(flush);
+      } else {
+      plt.raf(flush);
+    }
+  }
+};
+
+var consume = queue => {
+  for (var i = 0; i < queue.length; i++) {
+    try {
+      queue[i](performance.now());
+    } catch (e) {
+      consoleError(e);
+    }
+  }
+
+  queue.length = 0;
+};
+
+var flush = () => {
+  // always force a bunch of medium callbacks to run, but still have
+  // a throttle on how many can run in a certain time
+  // DOM READS!!!
+  consume(queueDomReads); // DOM WRITES!!!
+
+  {
+    consume(queueDomWrites);
+
+    if (queuePending = queueDomReads.length > 0) {
+      // still more to do yet, but we've run out of time
+      // let's let this thing cool off and try again in the next tick
+      plt.raf(flush);
+    }
+  }
+};
+
+var nextTick = /*@__PURE__*/cb => promiseResolve().then(cb);
+
+var readTask = /*@__PURE__*/queueTask(queueDomReads, false);
+var writeTask = /*@__PURE__*/queueTask(queueDomWrites, true);
+var Build = {
+  isDev: false,
+  isBrowser: true,
+  isServer: false,
+  isTesting: false
+};
+exports.Build = Build;
+exports.CSS = CSS;
+exports.Host = Host;
+exports.NAMESPACE = NAMESPACE;
+exports.bootstrapLazy = bootstrapLazy;
+exports.createEvent = createEvent;
+exports.doc = doc;
+exports.forceUpdate = forceUpdate;
+exports.getAssetPath = getAssetPath;
+exports.getElement = getElement;
+exports.getMode = getMode;
+exports.h = h;
+exports.plt = plt;
+exports.promiseResolve = promiseResolve;
+exports.readTask = readTask;
+exports.registerInstance = registerInstance;
+exports.setMode = setMode;
+exports.win = win;
+exports.writeTask = writeTask;
+  })();
+});
+require.register("@ionic/core/dist/cjs/index-c44b932c.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+var ionicGlobal = require('./ionic-global-75ba08dd.js');
+
+var animation = require('./animation-9929f2ae.js');
+
+var hardwareBackButton = require('./hardware-back-button-148ce546.js');
+/**
+ * baseAnimation
+ * Base class which is extended by the various types. Each
+ * type will provide their own animations for open and close
+ * and registers itself with Menu.
+ */
+
+
+var baseAnimation = isIos => {
+  // https://material.io/guidelines/motion/movement.html#movement-movement-in-out-of-screen-bounds
+  // https://material.io/guidelines/motion/duration-easing.html#duration-easing-natural-easing-curves
+
+  /**
+   * "Apply the sharp curve to items temporarily leaving the screen that may return
+   * from the same exit point. When they return, use the deceleration curve. On mobile,
+   * this transition typically occurs over 300ms" -- MD Motion Guide
+   */
+  return animation.createAnimation().duration(isIos ? 400 : 300);
+};
+/**
+ * Menu Overlay Type
+ * The menu slides over the content. The content
+ * itself, which is under the menu, does not move.
+ */
+
+
+var menuOverlayAnimation = menu => {
+  var closedX;
+  var openedX;
+  var width = menu.width + 8;
+  var menuAnimation = animation.createAnimation();
+  var backdropAnimation = animation.createAnimation();
+
+  if (menu.isEndSide) {
+    // right side
+    closedX = width + 'px';
+    openedX = '0px';
+  } else {
+    // left side
+    closedX = -width + 'px';
+    openedX = '0px';
+  }
+
+  menuAnimation.addElement(menu.menuInnerEl).fromTo('transform', "translateX(".concat(closedX, ")"), "translateX(".concat(openedX, ")"));
+  var mode = ionicGlobal.getIonMode(menu);
+  var isIos = mode === 'ios';
+  var opacity = isIos ? 0.2 : 0.25;
+  backdropAnimation.addElement(menu.backdropEl).fromTo('opacity', 0.01, opacity);
+  return baseAnimation(isIos).addAnimation([menuAnimation, backdropAnimation]);
+};
+/**
+ * Menu Push Type
+ * The content slides over to reveal the menu underneath.
+ * The menu itself also slides over to reveal its bad self.
+ */
+
+
+var menuPushAnimation = menu => {
+  var contentOpenedX;
+  var menuClosedX;
+  var mode = ionicGlobal.getIonMode(menu);
+  var width = menu.width;
+
+  if (menu.isEndSide) {
+    contentOpenedX = -width + 'px';
+    menuClosedX = width + 'px';
+  } else {
+    contentOpenedX = width + 'px';
+    menuClosedX = -width + 'px';
+  }
+
+  var menuAnimation = animation.createAnimation().addElement(menu.menuInnerEl).fromTo('transform', "translateX(".concat(menuClosedX, ")"), 'translateX(0px)');
+  var contentAnimation = animation.createAnimation().addElement(menu.contentEl).fromTo('transform', 'translateX(0px)', "translateX(".concat(contentOpenedX, ")"));
+  var backdropAnimation = animation.createAnimation().addElement(menu.backdropEl).fromTo('opacity', 0.01, 0.32);
+  return baseAnimation(mode === 'ios').addAnimation([menuAnimation, contentAnimation, backdropAnimation]);
+};
+/**
+ * Menu Reveal Type
+ * The content slides over to reveal the menu underneath.
+ * The menu itself, which is under the content, does not move.
+ */
+
+
+var menuRevealAnimation = menu => {
+  var mode = ionicGlobal.getIonMode(menu);
+  var openedX = menu.width * (menu.isEndSide ? -1 : 1) + 'px';
+  var contentOpen = animation.createAnimation().addElement(menu.contentEl) // REVIEW
+  .fromTo('transform', 'translateX(0px)', "translateX(".concat(openedX, ")"));
+  return baseAnimation(mode === 'ios').addAnimation(contentOpen);
+};
+
+var createMenuController = () => {
+  var menuAnimations = new Map();
+  var menus = [];
+
+  var open = /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator(function* (menu) {
+      var menuEl = yield get(menu);
+
+      if (menuEl) {
+        return menuEl.open();
+      }
+
+      return false;
+    });
+
+    return function open(_x) {
+      return _ref.apply(this, arguments);
+    };
+  }();
+
+  var close = /*#__PURE__*/function () {
+    var _ref2 = _asyncToGenerator(function* (menu) {
+      var menuEl = yield menu !== undefined ? get(menu) : getOpen();
+
+      if (menuEl !== undefined) {
+        return menuEl.close();
+      }
+
+      return false;
+    });
+
+    return function close(_x2) {
+      return _ref2.apply(this, arguments);
+    };
+  }();
+
+  var toggle = /*#__PURE__*/function () {
+    var _ref3 = _asyncToGenerator(function* (menu) {
+      var menuEl = yield get(menu);
+
+      if (menuEl) {
+        return menuEl.toggle();
+      }
+
+      return false;
+    });
+
+    return function toggle(_x3) {
+      return _ref3.apply(this, arguments);
+    };
+  }();
+
+  var enable = /*#__PURE__*/function () {
+    var _ref4 = _asyncToGenerator(function* (shouldEnable, menu) {
+      var menuEl = yield get(menu);
+
+      if (menuEl) {
+        menuEl.disabled = !shouldEnable;
+      }
+
+      return menuEl;
+    });
+
+    return function enable(_x4, _x5) {
+      return _ref4.apply(this, arguments);
+    };
+  }();
+
+  var swipeGesture = /*#__PURE__*/function () {
+    var _ref5 = _asyncToGenerator(function* (shouldEnable, menu) {
+      var menuEl = yield get(menu);
+
+      if (menuEl) {
+        menuEl.swipeGesture = shouldEnable;
+      }
+
+      return menuEl;
+    });
+
+    return function swipeGesture(_x6, _x7) {
+      return _ref5.apply(this, arguments);
+    };
+  }();
+
+  var isOpen = /*#__PURE__*/function () {
+    var _ref6 = _asyncToGenerator(function* (menu) {
+      if (menu != null) {
+        var menuEl = yield get(menu);
+        return menuEl !== undefined && menuEl.isOpen();
+      } else {
+        var _menuEl = yield getOpen();
+
+        return _menuEl !== undefined;
+      }
+    });
+
+    return function isOpen(_x8) {
+      return _ref6.apply(this, arguments);
+    };
+  }();
+
+  var isEnabled = /*#__PURE__*/function () {
+    var _ref7 = _asyncToGenerator(function* (menu) {
+      var menuEl = yield get(menu);
+
+      if (menuEl) {
+        return !menuEl.disabled;
+      }
+
+      return false;
+    });
+
+    return function isEnabled(_x9) {
+      return _ref7.apply(this, arguments);
+    };
+  }();
+
+  var get = /*#__PURE__*/function () {
+    var _ref8 = _asyncToGenerator(function* (menu) {
+      yield waitUntilReady();
+
+      if (menu === 'start' || menu === 'end') {
+        // there could be more than one menu on the same side
+        // so first try to get the enabled one
+        var menuRef = find(m => m.side === menu && !m.disabled);
+
+        if (menuRef) {
+          return menuRef;
+        } // didn't find a menu side that is enabled
+        // so try to get the first menu side found
+
+
+        return find(m => m.side === menu);
+      } else if (menu != null) {
+        // the menuId was not left or right
+        // so try to get the menu by its "id"
+        return find(m => m.menuId === menu);
+      } // return the first enabled menu
+
+
+      var menuEl = find(m => !m.disabled);
+
+      if (menuEl) {
+        return menuEl;
+      } // get the first menu in the array, if one exists
+
+
+      return menus.length > 0 ? menus[0].el : undefined;
+    });
+
+    return function get(_x10) {
+      return _ref8.apply(this, arguments);
+    };
+  }();
+  /**
+   * Get the instance of the opened menu. Returns `null` if a menu is not found.
+   */
+
+
+  var getOpen = /*#__PURE__*/function () {
+    var _ref9 = _asyncToGenerator(function* () {
+      yield waitUntilReady();
+      return _getOpenSync();
+    });
+
+    return function getOpen() {
+      return _ref9.apply(this, arguments);
+    };
+  }();
+  /**
+   * Get all menu instances.
+   */
+
+
+  var getMenus = /*#__PURE__*/function () {
+    var _ref10 = _asyncToGenerator(function* () {
+      yield waitUntilReady();
+      return getMenusSync();
+    });
+
+    return function getMenus() {
+      return _ref10.apply(this, arguments);
+    };
+  }();
+  /**
+   * Get whether or not a menu is animating. Returns `true` if any
+   * menu is currently animating.
+   */
+
+
+  var isAnimating = /*#__PURE__*/function () {
+    var _ref11 = _asyncToGenerator(function* () {
+      yield waitUntilReady();
+      return isAnimatingSync();
+    });
+
+    return function isAnimating() {
+      return _ref11.apply(this, arguments);
+    };
+  }();
+
+  var registerAnimation = (name, animation) => {
+    menuAnimations.set(name, animation);
+  };
+
+  var _register = menu => {
+    if (menus.indexOf(menu) < 0) {
+      if (!menu.disabled) {
+        _setActiveMenu(menu);
+      }
+
+      menus.push(menu);
+    }
+  };
+
+  var _unregister = menu => {
+    var index = menus.indexOf(menu);
+
+    if (index > -1) {
+      menus.splice(index, 1);
+    }
+  };
+
+  var _setActiveMenu = menu => {
+    // if this menu should be enabled
+    // then find all the other menus on this same side
+    // and automatically disable other same side menus
+    var side = menu.side;
+    menus.filter(m => m.side === side && m !== menu).forEach(m => m.disabled = true);
+  };
+
+  var _setOpen = /*#__PURE__*/function () {
+    var _ref12 = _asyncToGenerator(function* (menu, shouldOpen, animated) {
+      if (isAnimatingSync()) {
+        return false;
+      }
+
+      if (shouldOpen) {
+        var openedMenu = yield getOpen();
+
+        if (openedMenu && menu.el !== openedMenu) {
+          yield openedMenu.setOpen(false, false);
+        }
+      }
+
+      return menu._setOpen(shouldOpen, animated);
+    });
+
+    return function _setOpen(_x11, _x12, _x13) {
+      return _ref12.apply(this, arguments);
+    };
+  }();
+
+  var _createAnimation = (type, menuCmp) => {
+    var animationBuilder = menuAnimations.get(type);
+
+    if (!animationBuilder) {
+      throw new Error('animation not registered');
+    }
+
+    var animation = animationBuilder(menuCmp);
+    return animation;
+  };
+
+  var _getOpenSync = () => {
+    return find(m => m._isOpen);
+  };
+
+  var getMenusSync = () => {
+    return menus.map(menu => menu.el);
+  };
+
+  var isAnimatingSync = () => {
+    return menus.some(menu => menu.isAnimating);
+  };
+
+  var find = predicate => {
+    var instance = menus.find(predicate);
+
+    if (instance !== undefined) {
+      return instance.el;
+    }
+
+    return undefined;
+  };
+
+  var waitUntilReady = () => {
+    return Promise.all(Array.from(document.querySelectorAll('ion-menu')).map(menu => menu.componentOnReady()));
+  };
+
+  registerAnimation('reveal', menuRevealAnimation);
+  registerAnimation('push', menuPushAnimation);
+  registerAnimation('overlay', menuOverlayAnimation);
+  /* tslint:disable-next-line */
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('ionBackButton', ev => {
+      var openMenu = _getOpenSync();
+
+      if (openMenu) {
+        ev.detail.register(hardwareBackButton.MENU_BACK_BUTTON_PRIORITY, () => {
+          return openMenu.close();
+        });
+      }
+    });
+  }
+
+  return {
+    registerAnimation,
+    get,
+    getMenus,
+    getOpen,
+    isEnabled,
+    swipeGesture,
+    isAnimating,
+    isOpen,
+    enable,
+    toggle,
+    close,
+    open,
+    _getOpenSync,
+    _createAnimation,
+    _register,
+    _unregister,
+    _setOpen,
+    _setActiveMenu
+  };
+};
+
+var menuController = /*@__PURE__*/createMenuController();
+exports.menuController = menuController;
+  })();
+});
+require.register("@ionic/core/dist/cjs/index-e1bb33c3.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+/**
+ * Does a simple sanitization of all elements
+ * in an untrusted string
+ */
+
+var sanitizeDOMString = untrustedString => {
+  try {
+    if (untrustedString instanceof IonicSafeString) {
+      return untrustedString.value;
+    }
+
+    if (!isSanitizerEnabled() || typeof untrustedString !== 'string' || untrustedString === '') {
+      return untrustedString;
+    }
+    /**
+     * Create a document fragment
+     * separate from the main DOM,
+     * create a div to do our work in
+     */
+
+
+    var documentFragment = document.createDocumentFragment();
+    var workingDiv = document.createElement('div');
+    documentFragment.appendChild(workingDiv);
+    workingDiv.innerHTML = untrustedString;
+    /**
+     * Remove any elements
+     * that are blocked
+     */
+
+    blockedTags.forEach(blockedTag => {
+      var getElementsToRemove = documentFragment.querySelectorAll(blockedTag);
+
+      for (var elementIndex = getElementsToRemove.length - 1; elementIndex >= 0; elementIndex--) {
+        var element = getElementsToRemove[elementIndex];
+
+        if (element.parentNode) {
+          element.parentNode.removeChild(element);
+        } else {
+          documentFragment.removeChild(element);
+        }
+        /**
+         * We still need to sanitize
+         * the children of this element
+         * as they are left behind
+         */
+
+
+        var childElements = getElementChildren(element);
+        /* tslint:disable-next-line */
+
+        for (var childIndex = 0; childIndex < childElements.length; childIndex++) {
+          sanitizeElement(childElements[childIndex]);
+        }
+      }
+    });
+    /**
+     * Go through remaining elements and remove
+     * non-allowed attribs
+     */
+    // IE does not support .children on document fragments, only .childNodes
+
+    var dfChildren = getElementChildren(documentFragment);
+    /* tslint:disable-next-line */
+
+    for (var childIndex = 0; childIndex < dfChildren.length; childIndex++) {
+      sanitizeElement(dfChildren[childIndex]);
+    } // Append document fragment to div
+
+
+    var fragmentDiv = document.createElement('div');
+    fragmentDiv.appendChild(documentFragment); // First child is always the div we did our work in
+
+    var getInnerDiv = fragmentDiv.querySelector('div');
+    return getInnerDiv !== null ? getInnerDiv.innerHTML : fragmentDiv.innerHTML;
+  } catch (err) {
+    console.error(err);
+    return '';
+  }
+};
+/**
+ * Clean up current element based on allowed attributes
+ * and then recursively dig down into any child elements to
+ * clean those up as well
+ */
+
+
+var sanitizeElement = element => {
+  // IE uses childNodes, so ignore nodes that are not elements
+  if (element.nodeType && element.nodeType !== 1) {
+    return;
+  }
+
+  for (var i = element.attributes.length - 1; i >= 0; i--) {
+    var attribute = element.attributes.item(i);
+    var attributeName = attribute.name; // remove non-allowed attribs
+
+    if (!allowedAttributes.includes(attributeName.toLowerCase())) {
+      element.removeAttribute(attributeName);
+      continue;
+    } // clean up any allowed attribs
+    // that attempt to do any JS funny-business
+
+
+    var attributeValue = attribute.value;
+    /* tslint:disable-next-line */
+
+    if (attributeValue != null && attributeValue.toLowerCase().includes('javascript:')) {
+      element.removeAttribute(attributeName);
+    }
+  }
+  /**
+   * Sanitize any nested children
+   */
+
+
+  var childElements = getElementChildren(element);
+  /* tslint:disable-next-line */
+
+  for (var _i = 0; _i < childElements.length; _i++) {
+    sanitizeElement(childElements[_i]);
+  }
+};
+/**
+ * IE doesn't always support .children
+ * so we revert to .childNodes instead
+ */
+
+
+var getElementChildren = el => {
+  return el.children != null ? el.children : el.childNodes;
+};
+
+var isSanitizerEnabled = () => {
+  var win = window;
+  var config = win && win.Ionic && win.Ionic.config;
+
+  if (config) {
+    if (config.get) {
+      return config.get('sanitizerEnabled', true);
+    } else {
+      return config.sanitizerEnabled === true || config.sanitizerEnabled === undefined;
+    }
+  }
+
+  return true;
+};
+
+var allowedAttributes = ['class', 'id', 'href', 'src', 'name', 'slot'];
+var blockedTags = ['script', 'style', 'iframe', 'meta', 'link', 'object', 'embed'];
+
+class IonicSafeString {
+  constructor(value) {
+    this.value = value;
+  }
+
+}
+
+exports.IonicSafeString = IonicSafeString;
+exports.sanitizeDOMString = sanitizeDOMString;
+  })();
+});
+require.register("@ionic/core/dist/cjs/index.cjs.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+require('./index-a35cc20f.js');
+
+var ionicGlobal = require('./ionic-global-75ba08dd.js');
+
+require('./helpers-7e840ed2.js');
+
+var animation = require('./animation-9929f2ae.js');
+
+var index$2 = require('./index-3d9409db.js');
+
+var ios_transition = require('./ios.transition-93930998.js');
+
+var md_transition = require('./md.transition-407efd2b.js');
+
+var cubicBezier = require('./cubic-bezier-0b2ccc35.js');
+
+require('./gesture-controller-29adda71.js');
+
+var index = require('./index-98d43f07.js');
+
+var index$1 = require('./index-e1bb33c3.js');
+
+require('./hardware-back-button-148ce546.js');
+
+var index$3 = require('./index-c44b932c.js');
+
+var overlays = require('./overlays-c83d7754.js');
+
+var setupConfig = config => {
+  var win = window;
+  var Ionic = win.Ionic;
+
+  if (Ionic && Ionic.config && Ionic.config.constructor.name !== 'Object') {
+    console.error('ionic config was already initialized');
+    return;
+  }
+
+  win.Ionic = win.Ionic || {};
+  win.Ionic.config = Object.assign(Object.assign({}, win.Ionic.config), config);
+  return win.Ionic.config;
+};
+
+var getMode = () => {
+  var win = window;
+  var config = win && win.Ionic && win.Ionic.config;
+
+  if (config) {
+    if (config.mode) {
+      return config.mode;
+    } else {
+      return config.get('mode');
+    }
+  }
+
+  return 'md';
+};
+
+exports.getPlatforms = ionicGlobal.getPlatforms;
+exports.isPlatform = ionicGlobal.isPlatform;
+exports.createAnimation = animation.createAnimation;
+exports.LIFECYCLE_DID_ENTER = index$2.LIFECYCLE_DID_ENTER;
+exports.LIFECYCLE_DID_LEAVE = index$2.LIFECYCLE_DID_LEAVE;
+exports.LIFECYCLE_WILL_ENTER = index$2.LIFECYCLE_WILL_ENTER;
+exports.LIFECYCLE_WILL_LEAVE = index$2.LIFECYCLE_WILL_LEAVE;
+exports.LIFECYCLE_WILL_UNLOAD = index$2.LIFECYCLE_WILL_UNLOAD;
+exports.iosTransitionAnimation = ios_transition.iosTransitionAnimation;
+exports.mdTransitionAnimation = md_transition.mdTransitionAnimation;
+exports.getTimeGivenProgression = cubicBezier.getTimeGivenProgression;
+exports.createGesture = index.createGesture;
+exports.IonicSafeString = index$1.IonicSafeString;
+exports.menuController = index$3.menuController;
+exports.actionSheetController = overlays.actionSheetController;
+exports.alertController = overlays.alertController;
+exports.loadingController = overlays.loadingController;
+exports.modalController = overlays.modalController;
+exports.pickerController = overlays.pickerController;
+exports.popoverController = overlays.popoverController;
+exports.toastController = overlays.toastController;
+exports.getMode = getMode;
+exports.setupConfig = setupConfig;
+  })();
+});
+require.register("@ionic/core/dist/cjs/ionic-global-75ba08dd.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+
+var index = require('./index-a35cc20f.js');
+
+var getPlatforms = win => setupPlatforms(win);
+
+var isPlatform = (winOrPlatform, platform) => {
+  if (typeof winOrPlatform === 'string') {
+    platform = winOrPlatform;
+    winOrPlatform = undefined;
+  }
+
+  return getPlatforms(winOrPlatform).includes(platform);
+};
+
+var setupPlatforms = function setupPlatforms() {
+  var win = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : window;
+
+  if (typeof win === 'undefined') {
+    return [];
+  }
+
+  win.Ionic = win.Ionic || {};
+  var platforms = win.Ionic.platforms;
+
+  if (platforms == null) {
+    platforms = win.Ionic.platforms = detectPlatforms(win);
+    platforms.forEach(p => win.document.documentElement.classList.add("plt-".concat(p)));
+  }
+
+  return platforms;
+};
+
+var detectPlatforms = win => Object.keys(PLATFORMS_MAP).filter(p => PLATFORMS_MAP[p](win));
+
+var isMobileWeb = win => isMobile(win) && !isHybrid(win);
+
+var isIpad = win => {
+  // iOS 12 and below
+  if (testUserAgent(win, /iPad/i)) {
+    return true;
+  } // iOS 13+
+
+
+  if (testUserAgent(win, /Macintosh/i) && isMobile(win)) {
+    return true;
+  }
+
+  return false;
+};
+
+var isIphone = win => testUserAgent(win, /iPhone/i);
+
+var isIOS = win => testUserAgent(win, /iPhone|iPod/i) || isIpad(win);
+
+var isAndroid = win => testUserAgent(win, /android|sink/i);
+
+var isAndroidTablet = win => {
+  return isAndroid(win) && !testUserAgent(win, /mobile/i);
+};
+
+var isPhablet = win => {
+  var width = win.innerWidth;
+  var height = win.innerHeight;
+  var smallest = Math.min(width, height);
+  var largest = Math.max(width, height);
+  return smallest > 390 && smallest < 520 && largest > 620 && largest < 800;
+};
+
+var isTablet = win => {
+  var width = win.innerWidth;
+  var height = win.innerHeight;
+  var smallest = Math.min(width, height);
+  var largest = Math.max(width, height);
+  return isIpad(win) || isAndroidTablet(win) || smallest > 460 && smallest < 820 && largest > 780 && largest < 1400;
+};
+
+var isMobile = win => matchMedia(win, '(any-pointer:coarse)');
+
+var isDesktop = win => !isMobile(win);
+
+var isHybrid = win => isCordova(win) || isCapacitorNative(win);
+
+var isCordova = win => !!(win['cordova'] || win['phonegap'] || win['PhoneGap']);
+
+var isCapacitorNative = win => {
+  var capacitor = win['Capacitor'];
+  return !!(capacitor && capacitor.isNative);
+};
+
+var isElectron = win => testUserAgent(win, /electron/i);
+
+var isPWA = win => !!(win.matchMedia('(display-mode: standalone)').matches || win.navigator.standalone);
+
+var testUserAgent = (win, expr) => expr.test(win.navigator.userAgent);
+
+var matchMedia = (win, query) => win.matchMedia(query).matches;
+
+var PLATFORMS_MAP = {
+  'ipad': isIpad,
+  'iphone': isIphone,
+  'ios': isIOS,
+  'android': isAndroid,
+  'phablet': isPhablet,
+  'tablet': isTablet,
+  'cordova': isCordova,
+  'capacitor': isCapacitorNative,
+  'electron': isElectron,
+  'pwa': isPWA,
+  'mobile': isMobile,
+  'mobileweb': isMobileWeb,
+  'desktop': isDesktop,
+  'hybrid': isHybrid
+};
+
+class Config {
+  constructor() {
+    this.m = new Map();
+  }
+
+  reset(configObj) {
+    this.m = new Map(Object.entries(configObj));
+  }
+
+  get(key, fallback) {
+    var value = this.m.get(key);
+    return value !== undefined ? value : fallback;
+  }
+
+  getBoolean(key) {
+    var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    var val = this.m.get(key);
+
+    if (val === undefined) {
+      return fallback;
+    }
+
+    if (typeof val === 'string') {
+      return val === 'true';
+    }
+
+    return !!val;
+  }
+
+  getNumber(key, fallback) {
+    var val = parseFloat(this.m.get(key));
+    return isNaN(val) ? fallback !== undefined ? fallback : NaN : val;
+  }
+
+  set(key, value) {
+    this.m.set(key, value);
+  }
+
+}
+
+var config = /*@__PURE__*/new Config();
+
+var configFromSession = win => {
+  try {
+    var configStr = win.sessionStorage.getItem(IONIC_SESSION_KEY);
+    return configStr !== null ? JSON.parse(configStr) : {};
+  } catch (e) {
+    return {};
+  }
+};
+
+var saveConfig = (win, c) => {
+  try {
+    win.sessionStorage.setItem(IONIC_SESSION_KEY, JSON.stringify(c));
+  } catch (e) {
+    return;
+  }
+};
+
+var configFromURL = win => {
+  var configObj = {};
+  win.location.search.slice(1).split('&').map(entry => entry.split('=')).map((_ref) => {
+    var [key, value] = _ref;
+    return [decodeURIComponent(key), decodeURIComponent(value)];
+  }).filter((_ref2) => {
+    var [key] = _ref2;
+    return startsWith(key, IONIC_PREFIX);
+  }).map((_ref3) => {
+    var [key, value] = _ref3;
+    return [key.slice(IONIC_PREFIX.length), value];
+  }).forEach((_ref4) => {
+    var [key, value] = _ref4;
+    configObj[key] = value;
+  });
+  return configObj;
+};
+
+var startsWith = (input, search) => {
+  return input.substr(0, search.length) === search;
+};
+
+var IONIC_PREFIX = 'ionic:';
+var IONIC_SESSION_KEY = 'ionic-persist-config';
+var defaultMode;
+
+var getIonMode = ref => {
+  return ref && index.getMode(ref) || defaultMode;
+};
+
+var appGlobalScript = () => {
+  var doc = document;
+  var win = window;
+  var Ionic = win.Ionic = win.Ionic || {}; // Setup platforms
+
+  setupPlatforms(win); // create the Ionic.config from raw config object (if it exists)
+  // and convert Ionic.config into a ConfigApi that has a get() fn
+
+  var configObj = Object.assign(Object.assign(Object.assign(Object.assign({}, configFromSession(win)), {
+    persistConfig: false
+  }), Ionic.config), configFromURL(win));
+  config.reset(configObj);
+
+  if (config.getBoolean('persistConfig')) {
+    saveConfig(win, configObj);
+  } // first see if the mode was set as an attribute on <html>
+  // which could have been set by the user, or by pre-rendering
+  // otherwise get the mode via config settings, and fallback to md
+
+
+  Ionic.config = config;
+  Ionic.mode = defaultMode = config.get('mode', doc.documentElement.getAttribute('mode') || (isPlatform(win, 'ios') ? 'ios' : 'md'));
+  config.set('mode', defaultMode);
+  doc.documentElement.setAttribute('mode', defaultMode);
+  doc.documentElement.classList.add(defaultMode);
+
+  if (config.getBoolean('_testing')) {
+    config.set('animated', false);
+  }
+
+  var isIonicElement = elm => elm.tagName && elm.tagName.startsWith('ION-');
+
+  var isAllowedIonicModeValue = elmMode => ['ios', 'md'].includes(elmMode);
+
+  index.setMode(elm => {
+    while (elm) {
+      var elmMode = elm.mode || elm.getAttribute('mode');
+
+      if (elmMode) {
+        if (isAllowedIonicModeValue(elmMode)) {
+          return elmMode;
+        } else if (isIonicElement(elm)) {
+          console.warn('Invalid ionic mode: "' + elmMode + '", expected: "ios" or "md"');
+        }
+      }
+
+      elm = elm.parentElement;
+    }
+
+    return defaultMode;
+  });
+};
+
+exports.appGlobalScript = appGlobalScript;
+exports.config = config;
+exports.getIonMode = getIonMode;
+exports.getPlatforms = getPlatforms;
+exports.isPlatform = isPlatform;
+  })();
+});
+require.register("@ionic/core/dist/cjs/ios.transition-93930998.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+
+require('./index-a35cc20f.js');
+
+require('./helpers-7e840ed2.js');
+
+var animation = require('./animation-9929f2ae.js');
+
+var index = require('./index-3d9409db.js');
+
+var DURATION = 540;
+
+var getClonedElement = tagName => {
+  return document.querySelector("".concat(tagName, ".ion-cloned-element"));
+};
+
+var shadow = el => {
+  return el.shadowRoot || el;
+};
+
+var getLargeTitle = refEl => {
+  var tabs = refEl.tagName === 'ION-TABS' ? refEl : refEl.querySelector('ion-tabs');
+  var query = 'ion-header:not(.header-collapse-condense-inactive) ion-title.title-large';
+
+  if (tabs != null) {
+    var activeTab = tabs.querySelector('ion-tab:not(.tab-hidden), .ion-page:not(.ion-page-hidden)');
+    return activeTab != null ? activeTab.querySelector(query) : null;
+  }
+
+  return refEl.querySelector(query);
+};
+
+var getBackButton = (refEl, backDirection) => {
+  var tabs = refEl.tagName === 'ION-TABS' ? refEl : refEl.querySelector('ion-tabs');
+  var buttonsList = [];
+
+  if (tabs != null) {
+    var activeTab = tabs.querySelector('ion-tab:not(.tab-hidden), .ion-page:not(.ion-page-hidden)');
+
+    if (activeTab != null) {
+      buttonsList = activeTab.querySelectorAll('ion-buttons');
+    }
+  } else {
+    buttonsList = refEl.querySelectorAll('ion-buttons');
+  }
+
+  for (var buttons of buttonsList) {
+    var parentHeader = buttons.closest('ion-header');
+    var activeHeader = parentHeader && !parentHeader.classList.contains('header-collapse-condense-inactive');
+    var backButton = buttons.querySelector('ion-back-button');
+    var buttonsCollapse = buttons.classList.contains('buttons-collapse');
+    var startSlot = buttons.slot === 'start' || buttons.slot === '';
+
+    if (backButton !== null && startSlot && (buttonsCollapse && activeHeader && backDirection || !buttonsCollapse)) {
+      return backButton;
+    }
+  }
+
+  return null;
+};
+
+var createLargeTitleTransition = (rootAnimation, rtl, backDirection, enteringEl, leavingEl) => {
+  var enteringBackButton = getBackButton(enteringEl, backDirection);
+  var leavingLargeTitle = getLargeTitle(leavingEl);
+  var enteringLargeTitle = getLargeTitle(enteringEl);
+  var leavingBackButton = getBackButton(leavingEl, backDirection);
+  var shouldAnimationForward = enteringBackButton !== null && leavingLargeTitle !== null && !backDirection;
+  var shouldAnimationBackward = enteringLargeTitle !== null && leavingBackButton !== null && backDirection;
+
+  if (shouldAnimationForward) {
+    var leavingLargeTitleBox = leavingLargeTitle.getBoundingClientRect();
+    var enteringBackButtonBox = enteringBackButton.getBoundingClientRect();
+    animateLargeTitle(rootAnimation, rtl, backDirection, leavingLargeTitle, leavingLargeTitleBox, enteringBackButtonBox);
+    animateBackButton(rootAnimation, rtl, backDirection, enteringBackButton, leavingLargeTitleBox, enteringBackButtonBox);
+  } else if (shouldAnimationBackward) {
+    var enteringLargeTitleBox = enteringLargeTitle.getBoundingClientRect();
+    var leavingBackButtonBox = leavingBackButton.getBoundingClientRect();
+    animateLargeTitle(rootAnimation, rtl, backDirection, enteringLargeTitle, enteringLargeTitleBox, leavingBackButtonBox);
+    animateBackButton(rootAnimation, rtl, backDirection, leavingBackButton, enteringLargeTitleBox, leavingBackButtonBox);
+  }
+
+  return {
+    forward: shouldAnimationForward,
+    backward: shouldAnimationBackward
+  };
+};
+
+var animateBackButton = (rootAnimation, rtl, backDirection, backButtonEl, largeTitleBox, backButtonBox) => {
+  var BACK_BUTTON_START_OFFSET = rtl ? "calc(100% - ".concat(backButtonBox.right + 4, "px)") : "".concat(backButtonBox.left - 4, "px");
+  var START_TEXT_TRANSLATE = rtl ? '7px' : '-7px';
+  var END_TEXT_TRANSLATE = rtl ? '-4px' : '4px';
+  var ICON_TRANSLATE = rtl ? '-4px' : '4px';
+  var TEXT_ORIGIN_X = rtl ? 'right' : 'left';
+  var ICON_ORIGIN_X = rtl ? 'left' : 'right';
+  var FORWARD_TEXT_KEYFRAMES = [{
+    offset: 0,
+    opacity: 0,
+    transform: "translate3d(".concat(START_TEXT_TRANSLATE, ", ").concat(largeTitleBox.top - 40, "px, 0) scale(2.1)")
+  }, {
+    offset: 1,
+    opacity: 1,
+    transform: "translate3d(".concat(END_TEXT_TRANSLATE, ", ").concat(backButtonBox.top - 46, "px, 0) scale(1)")
+  }];
+  var BACKWARD_TEXT_KEYFRAMES = [{
+    offset: 0,
+    opacity: 1,
+    transform: "translate3d(".concat(END_TEXT_TRANSLATE, ", ").concat(backButtonBox.top - 46, "px, 0) scale(1)")
+  }, {
+    offset: 0.6,
+    opacity: 0
+  }, {
+    offset: 1,
+    opacity: 0,
+    transform: "translate3d(".concat(START_TEXT_TRANSLATE, ", ").concat(largeTitleBox.top - 40, "px, 0) scale(2.1)")
+  }];
+  var TEXT_KEYFRAMES = backDirection ? BACKWARD_TEXT_KEYFRAMES : FORWARD_TEXT_KEYFRAMES;
+  var FORWARD_ICON_KEYFRAMES = [{
+    offset: 0,
+    opacity: 0,
+    transform: "translate3d(".concat(ICON_TRANSLATE, ", ").concat(backButtonBox.top - 41, "px, 0) scale(0.6)")
+  }, {
+    offset: 1,
+    opacity: 1,
+    transform: "translate3d(".concat(ICON_TRANSLATE, ", ").concat(backButtonBox.top - 46, "px, 0) scale(1)")
+  }];
+  var BACKWARD_ICON_KEYFRAMES = [{
+    offset: 0,
+    opacity: 1,
+    transform: "translate3d(".concat(ICON_TRANSLATE, ", ").concat(backButtonBox.top - 46, "px, 0) scale(1)")
+  }, {
+    offset: 0.2,
+    opacity: 0,
+    transform: "translate3d(".concat(ICON_TRANSLATE, ", ").concat(backButtonBox.top - 41, "px, 0) scale(0.6)")
+  }, {
+    offset: 1,
+    opacity: 0,
+    transform: "translate3d(".concat(ICON_TRANSLATE, ", ").concat(backButtonBox.top - 41, "px, 0) scale(0.6)")
+  }];
+  var ICON_KEYFRAMES = backDirection ? BACKWARD_ICON_KEYFRAMES : FORWARD_ICON_KEYFRAMES;
+  var enteringBackButtonTextAnimation = animation.createAnimation();
+  var enteringBackButtonIconAnimation = animation.createAnimation();
+  var clonedBackButtonEl = getClonedElement('ion-back-button');
+  var backButtonTextEl = shadow(clonedBackButtonEl).querySelector('.button-text');
+  var backButtonIconEl = shadow(clonedBackButtonEl).querySelector('ion-icon');
+  clonedBackButtonEl.text = backButtonEl.text;
+  clonedBackButtonEl.mode = backButtonEl.mode;
+  clonedBackButtonEl.icon = backButtonEl.icon;
+  clonedBackButtonEl.color = backButtonEl.color;
+  clonedBackButtonEl.disabled = backButtonEl.disabled;
+  clonedBackButtonEl.style.setProperty('display', 'block');
+  clonedBackButtonEl.style.setProperty('position', 'fixed');
+  enteringBackButtonIconAnimation.addElement(backButtonIconEl);
+  enteringBackButtonTextAnimation.addElement(backButtonTextEl);
+  enteringBackButtonTextAnimation.beforeStyles({
+    'transform-origin': "".concat(TEXT_ORIGIN_X, " center")
+  }).beforeAddWrite(() => {
+    backButtonEl.style.setProperty('display', 'none');
+    clonedBackButtonEl.style.setProperty(TEXT_ORIGIN_X, BACK_BUTTON_START_OFFSET);
+  }).afterAddWrite(() => {
+    backButtonEl.style.setProperty('display', '');
+    clonedBackButtonEl.style.setProperty('display', 'none');
+    clonedBackButtonEl.style.removeProperty(TEXT_ORIGIN_X);
+  }).keyframes(TEXT_KEYFRAMES);
+  enteringBackButtonIconAnimation.beforeStyles({
+    'transform-origin': "".concat(ICON_ORIGIN_X, " center")
+  }).keyframes(ICON_KEYFRAMES);
+  rootAnimation.addAnimation([enteringBackButtonTextAnimation, enteringBackButtonIconAnimation]);
+};
+
+var animateLargeTitle = (rootAnimation, rtl, backDirection, largeTitleEl, largeTitleBox, backButtonBox) => {
+  var TITLE_START_OFFSET = rtl ? "calc(100% - ".concat(largeTitleBox.right, "px)") : "".concat(largeTitleBox.left, "px");
+  var START_TRANSLATE = rtl ? '-18px' : '18px';
+  var ORIGIN_X = rtl ? 'right' : 'left';
+  var BACKWARDS_KEYFRAMES = [{
+    offset: 0,
+    opacity: 0,
+    transform: "translate3d(".concat(START_TRANSLATE, ", ").concat(backButtonBox.top - 4, "px, 0) scale(0.49)")
+  }, {
+    offset: 0.1,
+    opacity: 0
+  }, {
+    offset: 1,
+    opacity: 1,
+    transform: "translate3d(0, ".concat(largeTitleBox.top - 2, "px, 0) scale(1)")
+  }];
+  var FORWARDS_KEYFRAMES = [{
+    offset: 0,
+    opacity: 0.99,
+    transform: "translate3d(0, ".concat(largeTitleBox.top - 2, "px, 0) scale(1)")
+  }, {
+    offset: 0.6,
+    opacity: 0
+  }, {
+    offset: 1,
+    opacity: 0,
+    transform: "translate3d(".concat(START_TRANSLATE, ", ").concat(backButtonBox.top - 4, "px, 0) scale(0.5)")
+  }];
+  var KEYFRAMES = backDirection ? BACKWARDS_KEYFRAMES : FORWARDS_KEYFRAMES;
+  var clonedTitleEl = getClonedElement('ion-title');
+  var clonedLargeTitleAnimation = animation.createAnimation();
+  clonedTitleEl.innerText = largeTitleEl.innerText;
+  clonedTitleEl.size = largeTitleEl.size;
+  clonedTitleEl.color = largeTitleEl.color;
+  clonedLargeTitleAnimation.addElement(clonedTitleEl);
+  clonedLargeTitleAnimation.beforeStyles({
+    'transform-origin': "".concat(ORIGIN_X, " center"),
+    'height': '46px',
+    'display': '',
+    'position': 'relative',
+    [ORIGIN_X]: TITLE_START_OFFSET
+  }).beforeAddWrite(() => {
+    largeTitleEl.style.setProperty('display', 'none');
+  }).afterAddWrite(() => {
+    largeTitleEl.style.setProperty('display', '');
+    clonedTitleEl.style.setProperty('display', 'none');
+  }).keyframes(KEYFRAMES);
+  rootAnimation.addAnimation(clonedLargeTitleAnimation);
+};
+
+var iosTransitionAnimation = (navEl, opts) => {
+  try {
+    var EASING = 'cubic-bezier(0.32,0.72,0,1)';
+    var OPACITY = 'opacity';
+    var TRANSFORM = 'transform';
+    var CENTER = '0%';
+    var OFF_OPACITY = 0.8;
+    var isRTL = navEl.ownerDocument.dir === 'rtl';
+    var OFF_RIGHT = isRTL ? '-99.5%' : '99.5%';
+    var OFF_LEFT = isRTL ? '33%' : '-33%';
+    var enteringEl = opts.enteringEl;
+    var leavingEl = opts.leavingEl;
+    var backDirection = opts.direction === 'back';
+    var contentEl = enteringEl.querySelector(':scope > ion-content');
+    var headerEls = enteringEl.querySelectorAll(':scope > ion-header > *:not(ion-toolbar), :scope > ion-footer > *');
+    var enteringToolBarEls = enteringEl.querySelectorAll(':scope > ion-header > ion-toolbar');
+    var rootAnimation = animation.createAnimation();
+    var enteringContentAnimation = animation.createAnimation();
+    rootAnimation.addElement(enteringEl).duration(opts.duration || DURATION).easing(opts.easing || EASING).fill('both').beforeRemoveClass('ion-page-invisible');
+
+    if (leavingEl && navEl) {
+      var navDecorAnimation = animation.createAnimation();
+      navDecorAnimation.addElement(navEl);
+      rootAnimation.addAnimation(navDecorAnimation);
+    }
+
+    if (!contentEl && enteringToolBarEls.length === 0 && headerEls.length === 0) {
+      enteringContentAnimation.addElement(enteringEl.querySelector(':scope > .ion-page, :scope > ion-nav, :scope > ion-tabs')); // REVIEW
+    } else {
+      enteringContentAnimation.addElement(contentEl); // REVIEW
+
+      enteringContentAnimation.addElement(headerEls);
+    }
+
+    rootAnimation.addAnimation(enteringContentAnimation);
+
+    if (backDirection) {
+      enteringContentAnimation.beforeClearStyles([OPACITY]).fromTo('transform', "translateX(".concat(OFF_LEFT, ")"), "translateX(".concat(CENTER, ")")).fromTo(OPACITY, OFF_OPACITY, 1);
+    } else {
+      // entering content, forward direction
+      enteringContentAnimation.beforeClearStyles([OPACITY]).fromTo('transform', "translateX(".concat(OFF_RIGHT, ")"), "translateX(".concat(CENTER, ")"));
+    }
+
+    if (contentEl) {
+      var enteringTransitionEffectEl = shadow(contentEl).querySelector('.transition-effect');
+
+      if (enteringTransitionEffectEl) {
+        var enteringTransitionCoverEl = enteringTransitionEffectEl.querySelector('.transition-cover');
+        var enteringTransitionShadowEl = enteringTransitionEffectEl.querySelector('.transition-shadow');
+        var enteringTransitionEffect = animation.createAnimation();
+        var enteringTransitionCover = animation.createAnimation();
+        var enteringTransitionShadow = animation.createAnimation();
+        enteringTransitionEffect.addElement(enteringTransitionEffectEl).beforeStyles({
+          opacity: '1',
+          display: 'block'
+        }).afterStyles({
+          opacity: '',
+          display: ''
+        });
+        enteringTransitionCover.addElement(enteringTransitionCoverEl) // REVIEW
+        .beforeClearStyles([OPACITY]).fromTo(OPACITY, 0, 0.1);
+        enteringTransitionShadow.addElement(enteringTransitionShadowEl) // REVIEW
+        .beforeClearStyles([OPACITY]).fromTo(OPACITY, 0.03, 0.70);
+        enteringTransitionEffect.addAnimation([enteringTransitionCover, enteringTransitionShadow]);
+        enteringContentAnimation.addAnimation([enteringTransitionEffect]);
+      }
+    }
+
+    var enteringContentHasLargeTitle = enteringEl.querySelector('ion-header.header-collapse-condense');
+    var {
+      forward,
+      backward
+    } = createLargeTitleTransition(rootAnimation, isRTL, backDirection, enteringEl, leavingEl);
+    enteringToolBarEls.forEach(enteringToolBarEl => {
+      var enteringToolBar = animation.createAnimation();
+      enteringToolBar.addElement(enteringToolBarEl);
+      rootAnimation.addAnimation(enteringToolBar);
+      var enteringTitle = animation.createAnimation();
+      enteringTitle.addElement(enteringToolBarEl.querySelector('ion-title')); // REVIEW
+
+      var enteringToolBarButtons = animation.createAnimation();
+      var buttons = Array.from(enteringToolBarEl.querySelectorAll('ion-buttons,[menuToggle]'));
+      var parentHeader = enteringToolBarEl.closest('ion-header');
+      var inactiveHeader = parentHeader && parentHeader.classList.contains('header-collapse-condense-inactive');
+      var buttonsToAnimate;
+
+      if (backDirection) {
+        buttonsToAnimate = buttons.filter(button => {
+          var isCollapseButton = button.classList.contains('buttons-collapse');
+          return isCollapseButton && !inactiveHeader || !isCollapseButton;
+        });
+      } else {
+        buttonsToAnimate = buttons.filter(button => !button.classList.contains('buttons-collapse'));
+      }
+
+      enteringToolBarButtons.addElement(buttonsToAnimate);
+      var enteringToolBarItems = animation.createAnimation();
+      enteringToolBarItems.addElement(enteringToolBarEl.querySelectorAll(':scope > *:not(ion-title):not(ion-buttons):not([menuToggle])'));
+      var enteringToolBarBg = animation.createAnimation();
+      enteringToolBarBg.addElement(shadow(enteringToolBarEl).querySelector('.toolbar-background')); // REVIEW
+
+      var enteringBackButton = animation.createAnimation();
+      var backButtonEl = enteringToolBarEl.querySelector('ion-back-button');
+
+      if (backButtonEl) {
+        enteringBackButton.addElement(backButtonEl);
+      }
+
+      enteringToolBar.addAnimation([enteringTitle, enteringToolBarButtons, enteringToolBarItems, enteringToolBarBg, enteringBackButton]);
+      enteringToolBarButtons.fromTo(OPACITY, 0.01, 1);
+      enteringToolBarItems.fromTo(OPACITY, 0.01, 1);
+
+      if (backDirection) {
+        if (!inactiveHeader) {
+          enteringTitle.fromTo('transform', "translateX(".concat(OFF_LEFT, ")"), "translateX(".concat(CENTER, ")")).fromTo(OPACITY, 0.01, 1);
+        }
+
+        enteringToolBarItems.fromTo('transform', "translateX(".concat(OFF_LEFT, ")"), "translateX(".concat(CENTER, ")")); // back direction, entering page has a back button
+
+        enteringBackButton.fromTo(OPACITY, 0.01, 1);
+      } else {
+        // entering toolbar, forward direction
+        if (!enteringContentHasLargeTitle) {
+          enteringTitle.fromTo('transform', "translateX(".concat(OFF_RIGHT, ")"), "translateX(".concat(CENTER, ")")).fromTo(OPACITY, 0.01, 1);
+        }
+
+        enteringToolBarItems.fromTo('transform', "translateX(".concat(OFF_RIGHT, ")"), "translateX(".concat(CENTER, ")"));
+        enteringToolBarBg.beforeClearStyles([OPACITY, 'transform']);
+        var translucentHeader = parentHeader === null || parentHeader === void 0 ? void 0 : parentHeader.translucent;
+
+        if (!translucentHeader) {
+          enteringToolBarBg.fromTo(OPACITY, 0.01, 'var(--opacity)');
+        } else {
+          enteringToolBarBg.fromTo('transform', isRTL ? 'translateX(-100%)' : 'translateX(100%)', 'translateX(0px)');
+        } // forward direction, entering page has a back button
+
+
+        if (!forward) {
+          enteringBackButton.fromTo(OPACITY, 0.01, 1);
+        }
+
+        if (backButtonEl && !forward) {
+          var enteringBackBtnText = animation.createAnimation();
+          enteringBackBtnText.addElement(shadow(backButtonEl).querySelector('.button-text')) // REVIEW
+          .fromTo("transform", isRTL ? 'translateX(-100px)' : 'translateX(100px)', 'translateX(0px)');
+          enteringToolBar.addAnimation(enteringBackBtnText);
+        }
+      }
+    }); // setup leaving view
+
+    if (leavingEl) {
+      var leavingContent = animation.createAnimation();
+      var leavingContentEl = leavingEl.querySelector(':scope > ion-content');
+      var leavingToolBarEls = leavingEl.querySelectorAll(':scope > ion-header > ion-toolbar');
+      var leavingHeaderEls = leavingEl.querySelectorAll(':scope > ion-header > *:not(ion-toolbar), :scope > ion-footer > *');
+
+      if (!leavingContentEl && leavingToolBarEls.length === 0 && leavingHeaderEls.length === 0) {
+        leavingContent.addElement(leavingEl.querySelector(':scope > .ion-page, :scope > ion-nav, :scope > ion-tabs')); // REVIEW
+      } else {
+        leavingContent.addElement(leavingContentEl); // REVIEW
+
+        leavingContent.addElement(leavingHeaderEls);
+      }
+
+      rootAnimation.addAnimation(leavingContent);
+
+      if (backDirection) {
+        // leaving content, back direction
+        leavingContent.beforeClearStyles([OPACITY]).fromTo('transform', "translateX(".concat(CENTER, ")"), isRTL ? 'translateX(-100%)' : 'translateX(100%)');
+        var leavingPage = index.getIonPageElement(leavingEl);
+        rootAnimation.afterAddWrite(() => {
+          if (rootAnimation.getDirection() === 'normal') {
+            leavingPage.style.setProperty('display', 'none');
+          }
+        });
+      } else {
+        // leaving content, forward direction
+        leavingContent.fromTo('transform', "translateX(".concat(CENTER, ")"), "translateX(".concat(OFF_LEFT, ")")).fromTo(OPACITY, 1, OFF_OPACITY);
+      }
+
+      if (leavingContentEl) {
+        var leavingTransitionEffectEl = shadow(leavingContentEl).querySelector('.transition-effect');
+
+        if (leavingTransitionEffectEl) {
+          var leavingTransitionCoverEl = leavingTransitionEffectEl.querySelector('.transition-cover');
+          var leavingTransitionShadowEl = leavingTransitionEffectEl.querySelector('.transition-shadow');
+          var leavingTransitionEffect = animation.createAnimation();
+          var leavingTransitionCover = animation.createAnimation();
+          var leavingTransitionShadow = animation.createAnimation();
+          leavingTransitionEffect.addElement(leavingTransitionEffectEl).beforeStyles({
+            opacity: '1',
+            display: 'block'
+          }).afterStyles({
+            opacity: '',
+            display: ''
+          });
+          leavingTransitionCover.addElement(leavingTransitionCoverEl) // REVIEW
+          .beforeClearStyles([OPACITY]).fromTo(OPACITY, 0.1, 0);
+          leavingTransitionShadow.addElement(leavingTransitionShadowEl) // REVIEW
+          .beforeClearStyles([OPACITY]).fromTo(OPACITY, 0.70, 0.03);
+          leavingTransitionEffect.addAnimation([leavingTransitionCover, leavingTransitionShadow]);
+          leavingContent.addAnimation([leavingTransitionEffect]);
+        }
+      }
+
+      leavingToolBarEls.forEach(leavingToolBarEl => {
+        var leavingToolBar = animation.createAnimation();
+        leavingToolBar.addElement(leavingToolBarEl);
+        var leavingTitle = animation.createAnimation();
+        leavingTitle.addElement(leavingToolBarEl.querySelector('ion-title')); // REVIEW
+
+        var leavingToolBarButtons = animation.createAnimation();
+        var buttons = leavingToolBarEl.querySelectorAll('ion-buttons,[menuToggle]');
+        var parentHeader = leavingToolBarEl.closest('ion-header');
+        var inactiveHeader = parentHeader && parentHeader.classList.contains('header-collapse-condense-inactive');
+        var buttonsToAnimate = Array.from(buttons).filter(button => {
+          var isCollapseButton = button.classList.contains('buttons-collapse');
+          return isCollapseButton && !inactiveHeader || !isCollapseButton;
+        });
+        leavingToolBarButtons.addElement(buttonsToAnimate);
+        var leavingToolBarItems = animation.createAnimation();
+        var leavingToolBarItemEls = leavingToolBarEl.querySelectorAll(':scope > *:not(ion-title):not(ion-buttons):not([menuToggle])');
+
+        if (leavingToolBarItemEls.length > 0) {
+          leavingToolBarItems.addElement(leavingToolBarItemEls);
+        }
+
+        var leavingToolBarBg = animation.createAnimation();
+        leavingToolBarBg.addElement(shadow(leavingToolBarEl).querySelector('.toolbar-background')); // REVIEW
+
+        var leavingBackButton = animation.createAnimation();
+        var backButtonEl = leavingToolBarEl.querySelector('ion-back-button');
+
+        if (backButtonEl) {
+          leavingBackButton.addElement(backButtonEl);
+        }
+
+        leavingToolBar.addAnimation([leavingTitle, leavingToolBarButtons, leavingToolBarItems, leavingBackButton, leavingToolBarBg]);
+        rootAnimation.addAnimation(leavingToolBar); // fade out leaving toolbar items
+
+        leavingBackButton.fromTo(OPACITY, 0.99, 0);
+        leavingToolBarButtons.fromTo(OPACITY, 0.99, 0);
+        leavingToolBarItems.fromTo(OPACITY, 0.99, 0);
+
+        if (backDirection) {
+          if (!inactiveHeader) {
+            // leaving toolbar, back direction
+            leavingTitle.fromTo('transform', "translateX(".concat(CENTER, ")"), isRTL ? 'translateX(-100%)' : 'translateX(100%)').fromTo(OPACITY, 0.99, 0);
+          }
+
+          leavingToolBarItems.fromTo('transform', "translateX(".concat(CENTER, ")"), isRTL ? 'translateX(-100%)' : 'translateX(100%)');
+          leavingToolBarBg.beforeClearStyles([OPACITY, 'transform']); // leaving toolbar, back direction, and there's no entering toolbar
+          // should just slide out, no fading out
+
+          var translucentHeader = parentHeader === null || parentHeader === void 0 ? void 0 : parentHeader.translucent;
+
+          if (!translucentHeader) {
+            leavingToolBarBg.fromTo(OPACITY, 'var(--opacity)', 0);
+          } else {
+            leavingToolBarBg.fromTo('transform', 'translateX(0px)', isRTL ? 'translateX(-100%)' : 'translateX(100%)');
+          }
+
+          if (backButtonEl && !backward) {
+            var leavingBackBtnText = animation.createAnimation();
+            leavingBackBtnText.addElement(shadow(backButtonEl).querySelector('.button-text')) // REVIEW
+            .fromTo('transform', "translateX(".concat(CENTER, ")"), "translateX(".concat((isRTL ? -124 : 124) + 'px', ")"));
+            leavingToolBar.addAnimation(leavingBackBtnText);
+          }
+        } else {
+          // leaving toolbar, forward direction
+          if (!inactiveHeader) {
+            leavingTitle.fromTo('transform', "translateX(".concat(CENTER, ")"), "translateX(".concat(OFF_LEFT, ")")).fromTo(OPACITY, 0.99, 0).afterClearStyles([TRANSFORM, OPACITY]);
+          }
+
+          leavingToolBarItems.fromTo('transform', "translateX(".concat(CENTER, ")"), "translateX(".concat(OFF_LEFT, ")")).afterClearStyles([TRANSFORM, OPACITY]);
+          leavingBackButton.afterClearStyles([OPACITY]);
+          leavingTitle.afterClearStyles([OPACITY]);
+          leavingToolBarButtons.afterClearStyles([OPACITY]);
+        }
+      });
+    }
+
+    return rootAnimation;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.iosTransitionAnimation = iosTransitionAnimation;
+exports.shadow = shadow;
+  })();
+});
+require.register("@ionic/core/dist/cjs/md.transition-407efd2b.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+
+require('./index-a35cc20f.js');
+
+require('./helpers-7e840ed2.js');
+
+var animation = require('./animation-9929f2ae.js');
+
+var index = require('./index-3d9409db.js');
+
+var mdTransitionAnimation = (_, opts) => {
+  var OFF_BOTTOM = '40px';
+  var CENTER = '0px';
+  var backDirection = opts.direction === 'back';
+  var enteringEl = opts.enteringEl;
+  var leavingEl = opts.leavingEl;
+  var ionPageElement = index.getIonPageElement(enteringEl);
+  var enteringToolbarEle = ionPageElement.querySelector('ion-toolbar');
+  var rootTransition = animation.createAnimation();
+  rootTransition.addElement(ionPageElement).fill('both').beforeRemoveClass('ion-page-invisible'); // animate the component itself
+
+  if (backDirection) {
+    rootTransition.duration(opts.duration || 200).easing('cubic-bezier(0.47,0,0.745,0.715)');
+  } else {
+    rootTransition.duration(opts.duration || 280).easing('cubic-bezier(0.36,0.66,0.04,1)').fromTo('transform', "translateY(".concat(OFF_BOTTOM, ")"), "translateY(".concat(CENTER, ")")).fromTo('opacity', 0.01, 1);
+  } // Animate toolbar if it's there
+
+
+  if (enteringToolbarEle) {
+    var enteringToolBar = animation.createAnimation();
+    enteringToolBar.addElement(enteringToolbarEle);
+    rootTransition.addAnimation(enteringToolBar);
+  } // setup leaving view
+
+
+  if (leavingEl && backDirection) {
+    // leaving content
+    rootTransition.duration(opts.duration || 200).easing('cubic-bezier(0.47,0,0.745,0.715)');
+    var leavingPage = animation.createAnimation();
+    leavingPage.addElement(index.getIonPageElement(leavingEl)).onFinish(currentStep => {
+      if (currentStep === 1 && leavingPage.elements.length > 0) {
+        leavingPage.elements[0].style.setProperty('display', 'none');
+      }
+    }).fromTo('transform', "translateY(".concat(CENTER, ")"), "translateY(".concat(OFF_BOTTOM, ")")).fromTo('opacity', 1, 0);
+    rootTransition.addAnimation(leavingPage);
+  }
+
+  return rootTransition;
+};
+
+exports.mdTransitionAnimation = mdTransitionAnimation;
+  })();
+});
+require.register("@ionic/core/dist/cjs/overlays-c83d7754.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+var ionicGlobal = require('./ionic-global-75ba08dd.js');
+
+var helpers = require('./helpers-7e840ed2.js');
+
+var hardwareBackButton = require('./hardware-back-button-148ce546.js');
+
+var lastId = 0;
+var activeAnimations = new WeakMap();
+
+var createController = tagName => {
+  return {
+    create(options) {
+      return createOverlay(tagName, options);
+    },
+
+    dismiss(data, role, id) {
+      return dismissOverlay(document, data, role, tagName, id);
+    },
+
+    getTop() {
+      return _asyncToGenerator(function* () {
+        return getOverlay(document, tagName);
+      })();
+    }
+
+  };
+};
+
+var alertController = /*@__PURE__*/createController('ion-alert');
+var actionSheetController = /*@__PURE__*/createController('ion-action-sheet');
+var loadingController = /*@__PURE__*/createController('ion-loading');
+var modalController = /*@__PURE__*/createController('ion-modal');
+var pickerController = /*@__PURE__*/createController('ion-picker');
+var popoverController = /*@__PURE__*/createController('ion-popover');
+var toastController = /*@__PURE__*/createController('ion-toast');
+
+var prepareOverlay = el => {
+  /* tslint:disable-next-line */
+  if (typeof document !== 'undefined') {
+    connectListeners(document);
+  }
+
+  var overlayIndex = lastId++;
+  el.overlayIndex = overlayIndex;
+
+  if (!el.hasAttribute('id')) {
+    el.id = "ion-overlay-".concat(overlayIndex);
+  }
+};
+
+var createOverlay = (tagName, opts) => {
+  /* tslint:disable-next-line */
+  if (typeof customElements !== 'undefined') {
+    return customElements.whenDefined(tagName).then(() => {
+      var element = document.createElement(tagName);
+      element.classList.add('overlay-hidden'); // convert the passed in overlay options into props
+      // that get passed down into the new overlay
+
+      Object.assign(element, opts); // append the overlay element to the document body
+
+      getAppRoot(document).appendChild(element);
+      return element.componentOnReady();
+    });
+  }
+
+  return Promise.resolve();
+};
+
+var focusableQueryString = '[tabindex]:not([tabindex^="-"]), input:not([type=hidden]):not([tabindex^="-"]), textarea:not([tabindex^="-"]), button:not([tabindex^="-"]), select:not([tabindex^="-"]), .ion-focusable:not([tabindex^="-"])';
+var innerFocusableQueryString = 'input:not([type=hidden]), textarea, button, select';
+
+var focusFirstDescendant = (ref, overlay) => {
+  var firstInput = ref.querySelector(focusableQueryString);
+  var shadowRoot = firstInput && firstInput.shadowRoot;
+
+  if (shadowRoot) {
+    // If there are no inner focusable elements, just focus the host element.
+    firstInput = shadowRoot.querySelector(innerFocusableQueryString) || firstInput;
+  }
+
+  if (firstInput) {
+    firstInput.focus();
+  } else {
+    // Focus overlay instead of letting focus escape
+    overlay.focus();
+  }
+};
+
+var focusLastDescendant = (ref, overlay) => {
+  var inputs = Array.from(ref.querySelectorAll(focusableQueryString));
+  var lastInput = inputs.length > 0 ? inputs[inputs.length - 1] : null;
+  var shadowRoot = lastInput && lastInput.shadowRoot;
+
+  if (shadowRoot) {
+    // If there are no inner focusable elements, just focus the host element.
+    lastInput = shadowRoot.querySelector(innerFocusableQueryString) || lastInput;
+  }
+
+  if (lastInput) {
+    lastInput.focus();
+  } else {
+    // Focus overlay instead of letting focus escape
+    overlay.focus();
+  }
+};
+/**
+ * Traps keyboard focus inside of overlay components.
+ * Based on https://w3c.github.io/aria-practices/examples/dialog-modal/alertdialog.html
+ * This includes the following components: Action Sheet, Alert, Loading, Modal,
+ * Picker, and Popover.
+ * Should NOT include: Toast
+ */
+
+
+var trapKeyboardFocus = (ev, doc) => {
+  var lastOverlay = getOverlay(doc);
+  var target = ev.target; // If no active overlay, ignore this event
+
+  if (!lastOverlay || !target) {
+    return;
+  }
+  /**
+   * If we are focusing the overlay, clear
+   * the last focused element so that hitting
+   * tab activates the first focusable element
+   * in the overlay wrapper.
+   */
+
+
+  if (lastOverlay === target) {
+    lastOverlay.lastFocus = undefined;
+    /**
+     * Otherwise, we must be focusing an element
+     * inside of the overlay. The two possible options
+     * here are an input/button/etc or the ion-focus-trap
+     * element. The focus trap element is used to prevent
+     * the keyboard focus from leaving the overlay when
+     * using Tab or screen assistants.
+     */
+  } else {
+    /**
+     * We do not want to focus the traps, so get the overlay
+     * wrapper element as the traps live outside of the wrapper.
+     */
+    var overlayRoot = helpers.getElementRoot(lastOverlay);
+
+    if (!overlayRoot.contains(target)) {
+      return;
+    }
+
+    var overlayWrapper = overlayRoot.querySelector('.ion-overlay-wrapper');
+
+    if (!overlayWrapper) {
+      return;
+    }
+    /**
+     * If the target is inside the wrapper, let the browser
+     * focus as normal and keep a log of the last focused element.
+     */
+
+
+    if (overlayWrapper.contains(target)) {
+      lastOverlay.lastFocus = target;
+    } else {
+      /**
+       * Otherwise, we must have focused one of the focus traps.
+       * We need to wrap the focus to either the first element
+       * or the last element.
+       */
+
+      /**
+       * Once we call `focusFirstDescendant` and focus the first
+       * descendant, another focus event will fire which will
+       * cause `lastOverlay.lastFocus` to be updated before
+       * we can run the code after that. We will cache the value
+       * here to avoid that.
+       */
+      var lastFocus = lastOverlay.lastFocus; // Focus the first element in the overlay wrapper
+
+      focusFirstDescendant(overlayWrapper, lastOverlay);
+      /**
+       * If the cached last focused element is the
+       * same as the active element, then we need
+       * to wrap focus to the last descendant. This happens
+       * when the first descendant is focused, and the user
+       * presses Shift + Tab. The previous line will focus
+       * the same descendant again (the first one), causing
+       * last focus to equal the active element.
+       */
+
+      if (lastFocus === doc.activeElement) {
+        focusLastDescendant(overlayWrapper, lastOverlay);
+      }
+
+      lastOverlay.lastFocus = doc.activeElement;
+    }
+  }
+};
+
+var connectListeners = doc => {
+  if (lastId === 0) {
+    lastId = 1;
+    doc.addEventListener('focus', ev => trapKeyboardFocus(ev, doc), true); // handle back-button click
+
+    doc.addEventListener('ionBackButton', ev => {
+      var lastOverlay = getOverlay(doc);
+
+      if (lastOverlay && lastOverlay.backdropDismiss) {
+        ev.detail.register(hardwareBackButton.OVERLAY_BACK_BUTTON_PRIORITY, () => {
+          return lastOverlay.dismiss(undefined, BACKDROP);
+        });
+      }
+    }); // handle ESC to close overlay
+
+    doc.addEventListener('keyup', ev => {
+      if (ev.key === 'Escape') {
+        var lastOverlay = getOverlay(doc);
+
+        if (lastOverlay && lastOverlay.backdropDismiss) {
+          lastOverlay.dismiss(undefined, BACKDROP);
+        }
+      }
+    });
+  }
+};
+
+var dismissOverlay = (doc, data, role, overlayTag, id) => {
+  var overlay = getOverlay(doc, overlayTag, id);
+
+  if (!overlay) {
+    return Promise.reject('overlay does not exist');
+  }
+
+  return overlay.dismiss(data, role);
+};
+
+var getOverlays = (doc, selector) => {
+  if (selector === undefined) {
+    selector = 'ion-alert,ion-action-sheet,ion-loading,ion-modal,ion-picker,ion-popover,ion-toast';
+  }
+
+  return Array.from(doc.querySelectorAll(selector)).filter(c => c.overlayIndex > 0);
+};
+
+var getOverlay = (doc, overlayTag, id) => {
+  var overlays = getOverlays(doc, overlayTag);
+  return id === undefined ? overlays[overlays.length - 1] : overlays.find(o => o.id === id);
+};
+
+var present = /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator(function* (overlay, name, iosEnterAnimation, mdEnterAnimation, opts) {
+    if (overlay.presented) {
+      return;
+    }
+
+    overlay.presented = true;
+    overlay.willPresent.emit();
+    var mode = ionicGlobal.getIonMode(overlay); // get the user's animation fn if one was provided
+
+    var animationBuilder = overlay.enterAnimation ? overlay.enterAnimation : ionicGlobal.config.get(name, mode === 'ios' ? iosEnterAnimation : mdEnterAnimation);
+    var completed = yield overlayAnimation(overlay, animationBuilder, overlay.el, opts);
+
+    if (completed) {
+      overlay.didPresent.emit();
+    }
+    /**
+     * When an overlay that steals focus
+     * is dismissed, focus should be returned
+     * to the element that was focused
+     * prior to the overlay opening. Toast
+     * does not steal focus and is excluded
+     * from returning focus as a result.
+     */
+
+
+    if (overlay.el.tagName !== 'ION-TOAST') {
+      focusPreviousElementOnDismiss(overlay.el);
+    }
+
+    if (overlay.keyboardClose) {
+      overlay.el.focus();
+    }
+  });
+
+  return function present(_x, _x2, _x3, _x4, _x5) {
+    return _ref.apply(this, arguments);
+  };
+}();
+/**
+ * When an overlay component is dismissed,
+ * focus should be returned to the element
+ * that presented the overlay. Otherwise
+ * focus will be set on the body which
+ * means that people using screen readers
+ * or tabbing will need to re-navigate
+ * to where they were before they
+ * opened the overlay.
+ */
+
+
+var focusPreviousElementOnDismiss = /*#__PURE__*/function () {
+  var _ref2 = _asyncToGenerator(function* (overlayEl) {
+    var previousElement = document.activeElement;
+
+    if (!previousElement) {
+      return;
+    }
+
+    var shadowRoot = previousElement && previousElement.shadowRoot;
+
+    if (shadowRoot) {
+      // If there are no inner focusable elements, just focus the host element.
+      previousElement = shadowRoot.querySelector(innerFocusableQueryString) || previousElement;
+    }
+
+    yield overlayEl.onDidDismiss();
+    previousElement.focus();
+  });
+
+  return function focusPreviousElementOnDismiss(_x6) {
+    return _ref2.apply(this, arguments);
+  };
+}();
+
+var dismiss = /*#__PURE__*/function () {
+  var _ref3 = _asyncToGenerator(function* (overlay, data, role, name, iosLeaveAnimation, mdLeaveAnimation, opts) {
+    if (!overlay.presented) {
+      return false;
+    }
+
+    overlay.presented = false;
+
+    try {
+      // Overlay contents should not be clickable during dismiss
+      overlay.el.style.setProperty('pointer-events', 'none');
+      overlay.willDismiss.emit({
+        data,
+        role
+      });
+      var mode = ionicGlobal.getIonMode(overlay);
+      var animationBuilder = overlay.leaveAnimation ? overlay.leaveAnimation : ionicGlobal.config.get(name, mode === 'ios' ? iosLeaveAnimation : mdLeaveAnimation); // If dismissed via gesture, no need to play leaving animation again
+
+      if (role !== 'gesture') {
+        yield overlayAnimation(overlay, animationBuilder, overlay.el, opts);
+      }
+
+      overlay.didDismiss.emit({
+        data,
+        role
+      });
+      activeAnimations.delete(overlay);
+    } catch (err) {
+      console.error(err);
+    }
+
+    overlay.el.remove();
+    return true;
+  });
+
+  return function dismiss(_x7, _x8, _x9, _x10, _x11, _x12, _x13) {
+    return _ref3.apply(this, arguments);
+  };
+}();
+
+var getAppRoot = doc => {
+  return doc.querySelector('ion-app') || doc.body;
+};
+
+var overlayAnimation = /*#__PURE__*/function () {
+  var _ref4 = _asyncToGenerator(function* (overlay, animationBuilder, baseEl, opts) {
+    // Make overlay visible in case it's hidden
+    baseEl.classList.remove('overlay-hidden');
+    var aniRoot = baseEl.shadowRoot || overlay.el;
+    var animation = animationBuilder(aniRoot, opts);
+
+    if (!overlay.animated || !ionicGlobal.config.getBoolean('animated', true)) {
+      animation.duration(0);
+    }
+
+    if (overlay.keyboardClose) {
+      animation.beforeAddWrite(() => {
+        var activeElement = baseEl.ownerDocument.activeElement;
+
+        if (activeElement && activeElement.matches('input, ion-input, ion-textarea')) {
+          activeElement.blur();
+        }
+      });
+    }
+
+    var activeAni = activeAnimations.get(overlay) || [];
+    activeAnimations.set(overlay, [...activeAni, animation]);
+    yield animation.play();
+    return true;
+  });
+
+  return function overlayAnimation(_x14, _x15, _x16, _x17) {
+    return _ref4.apply(this, arguments);
+  };
+}();
+
+var eventMethod = (element, eventName) => {
+  var resolve;
+  var promise = new Promise(r => resolve = r);
+  onceEvent(element, eventName, event => {
+    resolve(event.detail);
+  });
+  return promise;
+};
+
+var onceEvent = (element, eventName, callback) => {
+  var handler = ev => {
+    helpers.removeEventListener(element, eventName, handler);
+    callback(ev);
+  };
+
+  helpers.addEventListener(element, eventName, handler);
+};
+
+var isCancel = role => {
+  return role === 'cancel' || role === BACKDROP;
+};
+
+var defaultGate = h => h();
+
+var safeCall = (handler, arg) => {
+  if (typeof handler === 'function') {
+    var jmp = ionicGlobal.config.get('_zoneGate', defaultGate);
+    return jmp(() => {
+      try {
+        return handler(arg);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  }
+
+  return undefined;
+};
+
+var BACKDROP = 'backdrop';
+exports.BACKDROP = BACKDROP;
+exports.actionSheetController = actionSheetController;
+exports.activeAnimations = activeAnimations;
+exports.alertController = alertController;
+exports.dismiss = dismiss;
+exports.eventMethod = eventMethod;
+exports.isCancel = isCancel;
+exports.loadingController = loadingController;
+exports.modalController = modalController;
+exports.pickerController = pickerController;
+exports.popoverController = popoverController;
+exports.prepareOverlay = prepareOverlay;
+exports.present = present;
+exports.safeCall = safeCall;
+exports.toastController = toastController;
+  })();
+});
+require.register("@ionic/core/dist/cjs/shadow-css-476b8fcf.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    'use strict';
+/*
+ Stencil Client Platform v2.1.2 | MIT Licensed | https://stenciljs.com
+ */
+
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ *
+ * This file is a port of shadowCSS from webcomponents.js to TypeScript.
+ * https://github.com/webcomponents/webcomponentsjs/blob/4efecd7e0e/src/ShadowCSS/ShadowCSS.js
+ * https://github.com/angular/angular/blob/master/packages/compiler/src/shadow_css.ts
+ */
+
+var safeSelector = selector => {
+  var placeholders = [];
+  var index = 0;
+  var content; // Replaces attribute selectors with placeholders.
+  // The WS in [attr="va lue"] would otherwise be interpreted as a selector separator.
+
+  selector = selector.replace(/(\[[^\]]*\])/g, (_, keep) => {
+    var replaceBy = "__ph-".concat(index, "__");
+    placeholders.push(keep);
+    index++;
+    return replaceBy;
+  }); // Replaces the expression in `:nth-child(2n + 1)` with a placeholder.
+  // WS and "+" would otherwise be interpreted as selector separators.
+
+  content = selector.replace(/(:nth-[-\w]+)(\([^)]+\))/g, (_, pseudo, exp) => {
+    var replaceBy = "__ph-".concat(index, "__");
+    placeholders.push(exp);
+    index++;
+    return pseudo + replaceBy;
+  });
+  var ss = {
+    content,
+    placeholders
+  };
+  return ss;
+};
+
+var restoreSafeSelector = (placeholders, content) => {
+  return content.replace(/__ph-(\d+)__/g, (_, index) => placeholders[+index]);
+};
+
+var _polyfillHost = '-shadowcsshost';
+var _polyfillSlotted = '-shadowcssslotted'; // note: :host-context pre-processed to -shadowcsshostcontext.
+
+var _polyfillHostContext = '-shadowcsscontext';
+
+var _parenSuffix = ')(?:\\((' + '(?:\\([^)(]*\\)|[^)(]*)+?' + ')\\))?([^,{]*)';
+
+var _cssColonHostRe = new RegExp('(' + _polyfillHost + _parenSuffix, 'gim');
+
+var _cssColonHostContextRe = new RegExp('(' + _polyfillHostContext + _parenSuffix, 'gim');
+
+var _cssColonSlottedRe = new RegExp('(' + _polyfillSlotted + _parenSuffix, 'gim');
+
+var _polyfillHostNoCombinator = _polyfillHost + '-no-combinator';
+
+var _polyfillHostNoCombinatorRe = /-shadowcsshost-no-combinator([^\s]*)/;
+var _shadowDOMSelectorsRe = [/::shadow/g, /::content/g];
+var _selectorReSuffix = '([>\\s~+[.,{:][\\s\\S]*)?$';
+var _polyfillHostRe = /-shadowcsshost/gim;
+var _colonHostRe = /:host/gim;
+var _colonSlottedRe = /::slotted/gim;
+var _colonHostContextRe = /:host-context/gim;
+var _commentRe = /\/\*\s*[\s\S]*?\*\//g;
+
+var stripComments = input => {
+  return input.replace(_commentRe, '');
+};
+
+var _commentWithHashRe = /\/\*\s*#\s*source(Mapping)?URL=[\s\S]+?\*\//g;
+
+var extractCommentsWithHash = input => {
+  return input.match(_commentWithHashRe) || [];
+};
+
+var _ruleRe = /(\s*)([^;\{\}]+?)(\s*)((?:{%BLOCK%}?\s*;?)|(?:\s*;))/g;
+var _curlyRe = /([{}])/g;
+var OPEN_CURLY = '{';
+var CLOSE_CURLY = '}';
+var BLOCK_PLACEHOLDER = '%BLOCK%';
+
+var processRules = (input, ruleCallback) => {
+  var inputWithEscapedBlocks = escapeBlocks(input);
+  var nextBlockIndex = 0;
+  return inputWithEscapedBlocks.escapedString.replace(_ruleRe, function () {
+    var selector = arguments.length <= 2 ? undefined : arguments[2];
+    var content = '';
+    var suffix = arguments.length <= 4 ? undefined : arguments[4];
+    var contentPrefix = '';
+
+    if (suffix && suffix.startsWith('{' + BLOCK_PLACEHOLDER)) {
+      content = inputWithEscapedBlocks.blocks[nextBlockIndex++];
+      suffix = suffix.substring(BLOCK_PLACEHOLDER.length + 1);
+      contentPrefix = '{';
+    }
+
+    var cssRule = {
+      selector,
+      content
+    };
+    var rule = ruleCallback(cssRule);
+    return "".concat(arguments.length <= 1 ? undefined : arguments[1]).concat(rule.selector).concat(arguments.length <= 3 ? undefined : arguments[3]).concat(contentPrefix).concat(rule.content).concat(suffix);
+  });
+};
+
+var escapeBlocks = input => {
+  var inputParts = input.split(_curlyRe);
+  var resultParts = [];
+  var escapedBlocks = [];
+  var bracketCount = 0;
+  var currentBlockParts = [];
+
+  for (var partIndex = 0; partIndex < inputParts.length; partIndex++) {
+    var part = inputParts[partIndex];
+
+    if (part === CLOSE_CURLY) {
+      bracketCount--;
+    }
+
+    if (bracketCount > 0) {
+      currentBlockParts.push(part);
+    } else {
+      if (currentBlockParts.length > 0) {
+        escapedBlocks.push(currentBlockParts.join(''));
+        resultParts.push(BLOCK_PLACEHOLDER);
+        currentBlockParts = [];
+      }
+
+      resultParts.push(part);
+    }
+
+    if (part === OPEN_CURLY) {
+      bracketCount++;
+    }
+  }
+
+  if (currentBlockParts.length > 0) {
+    escapedBlocks.push(currentBlockParts.join(''));
+    resultParts.push(BLOCK_PLACEHOLDER);
+  }
+
+  var strEscapedBlocks = {
+    escapedString: resultParts.join(''),
+    blocks: escapedBlocks
+  };
+  return strEscapedBlocks;
+};
+
+var insertPolyfillHostInCssText = selector => {
+  selector = selector.replace(_colonHostContextRe, _polyfillHostContext).replace(_colonHostRe, _polyfillHost).replace(_colonSlottedRe, _polyfillSlotted);
+  return selector;
+};
+
+var convertColonRule = (cssText, regExp, partReplacer) => {
+  // m[1] = :host(-context), m[2] = contents of (), m[3] rest of rule
+  return cssText.replace(regExp, function () {
+    for (var _len = arguments.length, m = new Array(_len), _key = 0; _key < _len; _key++) {
+      m[_key] = arguments[_key];
+    }
+
+    if (m[2]) {
+      var parts = m[2].split(',');
+      var r = [];
+
+      for (var i = 0; i < parts.length; i++) {
+        var p = parts[i].trim();
+        if (!p) break;
+        r.push(partReplacer(_polyfillHostNoCombinator, p, m[3]));
+      }
+
+      return r.join(',');
+    } else {
+      return _polyfillHostNoCombinator + m[3];
+    }
+  });
+};
+
+var colonHostPartReplacer = (host, part, suffix) => {
+  return host + part.replace(_polyfillHost, '') + suffix;
+};
+
+var convertColonHost = cssText => {
+  return convertColonRule(cssText, _cssColonHostRe, colonHostPartReplacer);
+};
+
+var colonHostContextPartReplacer = (host, part, suffix) => {
+  if (part.indexOf(_polyfillHost) > -1) {
+    return colonHostPartReplacer(host, part, suffix);
+  } else {
+    return host + part + suffix + ', ' + part + ' ' + host + suffix;
+  }
+};
+
+var convertColonSlotted = (cssText, slotScopeId) => {
+  var slotClass = '.' + slotScopeId + ' > ';
+  var selectors = [];
+  cssText = cssText.replace(_cssColonSlottedRe, function () {
+    for (var _len2 = arguments.length, m = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      m[_key2] = arguments[_key2];
+    }
+
+    if (m[2]) {
+      var compound = m[2].trim();
+      var suffix = m[3];
+      var slottedSelector = slotClass + compound + suffix;
+      var prefixSelector = '';
+
+      for (var i = m[4] - 1; i >= 0; i--) {
+        var char = m[5][i];
+
+        if (char === '}' || char === ',') {
+          break;
+        }
+
+        prefixSelector = char + prefixSelector;
+      }
+
+      var orgSelector = prefixSelector + slottedSelector;
+      var addedSelector = "".concat(prefixSelector.trimRight()).concat(slottedSelector.trim());
+
+      if (orgSelector.trim() !== addedSelector.trim()) {
+        var updatedSelector = "".concat(addedSelector, ", ").concat(orgSelector);
+        selectors.push({
+          orgSelector,
+          updatedSelector
+        });
+      }
+
+      return slottedSelector;
+    } else {
+      return _polyfillHostNoCombinator + m[3];
+    }
+  });
+  return {
+    selectors,
+    cssText
+  };
+};
+
+var convertColonHostContext = cssText => {
+  return convertColonRule(cssText, _cssColonHostContextRe, colonHostContextPartReplacer);
+};
+
+var convertShadowDOMSelectors = cssText => {
+  return _shadowDOMSelectorsRe.reduce((result, pattern) => result.replace(pattern, ' '), cssText);
+};
+
+var makeScopeMatcher = scopeSelector => {
+  var lre = /\[/g;
+  var rre = /\]/g;
+  scopeSelector = scopeSelector.replace(lre, '\\[').replace(rre, '\\]');
+  return new RegExp('^(' + scopeSelector + ')' + _selectorReSuffix, 'm');
+};
+
+var selectorNeedsScoping = (selector, scopeSelector) => {
+  var re = makeScopeMatcher(scopeSelector);
+  return !re.test(selector);
+};
+
+var applySimpleSelectorScope = (selector, scopeSelector, hostSelector) => {
+  // In Android browser, the lastIndex is not reset when the regex is used in String.replace()
+  _polyfillHostRe.lastIndex = 0;
+
+  if (_polyfillHostRe.test(selector)) {
+    var replaceBy = ".".concat(hostSelector);
+    return selector.replace(_polyfillHostNoCombinatorRe, (_, selector) => {
+      return selector.replace(/([^:]*)(:*)(.*)/, (_, before, colon, after) => {
+        return before + replaceBy + colon + after;
+      });
+    }).replace(_polyfillHostRe, replaceBy + ' ');
+  }
+
+  return scopeSelector + ' ' + selector;
+};
+
+var applyStrictSelectorScope = (selector, scopeSelector, hostSelector) => {
+  var isRe = /\[is=([^\]]*)\]/g;
+  scopeSelector = scopeSelector.replace(isRe, function (_) {
+    return arguments.length <= 1 ? undefined : arguments[1];
+  });
+  var className = '.' + scopeSelector;
+
+  var _scopeSelectorPart = p => {
+    var scopedP = p.trim();
+
+    if (!scopedP) {
+      return '';
+    }
+
+    if (p.indexOf(_polyfillHostNoCombinator) > -1) {
+      scopedP = applySimpleSelectorScope(p, scopeSelector, hostSelector);
+    } else {
+      // remove :host since it should be unnecessary
+      var t = p.replace(_polyfillHostRe, '');
+
+      if (t.length > 0) {
+        var matches = t.match(/([^:]*)(:*)(.*)/);
+
+        if (matches) {
+          scopedP = matches[1] + className + matches[2] + matches[3];
+        }
+      }
+    }
+
+    return scopedP;
+  };
+
+  var safeContent = safeSelector(selector);
+  selector = safeContent.content;
+  var scopedSelector = '';
+  var startIndex = 0;
+  var res;
+  var sep = /( |>|\+|~(?!=))\s*/g; // If a selector appears before :host it should not be shimmed as it
+  // matches on ancestor elements and not on elements in the host's shadow
+  // `:host-context(div)` is transformed to
+  // `-shadowcsshost-no-combinatordiv, div -shadowcsshost-no-combinator`
+  // the `div` is not part of the component in the 2nd selectors and should not be scoped.
+  // Historically `component-tag:host` was matching the component so we also want to preserve
+  // this behavior to avoid breaking legacy apps (it should not match).
+  // The behavior should be:
+  // - `tag:host` -> `tag[h]` (this is to avoid breaking legacy apps, should not match anything)
+  // - `tag :host` -> `tag [h]` (`tag` is not scoped because it's considered part of a
+  //   `:host-context(tag)`)
+
+  var hasHost = selector.indexOf(_polyfillHostNoCombinator) > -1; // Only scope parts after the first `-shadowcsshost-no-combinator` when it is present
+
+  var shouldScope = !hasHost;
+
+  while ((res = sep.exec(selector)) !== null) {
+    var separator = res[1];
+
+    var _part = selector.slice(startIndex, res.index).trim();
+
+    shouldScope = shouldScope || _part.indexOf(_polyfillHostNoCombinator) > -1;
+    var scopedPart = shouldScope ? _scopeSelectorPart(_part) : _part;
+    scopedSelector += "".concat(scopedPart, " ").concat(separator, " ");
+    startIndex = sep.lastIndex;
+  }
+
+  var part = selector.substring(startIndex);
+  shouldScope = shouldScope || part.indexOf(_polyfillHostNoCombinator) > -1;
+  scopedSelector += shouldScope ? _scopeSelectorPart(part) : part; // replace the placeholders with their original values
+
+  return restoreSafeSelector(safeContent.placeholders, scopedSelector);
+};
+
+var scopeSelector = (selector, scopeSelectorText, hostSelector, slotSelector) => {
+  return selector.split(',').map(shallowPart => {
+    if (slotSelector && shallowPart.indexOf('.' + slotSelector) > -1) {
+      return shallowPart.trim();
+    }
+
+    if (selectorNeedsScoping(shallowPart, scopeSelectorText)) {
+      return applyStrictSelectorScope(shallowPart, scopeSelectorText, hostSelector).trim();
+    } else {
+      return shallowPart.trim();
+    }
+  }).join(', ');
+};
+
+var scopeSelectors = (cssText, scopeSelectorText, hostSelector, slotSelector, commentOriginalSelector) => {
+  return processRules(cssText, rule => {
+    var selector = rule.selector;
+    var content = rule.content;
+
+    if (rule.selector[0] !== '@') {
+      selector = scopeSelector(rule.selector, scopeSelectorText, hostSelector, slotSelector);
+    } else if (rule.selector.startsWith('@media') || rule.selector.startsWith('@supports') || rule.selector.startsWith('@page') || rule.selector.startsWith('@document')) {
+      content = scopeSelectors(rule.content, scopeSelectorText, hostSelector, slotSelector);
+    }
+
+    var cssRule = {
+      selector: selector.replace(/\s{2,}/g, ' ').trim(),
+      content
+    };
+    return cssRule;
+  });
+};
+
+var scopeCssText = (cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector) => {
+  cssText = insertPolyfillHostInCssText(cssText);
+  cssText = convertColonHost(cssText);
+  cssText = convertColonHostContext(cssText);
+  var slotted = convertColonSlotted(cssText, slotScopeId);
+  cssText = slotted.cssText;
+  cssText = convertShadowDOMSelectors(cssText);
+
+  if (scopeId) {
+    cssText = scopeSelectors(cssText, scopeId, hostScopeId, slotScopeId);
+  }
+
+  cssText = cssText.replace(/-shadowcsshost-no-combinator/g, ".".concat(hostScopeId));
+  cssText = cssText.replace(/>\s*\*\s+([^{, ]+)/gm, ' $1 ');
+  return {
+    cssText: cssText.trim(),
+    slottedSelectors: slotted.selectors
+  };
+};
+
+var scopeCss = (cssText, scopeId, commentOriginalSelector) => {
+  var hostScopeId = scopeId + '-h';
+  var slotScopeId = scopeId + '-s';
+  var commentsWithHash = extractCommentsWithHash(cssText);
+  cssText = stripComments(cssText);
+  var orgSelectors = [];
+
+  if (commentOriginalSelector) {
+    var processCommentedSelector = rule => {
+      var placeholder = "/*!@___".concat(orgSelectors.length, "___*/");
+      var comment = "/*!@".concat(rule.selector, "*/");
+      orgSelectors.push({
+        placeholder,
+        comment
+      });
+      rule.selector = placeholder + rule.selector;
+      return rule;
+    };
+
+    cssText = processRules(cssText, rule => {
+      if (rule.selector[0] !== '@') {
+        return processCommentedSelector(rule);
+      } else if (rule.selector.startsWith('@media') || rule.selector.startsWith('@supports') || rule.selector.startsWith('@page') || rule.selector.startsWith('@document')) {
+        rule.content = processRules(rule.content, processCommentedSelector);
+        return rule;
+      }
+
+      return rule;
+    });
+  }
+
+  var scoped = scopeCssText(cssText, scopeId, hostScopeId, slotScopeId);
+  cssText = [scoped.cssText, ...commentsWithHash].join('\n');
+
+  if (commentOriginalSelector) {
+    orgSelectors.forEach((_ref) => {
+      var {
+        placeholder,
+        comment
+      } = _ref;
+      cssText = cssText.replace(placeholder, comment);
+    });
+  }
+
+  scoped.slottedSelectors.forEach(slottedSelector => {
+    cssText = cssText.replace(slottedSelector.orgSelector, slottedSelector.updatedSelector);
+  });
+  return cssText;
+};
+
+exports.scopeCss = scopeCss;
+  })();
+});
+require.register("@ionic/core/dist/index.cjs.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "@ionic/core");
+  (function() {
+    "use strict";
+
+module.exports = require('./cjs/index.cjs.js');
+  })();
+});
 require.register("data.task/lib/index.js", function(exports, require, module) {
   require = __makeRelativeRequire(require, {}, "data.task");
   (function() {
@@ -20422,7 +28150,8 @@ var zipWith = /*#__PURE__*/_curry3(function zipWith(fn, a, b) {
 
 module.exports = zipWith;
   })();
-});require.alias("data.task/lib/index.js", "data.task");
+});require.alias("@ionic/core/dist/index.cjs.js", "@ionic/core");
+require.alias("data.task/lib/index.js", "data.task");
 require.alias("marked/lib/marked.js", "marked");
 require.alias("process/browser.js", "process");
 require.alias("ramda/src/index.js", "ramda");process = require('process');require.register("___globals___", function(exports, require, module) {
