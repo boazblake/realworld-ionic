@@ -1,0 +1,13 @@
+{
+  "appId": "boazblake.github.io",
+  "appName": "ionic-realworld",
+  "bundledWebRuntime": false,
+  "npmClient": "yarn",
+  "webDir": "docs",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {}
+}

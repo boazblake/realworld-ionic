@@ -5,7 +5,7 @@ const registerTask = (http) => (mdl) => (user) =>
   http.postTask(mdl)("users")({ user })
 
 const Register = () => {
-  const state = { errors: [], disabled: false }
+  const state = { errors: null, disabled: false }
   const data = {
     username: "",
     email: "",
@@ -36,73 +36,61 @@ const Register = () => {
 
   return {
     view: ({ attrs: { mdl } }) =>
-      m(
-        ".auth-page",
-        m(
-          ".container.page",
-          m(
-            ".row",
-            m(".col-md-6.offset-md-3.col-xs-12", [
-              m("h1.text-xs-center", "Sign Up"),
+      m("form", [
+        m("ion-text", m("h1", "Sign Up")),
+
+        state.errors &&
+          state.errors.map(({ key, errors }) =>
+            m(
+              ".error-messages",
               m(
-                "p.text-xs-center",
-                m(m.route.Link, { href: "/login" }, "Have an account?")
-              ),
-
-              state.errors &&
-                state.errors.map((e) =>
-                  m(
-                    ".error-messages",
-                    m(
-                      "ul",
-                      `${e.key}`,
-                      e.values.map((error) => m("li", error))
-                    )
+                "ion-list",
+                m("ion-label", { color: "danger" }, `${key}`),
+                m(
+                  "ion-list",
+                  errors.map((error) =>
+                    m("ion-item", { color: "danger" }, error)
                   )
-                ),
+                )
+              )
+            )
+          ),
 
-              m("form", [
-                m(
-                  "fieldset.form-group",
-                  m("input.form-control.form-control-lg", {
-                    type: "text",
-                    disabled: state.disabled,
-                    placeholder: "Your Name",
-                    onchange: (e) => (data.username = e.target.value),
-                    value: data.username,
-                  })
-                ),
+        m("ion-input", {
+          type: "text",
+          disabled: state.disabled,
+          placeholder: "Your Name",
+          onchange: (e) => (data.username = e.target.value),
+          value: data.username,
+        }),
 
-                m(
-                  "fieldset.form-group",
-                  m("input.form-control.form-control-lg", {
-                    type: "text",
-                    disabled: state.disabled,
-                    placeholder: "email",
-                    onchange: (e) => (data.email = e.target.value),
-                    value: data.email,
-                  })
-                ),
-                m(
-                  "fieldset.form-group",
-                  m("input.form-control.form-control-lg", {
-                    type: "password",
-                    disabled: state.disabled,
-                    placeholder: "password",
-                    onchange: (e) => (data.password = e.target.value),
-                    value: data.password,
-                  })
-                ),
-                m(
-                  "button.btn.btn-lg.btn-primary.pull-xs-right",
-                  { type: "submit", onclick: (e) => onSubmit(mdl, e) },
-                  "Sign Up"
-                ),
-              ]),
-            ])
+        m("ion-input", {
+          type: "text",
+          disabled: state.disabled,
+          placeholder: "email",
+          onchange: (e) => (data.email = e.target.value),
+          value: data.email,
+        }),
+
+        m("ion-input", {
+          type: "password",
+          disabled: state.disabled,
+          placeholder: "password",
+          onchange: (e) => (data.password = e.target.value),
+          value: data.password,
+        }),
+
+        m("ion-button", { onclick: (e) => onSubmit(mdl, e) }, "Sign Up"),
+
+        m(
+          "ion-link",
+          m(
+            m.route.Link,
+            { href: "/login" },
+            m("ion-label", "Have an account?")
           )
-        )
-      ),
+        ),
+      ]),
   }
 }
 

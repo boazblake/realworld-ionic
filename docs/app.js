@@ -1,1 +1,2649 @@
-!function(){"use strict";var e="undefined"==typeof global?self:global;if("function"!=typeof e.require){var t={},r={},n={},o={}.hasOwnProperty,i=/^\.\.?(\/|$)/,u=function(e,t){for(var r,n=[],o=(i.test(t)?e+"/"+t:t).split("/"),u=0,a=o.length;u<a;u++)".."===(r=o[u])?n.pop():"."!==r&&""!==r&&n.push(r);return n.join("/")},a=function(e){return e.split("/").slice(0,-1).join("/")},s=function(t,n){var o,i={id:t,exports:{},hot:d&&d.createHot(t)};return r[t]=i,n(i.exports,(o=t,function(t){var r=u(a(o),t);return e.require(r,o)}),i),i.exports},c=function(e){var t=n[e];return t&&e!==t?c(t):e},l=function(e,n){null==n&&(n="/");var i=c(e);if(o.call(r,i))return r[i].exports;if(o.call(t,i))return s(i,t[i]);throw new Error("Cannot find module '"+e+"' from '"+n+"'")};l.alias=function(e,t){n[t]=e};var f=/\.[^.\/]+$/,m=/\/index(\.[^\/]+)?$/;l.register=l.define=function(e,i){if(e&&"object"==typeof e)for(var u in e)o.call(e,u)&&l.register(u,e[u]);else t[e]=i,delete r[e],function(e){if(f.test(e)){var t=e.replace(f,"");o.call(n,t)&&n[t].replace(f,"")!==t+"/index"||(n[t]=e)}if(m.test(e)){var r=e.replace(m,"");o.call(n,r)||(n[r]=e)}}(e)},l.list=function(){var e=[];for(var r in t)o.call(t,r)&&e.push(r);return e};var d=e._hmr&&new e._hmr((function(e,t){return c(u(a(e),t))}),l,t,r);l._cache=r,l.hmr=d&&d.wrap,l.brunch=!0,e.require=l}}(),function(){"undefined"==typeof window||window;require.register("Http.js",(function(e,t,r){"use strict";function n(e,t){var r=Object.keys(e);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(e);t&&(n=n.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),r.push.apply(r,n)}return r}function o(e){for(var t=1;t<arguments.length;t++){var r=null!=arguments[t]?arguments[t]:{};t%2?n(Object(r),!0).forEach((function(t){i(e,t,r[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(r)):n(Object(r)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(r,t))}))}return e}function i(e,t,r){return t in e?Object.defineProperty(e,t,{value:r,enumerable:!0,configurable:!0,writable:!0}):e[t]=r,e}Object.defineProperty(e,"__esModule",{value:!0}),e.default=e.parseHttpSuccess=e.parseHttpError=void 0;function u(){return!1}var a=function(e){return{config:function(t){t.onprogress=function(e){return function(t){t.lengthComputable&&(e.state.loadingProgress.max=t.total,e.state.loadingProgress.value=t.loaded,m.redraw())}}(e),t.onload=u,t.onloadstart=function(e){return function(t){return e.state.isLoading=!0,!1}}(e),t.onloadend=function(e){return function(t){return e.state.isLoading=!1,e.state.loadingProgress.max=0,e.state.loadingProgress.value=0,!1}}(e)}}},s=function(e){return function(t){return function(r){return e.state.isLoading=!1,t(r.response.errors)}}};e.parseHttpError=s;var c=function(e){return function(t){return function(r){return e.state.isLoading=!1,t(r)}}};e.parseHttpSuccess=c;var l=function(){return sessionStorage.getItem("token")?{authorization:sessionStorage.getItem("token")}:""},f=function(e){return function(t){return function(r){return function(n){return function(i){return!["POST","PUT","DELETE"].includes(t)||r.state.isLoggedIn()||["/login","/register"].includes(r.slug)?(r.state.isLoading=!0,new Task((function(u,l){return m.request(o({method:t,url:"https://conduit.productionready.io/api/"+n,headers:o({"content-type":"application/json"},e),body:i,withCredentials:!1},a(r))).then(c(r)(l),s(r)(u))}))):Task.rejected(m.route.set("/register"))}}}}},d={getTask:function(e){return function(t){return f(l())("GET")(e)(t)(null)}},deleteTask:function(e){return function(t){return f(l())("DELETE")(e)(t)(null)}},postTask:function(e){return function(t){return function(r){return f(l())("POST")(e)(t)(r)}}},putTask:function(e){return function(t){return function(r){return f(l())("PUT")(e)(t)(r)}}}};e.default=d})),require.register("Utils.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.errorViewModel=e.sanitizeImg=e.log=void 0;e.log=function(e){return function(t){return console.log(e,t),t}};e.sanitizeImg=function(e){return e&&e.match(/\.(jpeg|jpg|gif|png|svg)$/)?function(e){return e.match(/(https)./)?e:e.replace("http","https")}(e):"https://static.productionready.io/images/smiley-cyrus.jpg"};e.errorViewModel=function(e){return Object.keys(e).map((function(t){return{key:t.toUpperCase(),values:e[t]}}))}})),require.register("components/articles.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Articles=void 0;var n,o=(n=t("Http"))&&n.__esModule?n:{default:n},i=t("Utils");var u=function(e){return"articles/".concat(e,"/favorite")},a=function(e){return function(t){return function(r){return e.postTask(t)(u(r))()}}},s=function(e){return function(t){return function(r){return e.deleteTask(t)(u(r))}}},c=function(e){var t=e.attrs,r=t.mdl,n=t.article;return{view:function(){return m("ion-item",{button:!0},m("ion-grid",[m("ion-row",m("ion-col",m(m.route.Link,{class:"preview-link",href:"/article/".concat(n.slug)},m("ion-text",m("h1",n.title)),m("ion-text",m("p",n.description))))),m("ion-row",m("ion-col",m("ion-list",{side:"end"},n.tagList.map((function(e){return m("ion-chip",e)}))))),m("ion-row",[m(m.route.Link,{href:"/profile/".concat(n.author.username),options:{replace:!0}},m("ion-avatar",{slot:"start"},m("img",{src:(0,i.sanitizeImg)(n.author.image)}))),m("ion-label",m("ion-text",m("h2",n.author.username)),m("p",n.createdAt)),m("ion-chip",{onclick:function(e){return t=n.favorited,u=n.slug,c=(0,i.log)("toggleArticleLike err-art"),void(t?s:a)(o.default)(r)(u).fork(c,(function(e){var t=e.article,r=t.favorited,o=t.favoritesCount;n.favorited=r,n.favoritesCount=o}));var t,u,c}},[m("ion-icon",{name:n.favorited?"heart-dislike-outline":"heart-outline"}),m("ion-text",n.favoritesCount)])])]))}}};e.Articles=function(){return{view:function(e){var t=e.attrs,r=t.mdl,n=t.data;return n.articles.length?m("ion-list",{button:!0},n.articles.map((function(e){return m(c,{mdl:r,data:n,article:e})}))):m("p","No articles are here... yet.")}}}})),require.register("components/banner.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Banner=void 0;e.Banner=function(){return{view:function(e){var t=e.children;return m(".banner",m(".container",t))}}}})),require.register("components/card.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Card=void 0;var n={view:function(e){var t=e.attrs,r=t.options,n=t.header,o=t.content,i=t.footer;return m("ion-card",r,m("ion-card-header",{translucent:!0},n),m("ion-card-content",o),m("ion-card-footer",i))}};e.Card=n})),require.register("components/comments.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Comments=void 0;var n,o=(n=t("Http"))&&n.__esModule?n:{default:n},i=t("Utils"),u=t("ramda");var a=function(e){return function(t){return function(r){return e.getTask(t)("articles/".concat(r,"/comments"))}}},s=(0,u.over)((0,u.lensProp)("body"),u.trim),c=function(e){var t=e.attrs,r=t.mdl,n=t.reload,u={body:""},a={errors:[],disabled:!1},c=function(e){a.errors=(0,i.errorViewModel)(e),console.log("Error with form ",a),a.disabled=!1},l=function(){u.body="",a.errors=[],a.disabled=!1,n()},f=function(e){return(t=o.default,function(e){return function(r){return t.postTask(e)("articles/".concat(e.slug,"/comments"))({comment:r})}})(r)(s(e)).fork(c,l);var t};return{oninit:function(){return u.body=""},view:function(e){var t=e.attrs.mdl;return[m("ion-grid",m("ion-row",m("ion-col",m("ion-textarea",{rows:3,placeholder:"Write a comment ...",onchange:function(e){return u.body=e.target.value},disabled:a.disabled,value:u.body}))),m("ion-row",m("ion-col",m("ion-avatar",m("img",{src:(0,i.sanitizeImg)(t.user.image)}))),m("ion-col",m("ion-button",{onclick:function(e){a.disabled=!0,f(u)}}," Post Comment ")))),a.errors.map((function(e){return e.values.map((function(t){return m("p.error-messages","".concat(e.key," ").concat(t))}))}))]}}},l=function(){return{view:function(e){var t=e.attrs,r=t.mdl,n=t.comment,o=n.author,u=o.image,a=o.username,s=n.body,c=n.createdAt,l=n.id,f=t.deleteComment;return m("ion-item",m("ion-grid",m("ion-text",s),m("ion-row",m(m.route.Link,{href:"/profile/".concat(a),class:"comment-author m-5"},m("ion-avatar",m("img",{src:(0,i.sanitizeImg)(u)})),m("ion-text",a)),m("ion-text",c),a==r.user.username&&m("ion-icon",{name:"trash-outline",onclick:function(e){return f(l)}}))))}}};e.Comments=function(e){var t=e.attrs.mdl,r={comments:[]},n=function(e){var t=(0,i.log)("error with comments");a(o.default)(e)(e.slug).fork(t,(function(e){var t=e.comments;return r.comments=t}))},u=function(e){var n,u=(0,i.log)("error with comments");(n=o.default,function(e){return function(t){return function(r){return n.deleteTask(e)("articles/".concat(t,"/comments/").concat(r))}}})(t)(t.slug)(e).chain((function(e){return a(o.default)(t)(t.slug)})).fork(u,(function(e){var t=e.comments;return r.comments=t}))};return{oninit:function(e){var t=e.attrs.mdl;return n(t)},view:function(e){var t=e.attrs.mdl;return m("item-list",m(c,{mdl:t,reload:function(){return n(t)}}),r.comments.map((function(e){return m(l,{mdl:t,comment:e,deleteComment:function(e){return u(e)}})})))}}}})),require.register("components/feed-nav.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.FeedNav=void 0;e.FeedNav=function(e){var t=e.attrs.fetchData;return{view:function(e){var r=e.attrs,n=r.mdl,o=r.data;return[m("ion-toolbar",m("ion-row",m("ion-col",m("ion-button",{fill:"solid",expand:"full",id:"",color:""==o.tags.current?"primary":"secondary",onclick:function(e){o.tags.current=e.target.id,t(n)}},"Global Feed")),n.state.isLoggedIn()&&m("ion-col",m("ion-button",{fill:"solid",expand:"full",id:"feed",color:"feed"==o.tags.current?"primary":"secondary",onclick:function(e){console.log("data.tags.current",e.target.id,e),o.tags.current=e.target.id,t(n)}},"Your Feed"))),m("ion-row",m("ion-col",o.tags.selected.map((function(e){return m("ion-button",{fill:"solid",size:"small",color:o.tags.current==e?"primary":"secondary",id:e,onclick:function(r){o.tags.current=e,t(n)}},m("ion-text","# ".concat(e)))})))))]}}}})),require.register("components/follow-favorite.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.FollowFavorite=void 0;var n,o=(n=t("Http"))&&n.__esModule?n:{default:n},i=t("Utils");var u=function(e){return"articles/".concat(e,"/favorite")},a=function(e){return"profiles/".concat(e,"/follow")},s=function(e){return function(t){return e.postTask(t)(u(t.slug))()}},c=function(e){return function(t){return e.deleteTask(t)(u(t.slug))}},l=function(e){return function(t){return function(r){return e.postTask(t)(a(r))()}}},f=function(e){return function(t){return function(r){return e.deleteTask(t)(a(r))}}};e.FollowFavorite=function(e){var t=e.attrs,r=t.mdl,n=t.data,u=function(e){var t=e.favorited,u=(0,i.log)("toggleArticleLike err-art");(t?c:s)(o.default)(r).fork(u,(function(e){var t=e.article,r=t.favorited,o=t.favoritesCount;n.favorited=r,n.favoritesCount=o}))},a=function(e){var t=e.author,u=t.username,a=t.following,s=(0,i.log)("toggleAuthorFollow, err-auth");(a?f:l)(o.default)(r)(u).fork(s,(function(e){var t=e.profile.following;return n.author.following=t}))},d=function(e){var t,n=(0,i.log)("deleteArticle, err-auth");(t=o.default,function(e){return t.deleteTask(e)((r=e.slug,"articles/".concat(r)));var r})(r).fork(n,(function(e){console.log(e),m.route.set("/home")}))};return{view:function(e){var t=e.attrs,r=t.mdl,o=t.data,s=o.author,c=s.username,l=s.image,f=s.following,g=o.favoritesCount,p=o.favorited,v=o.slug;return m("ion-grid",m("ion-row",[m(m.route.Link,{href:"profile/".concat(c)},m("ion-chip",m("ion-avatar",m("ion-img",{src:(0,i.sanitizeImg)(l)})),m("ion-text",c))),r.user.username==c?[m(m.route.Link,{class:"btn btn-sm btn-outline-secondary",href:"/editor/".concat(v),selector:"button"},[m("ion-icon",{name:"edit"}),"Edit Article"]),m("ion-button",{onclick:function(e){return d()}},[m("ion-icon",{name:"trash-outline"}),"Delete Article "])]:[m("ion-chip",{onclick:function(e){return a(n)}},[m("ion-icon",{name:f?"people-circle-outline":"people-outline"}),m("ion-label","".concat(c))]),m("ion-chip",{onclick:function(e){return u(n)}},[m("ion-icon",{name:p?"heart-dislike-outline":"heart-outline"}),m("ion-label",g)])]]))}}}})),require.register("components/index.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var n=t("./banner");Object.keys(n).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===n[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return n[t]}}))}));var o=t("./loader");Object.keys(o).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===o[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return o[t]}}))}));var i=t("./paginator");Object.keys(i).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===i[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return i[t]}}))}));var u=t("./articles");Object.keys(u).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===u[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return u[t]}}))}));var a=t("./follow-favorite");Object.keys(a).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===a[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return a[t]}}))}));var s=t("./comments");Object.keys(s).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===s[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return s[t]}}))}));var c=t("./feed-nav");Object.keys(c).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===c[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return c[t]}}))}));var l=t("./taglist");Object.keys(l).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===l[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return l[t]}}))}));var f=t("./card");Object.keys(f).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===f[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return f[t]}}))}));var m=t("./menu");Object.keys(m).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===m[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return m[t]}}))}));var d=t("./sidebars");Object.keys(d).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===d[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return d[t]}}))}))})),require.register("components/loader.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Loader=void 0;e.Loader=function(){return{view:function(e){var t=e.children;return m(".container",m(".banner",m(".container",t)))}}}})),require.register("components/menu.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Menu=e.MenuButton=void 0;var n=t("@ionic/core");e.MenuButton=function(){return{view:function(e){var t=e.attrs,r=t.name,o=t.menuId;return m("ion-menu-toggle",{oncreate:function(e){e.dom;n.menuController.enable(!0,o)},onclick:function(e){return function(e){console.log(n.menuController),n.menuController.open(e).then((function(e){return console.log(e)}),(function(e){return console.log(e)}))}(o)}},m("ion-button",m("ion-icon",{name:r})))}}};e.Menu=function(){return{view:function(e){var t=e.attrs,r=t.title,n=t.side,o=t.menuId,i=t.contentId,u=t.contents;return m("ion-menu[main]",{side:n,menuId:o,contentId:i},[m("ion-header",m("ion-toolbar[translucent]",m("ion-title",r))),m("ion-content",u)])}}}})),require.register("components/paginator.js",(function(e,t,r){"use strict";function n(e){return function(e){if(Array.isArray(e))return o(e)}(e)||function(e){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e))return Array.from(e)}(e)||function(e,t){if(!e)return;if("string"==typeof e)return o(e,t);var r=Object.prototype.toString.call(e).slice(8,-1);"Object"===r&&e.constructor&&(r=e.constructor.name);if("Map"===r||"Set"===r)return Array.from(e);if("Arguments"===r||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r))return o(e,t)}(e)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function o(e,t){(null==t||t>e.length)&&(t=e.length);for(var r=0,n=new Array(t);r<t;r++)n[r]=e[r];return n}Object.defineProperty(e,"__esModule",{value:!0}),e.Paginator=void 0;e.Paginator=function(){return{view:function(e){var t=e.attrs,r=t.state,o=t.fetchDataFor,i=Math.ceil(r.total/r.limit)+1,u=r.offset/r.limit+1,a=n(Array(i).keys()).slice(1);return r.total>r.limit&&a.map((function(e,t){return m("ion-chip",{color:e==u&&"primary",onclick:function(e){return o(t*r.limit)}},e)}))}}}})),require.register("components/sidebars.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.SideBars=e.SettingsMenu=void 0;var n=t("./menu"),o=t("@ionic/core"),i=function(){return{view:function(e){var t=e.attrs.mdl;return m("ion-list",[m("ion-item",m(m.route.Link,{onclick:function(e){return o.menuController.toggle("settings")},href:"/settings/".concat(t.user.username)},[m("i.ion-gear-a.p-5"),"Settings"])),m("ion-item",m(m.route.Link,{onclick:function(e){return o.menuController.toggle("settings")},href:"/profile/".concat(t.user.username)},t.user.username))])}}};e.SettingsMenu=i;e.SideBars=function(){return{view:function(e){var t=e.attrs.mdl;return[m(n.Menu,{mdl:t,title:"Settings",side:"start",menuId:"settings",contentId:"layout",contents:m(i,{mdl:t})}),m(n.Menu,{mdl:t,title:"Options",side:"end",menuId:"options",contentId:"layout",contents:m(i,{mdl:t})})]}}}})),require.register("components/taglist.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.TagList=void 0;var n=t("ramda");e.TagList=function(){return{view:function(e){var t=e.attrs.data,r=function(e){return t.tags.selected.includes(e)?"primary":"secondary"};return[m("ion-text","Popular Tags"),t.tags.tagList.filter((function(e){return!t.tags.selected.includes(e)})).map((function(e){return m("ion-chip",{color:r(e),onclick:function(r){return function(e,t){return e.tags.selected=(0,n.uniq)(e.tags.selected.concat([t]))}(t,e)}},e)}))]}}}})),require.register("index.js",(function(e,t,r){"use strict";var n=i(t("./routes.js")),o=i(t("./model.js"));function i(e){return e&&e.__esModule?e:{default:e}}var u=document.body,a=window.innerWidth;r.hot&&r.hot.accept(),"serviceWorker"in navigator&&window.addEventListener("load",(function(){navigator.serviceWorker.register("./service-worker.js").then((function(e){console.log("⚙️ SW registered: ",e)})).catch((function(e){console.log("🧟 SW registration failed: ",e)}))}));var s=function(e){return e<668?"phone":e<920?"tablet":"desktop"};o.default.settings.profile=s(a),function e(t){var r=window.innerWidth;if(t!==r){t=r;var n=o.default.settings.profile;o.default.settings.profile=s(r),n!=o.default.settings.profile&&m.redraw()}return requestAnimationFrame(e)}(a),sessionStorage.getItem("user")&&(o.default.user=JSON.parse(sessionStorage.getItem("user"))),m.route(u,"/home",(0,n.default)(o.default))})),require.register("initialize.js",(function(e,t,r){"use strict";document.addEventListener("DOMContentLoaded",(function(){t("./index.js")}))})),require.register("layout/footer.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var n=function(){return{view:function(){return m("ion-footer",m("div",{class:"container"},[m("a",{class:"logo-font",href:"https://github.com/gothinkster/realworld"},"conduit"),m("span",{class:"attribution"},[" An interactive learning project from ",m("a",{href:"https://thinkster.io"},"Thinkster"),". Code ",m.trust("&amp;")," design licensed under MIT. "])]))}}};e.default=n})),require.register("layout/header.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var n=t("components"),o=function(){return{view:function(e){var t=e.attrs.mdl;return m("ion-header",m("ion-toolbar",m("ion-buttons",{slot:"start"},"/home"!==m.route.get()&&m("ion-back-button",{slot:"start",onclick:function(){return history.back()},defaultHref:"/"}),t.state.isLoggedIn()?m(n.MenuButton,{mdl:t,name:"settings"}):[m("ion-item",m(m.route.Link,{href:"/register"},"Sign up")),m("ion-item",m(m.route.Link,{href:"/login"},"Login"))],m(m.route.Link,{href:"#"},"Home")),m("ion-buttons",{slot:"end"},m(n.MenuButton,{mdl:t,name:"options"}))))}}};e.default=o})),require.register("layout/index.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var n=u(t("./header.js")),o=u(t("./footer.js")),i=t("components");function u(e){return e&&e.__esModule?e:{default:e}}var a=function(){return{view:function(e){var t=e.children,r=e.attrs.mdl;return m("ion-app",m(n.default,{mdl:r}),m("ion-content",{id:"layout"},t),m(i.SideBars,{mdl:r}),m(o.default,{mdl:r}))}}};e.default=a})),require.register("layout/info.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var n=function(){return{view:function(){return m("footer",m("div",{class:"container"},[m("a",{class:"logo-font",href:"https://github.com/gothinkster/realworld"},"conduit"),m("span",{class:"attribution"},[" An interactive learning project from ",m("a",{href:"https://thinkster.io"},"Thinkster"),". Code ",m.trust("&amp;")," design licensed under MIT. "])]))}}};e.default=n})),require.register("model.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var n={state:{isLoading:!1,loadingProgress:{max:0,value:0},isLoggedIn:function(){return sessionStorage.getItem("token")}},settings:{},page:"",user:{}};e.default=n})),require.register("pages/article.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var n=u(t("Http")),o=t("components"),i=u(t("marked"));function u(e){return e&&e.__esModule?e:{default:e}}var a=function(){var e={},t={status:"loading",error:null},r=function(r){var n=r.article,o=r.comments;e.article=n,e.comments=o,t.status="success"},u=function(e){console.log("error",e),t.error=e,t.status="error"},a=function(e){var o;t.status="loading",(o=n.default,function(e){return function(t){return o.getTask(e)("articles/".concat(t))}})(e)(e.slug).fork(u,r)};return{oninit:function(e){var t=e.attrs.mdl;return a(t)},view:function(r){var n=r.attrs.mdl;return["loading"==t.status&&m(o.Banner,[m("h1.logo-font","Loading ...")]),"error"==t.status&&m(o.Banner,[m("h1.logo-font","Error Loading Data: ".concat(t.error))]),"success"==t.status&&[m("ion-text",m("h1",e.article.title)),m("ion-text",m.trust((0,i.default)(e.article.body))),m(o.FollowFavorite,{mdl:n,data:e.article}),m(o.Comments,{mdl:n,comments:e.comments,reloadArticle:function(){return a(n)}})]]}}};e.default=a})),require.register("pages/editor.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=e.submitArticleTask=e.loadArticleTask=void 0;var n,o=(n=t("Http"))&&n.__esModule?n:{default:n},i=t("Utils"),u=t("ramda");var a=function(e){return function(t){return function(r){return e.getTask(t)("articles/".concat(r))}}};e.loadArticleTask=a;(0,u.over)((0,u.lensProp)("tagList"),(0,u.compose)(u.uniq,(0,u.split)(" "),u.trim));var s=function(e){return function(t){return function(r){return e.postTask(t)("articles")({article:r})}}};e.submitArticleTask=s;var c=function(e){var t=e.attrs.mdl,r={description:"",title:"",body:"",tagList:""},n={disabled:!1};return{oninit:function(e){return function(e){n.disabled=!1;"/editor"!==e.slug&&a(o.default)(e)(e.slug).fork((function(e){return n.errors=(0,i.errorViewModel)(e)}),(function(e){var t=e.article;return r=t}))}(e.attrs.mdl)},view:function(){return m(".editor-page",m(".container.page",m(".row",m(".col-md-10.offset-md-1.col-xs-12",m("form",[n.errors&&n.errors.map((function(e){return m(".error-messages",m("ul","".concat(e.key),e.values.map((function(e){return m("li",e)}))))})),m("fieldset.form-group",m("input.form-control.form-control-lg",{type:"text",disabled:n.disabled,placeholder:"Article Title",onchange:function(e){return r.title=e.target.value},value:r.title})),m("fieldset.form-group",m("input.form-control.form-control-lg",{type:"text",disabled:n.disabled,placeholder:"What's this article about?",onchange:function(e){return r.description=e.target.value},value:r.description})),m("fieldset.form-group",m("textarea.form-control.form-control-lg",{rows:8,placeholder:"Write your article (in markdown)",disabled:n.disabled,onchange:function(e){return r.body=e.target.value},value:r.body})),m("fieldset.form-group",m("input.form-control.form-control-lg",{type:"text",disabled:n.disabled,placeholder:"Enter tags",onchange:function(e){return r.tagList=e.target.value},value:r.tagList})),m("button.btn-lg.pull-xs-right.btn-primary",{onclick:function(e){return function(e){n.disabled=!0;s(o.default)(t)(e).fork((function(e){n.errors=(0,i.errorViewModel)(e),n.disabled=!1}),(function(e){var t=e.article.slug;return m.route.set("/article/".concat(t))}))}(r)}}," Publish Article ")])))))}}};e.default=c})),require.register("pages/home.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var n,o=(n=t("Http"))&&n.__esModule?n:{default:n},i=t("components");function u(e,t){var r=Object.keys(e);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(e);t&&(n=n.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),r.push.apply(r,n)}return r}function a(e){for(var t=1;t<arguments.length;t++){var r=null!=arguments[t]?arguments[t]:{};t%2?u(Object(r),!0).forEach((function(t){s(e,t,r[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(r)):u(Object(r)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(r,t))}))}return e}function s(e,t,r){return t in e?Object.defineProperty(e,t,{value:r,enumerable:!0,configurable:!0,writable:!0}):e[t]=r,e}var c=function(e){return function(t){return function(r){return function(n){return"feed"==n.tags.current?e.getTask(t)("articles/feed?limit=20&offset=".concat(r.offset)):e.getTask(t)("articles?limit=20&offset=".concat(r.offset,"&tag=").concat(n.tags.current))}}}},l=function(){var e={tags:{tagList:[],selected:[],current:""},articles:{}},t={feedStatus:"loading",pageStatus:"loading",limit:20,offset:0,total:0,error:null},r=function(r){var n;t.pageStatus="loading",(n=o.default,function(e){return function(t){return function(r){return Task.of((function(e){return function(t){return a(a({},e),t)}})).ap(function(e){return function(t){return e.getTask(t)("tags")}}(n)(e)).ap(c(n)(e)(t)(r))}}})(r)(t)(e).fork((function(e){console.log("error",e),t.error=e,t.pageStatus="error"}),(function(r){var n=r.articles,o=r.articlesCount,i=r.tags;e.articles=n,t.total=o,e.tags.tagList=i,t.pageStatus="success",t.feedStatus="success"}))},n=function(r){t.feedStatus="loading",c(o.default)(r)(t)(e).fork((function(e){console.log("error",e),t.error=e,t.feedStatus="error"}),(function(r){var n=r.articles,o=r.articlesCount;e.articles=n,t.total=o,t.feedStatus="success"}))};return{oninit:function(e){var t=e.attrs.mdl;return r(t)},view:function(r){var o=r.attrs.mdl;return[!o.state.isLoggedIn()&&m(i.Banner,[m("h1.logo-font","conduit"),m("p","A place to share your knowledge.")]),"loading"==t.pageStatus&&m(i.Loader,[m("h1.logo-font","Loading Data")]),"error"==t.pageStatus&&m(i.Banner,[m("h1.logo-font","Error Loading Data: ".concat(t.error))]),"success"==t.pageStatus&&[m(i.FeedNav,{fetchData:n,mdl:o,data:e}),"loading"==t.feedStatus&&m("ion-text","Loading Articles ..."),"success"==t.feedStatus&&t.total?[m(i.Articles,{mdl:o,data:e}),m(i.Paginator,{mdl:o,state:t,fetchDataFor:function(e){t.offset=e,n(o)}})]:m("ion-text","No articles are here... yet."),o.state.isLoggedIn()&&m("ion-fab",{vertical:"bottom",horizontal:"end",slot:"fixed"},m(m.route.Link,{class:"nav-link",href:"/editor"},[m("ion-fab-button",m("ion-icon",{name:"add-circle"}))])),m("",m(i.TagList,{mdl:o,data:e}))]]}}};e.default=l})),require.register("pages/login.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=e.loginTask=void 0;var n,o=(n=t("Http"))&&n.__esModule?n:{default:n};var i=function(e){return function(t){return function(r){return e.postTask(t)("users/login")({user:r})}}};e.loginTask=i;var u=function(){var e={errors:{},disabled:!1},t={email:"",password:""};return{view:function(r){var n=r.attrs.mdl;return m("div.auth-page",m("div.container.page",m("div.row",m("div.col-md-6.offset-md-3.col-xs-12",[m("h1.text-xs-center","Login"),m("p.text-xs-center",m(m.route.Link,{href:"/register"},"Need an account?"),e.errors["email or password"]&&m(".error-messages",m("span","email or password  ".concat(e.errors["email or password"])))),m("form",[m("fieldset.form-group",m("input.form-control.form-control-lg",{type:"text",disabled:e.disabled,placeholder:"email",onchange:function(e){return t.email=e.target.value},value:t.email,onblur:function(t){return e.isSubmitted&&validate}}),e.errors.email&&m(".error-messages",m("span",e.errors.email))),m("fieldset.form-group",m("input.form-control.form-control-lg",{type:"password",disabled:e.disabled,placeholder:"password",onchange:function(e){return t.password=e.target.value},value:t.password,onblur:function(t){return e.isSubmitted&&validate}})),m("button.btn.btn-lg.btn-primary.pull-xs-right",{type:"submit",onclick:function(r){return function(r,n){n.preventDefault(),e.disabled=!0;i(o.default)(r)(t).fork((function(t){e.errors=t,e.disabled=!1,console.log(e.errors)}),(function(t){var n=t.user;sessionStorage.setItem("token","Token ".concat(n.token)),sessionStorage.setItem("user",JSON.stringify(n)),r.user=n,e.disabled=!1,m.route.set("/home")}))}(n,r)}},"Login")])]))))}}};e.default=u})),require.register("pages/profile.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=e.loadInitDataTask=e.loadDataTask=void 0;var n,o=(n=t("Http"))&&n.__esModule?n:{default:n},i=t("Utils"),u=t("components");function a(e,t){var r=Object.keys(e);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(e);t&&(n=n.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),r.push.apply(r,n)}return r}function s(e){for(var t=1;t<arguments.length;t++){var r=null!=arguments[t]?arguments[t]:{};t%2?a(Object(r),!0).forEach((function(t){c(e,t,r[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(r)):a(Object(r)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(r,t))}))}return e}function c(e,t,r){return t in e?Object.defineProperty(e,t,{value:r,enumerable:!0,configurable:!0,writable:!0}):e[t]=r,e}var l=function(e){return"profiles/".concat(e,"/follow")},f=function(e){return function(t){return function(r){return e.postTask(t)(l(r))()}}},d=function(e){return function(t){return function(r){return e.deleteTask(t)(l(r))}}},g=function(e){return function(t){return function(r){return function(n){return e.getTask(t)("articles?limit=".concat(r.limit,"&offset=").concat(r.offset,"&author=").concat(n))}}}},p=function(e){return function(t){return function(r){return r.showFaveArticles?function(e){return function(t){return function(r){return function(n){return e.getTask(t)("articles?limit=".concat(r.limit,"&offset=").concat(r.offset,"&favorited=").concat(n))}}}}(e)(t)(r)(t.slug):g(e)(t)(r)(t.slug)}}};e.loadDataTask=p;var v=function(e){return function(t){return function(r){return Task.of((function(e){return function(t){return s(s({},e),{},{authorArticles:t})}})).ap(function(e){return function(t){return function(r){return e.getTask(t)("profiles/".concat(r))}}}(e)(t)(t.slug)).ap(g(e)(t)(r)(t.slug))}}};e.loadInitDataTask=v;var b=function(e){var t=e.attrs.mdl,r={authorArticles:{articles:[],articlesCount:0},authorFavoriteArticles:{articles:[],articlesCount:0}},n={pageStatus:"loading",feedStatus:"loading",showFaveArticles:!1,limit:5,offset:0,total:0,error:null},a=function(e){n.feedStatus="loading",p(o.default)(e)(n).fork((function(e){console.log("error",e),n.error=e,n.feedStatus="error"}),(function(e){n.showFaveArticles?r.authorFavoriteArticles=e:r.authorArticles=e,n.total=n.showFaveArticles?r.authorFavoriteArticles.articlesCount:r.authorArticles.articlesCount,n.feedStatus="success"}))},s=function(e){n.showFaveArticles=e,n.offset=0,a(t)},c=function(e){var n=e.author,u=n.username,a=n.following,s=(0,i.log)("toggleAuthorFollow, err-auth");(a?d:f)(o.default)(t)(u).fork(s,(function(e){var t=e.profile.following;return r.profile.following=t}))};return{oninit:function(e){return function(e){n.pageStatus="loading",v(o.default)(e)(n).fork((function(e){console.log("error",e),n.error=e,n.pageStatus="error",m.route.set("/home")}),(function(e){var t=e.authorArticles,o=e.profile;r.authorArticles=t,r.profile=o,n.pageStatus="success",n.feedStatus="success",n.total=r.authorArticles.articlesCount}))}(e.attrs.mdl)},view:function(e){var t=e.attrs.mdl;return m(".profile-page","loading"==n.pageStatus&&m(u.Loader,[m("h1.logo-font","Loading ...")]),"error"==n.pageStatus&&m(u.Banner,[m("h1.logo-font","Error Loading Data: ".concat(n.error))]),"success"==n.pageStatus&&[m(".user-info",m(".container",m(".row",m(".col-xs-12.col-md-10.offset-md-1",[m("img.user-img",{src:(0,i.sanitizeImg)(r.profile.image)}),m("h4",r.profile.username),m("p",r.profile.bio),r.profile.username!==t.user.username?m("button.btn.btn-sm.btn-outline-secondary.action-btn",{onclick:function(e){c({author:{username:r.profile.username,following:r.profile.following}})}},[r.profile.following?[m("i.ion-minus-round")," Unfollow ".concat(r.profile.username," ")]:[m("i.ion-plus-round")," Follow ".concat(r.profile.username," ")]]):m("button.btn.btn-sm.btn-outline-secondary.action-btn",{onclick:function(e){return m.route.set("/settings/".concat(r.profile.username))}},[m("i.ion-gear-a.p-5"),"Edit Profile Settings"])])))),m(".container",m(".row",m(".col-xs-12.col-md-10.offset-md-1",[m(".articles-toggle",m("ul.nav.nav-pills.outline-active",[m("li.nav-item",m("a.nav-link ".concat(!n.showFaveArticles&&"active"),{onclick:function(e){return s(!1)}},"My Articles")),m("li.nav-item",m("a.nav-link ".concat(n.showFaveArticles&&"active"),{onclick:function(e){return s(!0)}},"Favorited Articles"))])),"loading"==n.feedStatus&&"Loading Articles...","error"==n.feedStatus&&m(u.Banner,[m("h1.logo-font","Error Loading Data: ".concat(n.error))]),"success"==n.feedStatus&&[n.showFaveArticles?m(u.Articles,{mdl:t,data:r.authorFavoriteArticles}):m(u.Articles,{mdl:t,data:r.authorArticles}),m(u.Paginator,{mdl:t,state:n,fetchDataFor:function(e){n.offset=e,a(t)}})]])))])}}};e.default=b})),require.register("pages/register.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var n,o=(n=t("Http"))&&n.__esModule?n:{default:n},i=t("Utils");var u=function(){var e={errors:[],disabled:!1},t={username:"",email:"",password:""};return{view:function(r){var n=r.attrs.mdl;return m(".auth-page",m(".container.page",m(".row",m(".col-md-6.offset-md-3.col-xs-12",[m("h1.text-xs-center","Sign Up"),m("p.text-xs-center",m(m.route.Link,{href:"/login"},"Have an account?")),e.errors&&e.errors.map((function(e){return m(".error-messages",m("ul","".concat(e.key),e.values.map((function(e){return m("li",e)}))))})),m("form",[m("fieldset.form-group",m("input.form-control.form-control-lg",{type:"text",disabled:e.disabled,placeholder:"Your Name",onchange:function(e){return t.username=e.target.value},value:t.username})),m("fieldset.form-group",m("input.form-control.form-control-lg",{type:"text",disabled:e.disabled,placeholder:"email",onchange:function(e){return t.email=e.target.value},value:t.email})),m("fieldset.form-group",m("input.form-control.form-control-lg",{type:"password",disabled:e.disabled,placeholder:"password",onchange:function(e){return t.password=e.target.value},value:t.password})),m("button.btn.btn-lg.btn-primary.pull-xs-right",{type:"submit",onclick:function(r){return function(r,n){n.preventDefault(),console.log(r),e.disabled=!0;var u;e.isSubmitted=!0,(u=o.default,function(e){return function(t){return u.postTask(e)("users")({user:t})}})(r)(t).fork((function(t){e.disabled=!1,e.errors=(0,i.errorViewModel)(t)}),(function(t){var n=t.user;r.user=n,sessionStorage.setItem("token","Token ".concat(n.token)),sessionStorage.setItem("user",JSON.stringify(n)),e.disabled=!1,m.route.set("/home"),console.log("success",n)}))}(n,r)}},"Sign Up")])]))))}}};e.default=u})),require.register("pages/user.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var n,o=(n=t("Http"))&&n.__esModule?n:{default:n},i=t("Utils");var u=function(e){var t=e.attrs.mdl.user,r={image:t.image,username:t.username,password:t.password,bio:t.bio,email:t.email};return{view:function(e){var t=e.attrs.mdl;return m(".settings-page",m(".container.page",m(".row",m(".col-md-6.offset-md-3.col-xs-12",[m("h1.text-xs-center","Your Settings"),m("form",m("fieldset",[m("fieldset.form-group",m("input.form-control.form-control-lg",{type:"text",placeholder:"URL of profile picture",onchange:function(e){return r.image=e.target.value},value:r.image})),m("fieldset.form-group",m("input.form-control.form-control-lg",{type:"text",placeholder:"Your Name",onchange:function(e){return r.username=e.target.value},value:r.username})),m("fieldset.form-group",m("textarea.form-control.form-control-lg",{placeholder:"Short bio about you",onchange:function(e){return r.bio=e.target.value},value:r.bio})),m("fieldset.form-group",m("fieldset.form-group",m("input.form-control.form-control-lg",{type:"text",placeholder:"Email",onchange:function(e){return r.email=e.target.value},value:r.email}))),m("fieldset.form-group",m("fieldset.form-group",m("input.form-control.form-control-lg",{type:"password",placeholder:"Password",onchange:function(e){return r.password=e.target.value},value:r.password}))),m("button.btn.btn-lg.btn-primary.pull-xs-right",{onclick:function(e){return function(e,t){var r,n=(0,i.log)("error");(r=o.default,function(e){return function(t){return r.putTask(e)("user")(t)}})(e)(t).fork(n,(function(t){var r=t.user;sessionStorage.setItem("user",JSON.stringify(r)),e.user=r,console.log(e.user),m.route.set("/home")}))}(t,r)}}," Update Settings "),m("button.btn.btn-outline-danger.pull-xs-right",{onclick:function(e){return sessionStorage.clear(),void m.route.set("/home")}},"Or click here to logout.")]))]))))}}};e.default=u})),require.register("routes.js",(function(e,t,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var n=f(t("./layout/index")),o=f(t("./pages/home")),i=f(t("./pages/article")),u=f(t("./pages/profile")),a=f(t("./pages/register")),s=f(t("./pages/login")),c=f(t("./pages/user")),l=f(t("./pages/editor"));function f(e){return e&&e.__esModule?e:{default:e}}var d=function(e){return{"/home":{onmatch:function(t,r){e.slug=r},render:function(){return m(n.default,{mdl:e},m(o.default,{mdl:e}))}},"/editor":{onmatch:function(t,r){e.slug=r},render:function(){return m(n.default,{mdl:e},m(l.default,{mdl:e,key:e.slug}))}},"/editor/:slug":{onmatch:function(t){var r=t.slug;e.slug=r},render:function(){return m(n.default,{mdl:e},m(l.default,{mdl:e}))}},"/article/:slug":{onmatch:function(t){var r=t.slug;e.slug=r},render:function(){return m(n.default,{mdl:e},m(i.default,{mdl:e}))}},"/profile/:slug":{onmatch:function(t){var r=t.slug;e.slug=r},render:function(){return m(n.default,{mdl:e},m(u.default,{mdl:e,key:e.slug}))}},"/settings/:slug":{onmatch:function(t){var r=t.slug;e.slug=r},render:function(){return m(n.default,{mdl:e},m(c.default,{mdl:e,key:e.slug}))}},"/login":{onmatch:function(t,r){e.slug=r},render:function(){return m(n.default,{mdl:e},m(s.default,{mdl:e}))}},"/register":{onmatch:function(t,r){e.slug=r},render:function(){return m(n.default,{mdl:e},m(a.default,{mdl:e}))}}}};e.default=d})),require.alias("process/browser.js","process"),require("process"),require.register("___globals___",(function(e,t,r){window.m=t("mithril"),window.Task=t("data.task")}))}(),require("___globals___");
+(function() {
+  'use strict';
+
+  var globals = typeof global === 'undefined' ? self : global;
+  if (typeof globals.require === 'function') return;
+
+  var modules = {};
+  var cache = {};
+  var aliases = {};
+  var has = {}.hasOwnProperty;
+
+  var expRe = /^\.\.?(\/|$)/;
+  var expand = function(root, name) {
+    var results = [], part;
+    var parts = (expRe.test(name) ? root + '/' + name : name).split('/');
+    for (var i = 0, length = parts.length; i < length; i++) {
+      part = parts[i];
+      if (part === '..') {
+        results.pop();
+      } else if (part !== '.' && part !== '') {
+        results.push(part);
+      }
+    }
+    return results.join('/');
+  };
+
+  var dirname = function(path) {
+    return path.split('/').slice(0, -1).join('/');
+  };
+
+  var localRequire = function(path) {
+    return function expanded(name) {
+      var absolute = expand(dirname(path), name);
+      return globals.require(absolute, path);
+    };
+  };
+
+  var initModule = function(name, definition) {
+    var hot = hmr && hmr.createHot(name);
+    var module = {id: name, exports: {}, hot: hot};
+    cache[name] = module;
+    definition(module.exports, localRequire(name), module);
+    return module.exports;
+  };
+
+  var expandAlias = function(name) {
+    var val = aliases[name];
+    return (val && name !== val) ? expandAlias(val) : name;
+  };
+
+  var _resolve = function(name, dep) {
+    return expandAlias(expand(dirname(name), dep));
+  };
+
+  var require = function(name, loaderPath) {
+    if (loaderPath == null) loaderPath = '/';
+    var path = expandAlias(name);
+
+    if (has.call(cache, path)) return cache[path].exports;
+    if (has.call(modules, path)) return initModule(path, modules[path]);
+
+    throw new Error("Cannot find module '" + name + "' from '" + loaderPath + "'");
+  };
+
+  require.alias = function(from, to) {
+    aliases[to] = from;
+  };
+
+  var extRe = /\.[^.\/]+$/;
+  var indexRe = /\/index(\.[^\/]+)?$/;
+  var addExtensions = function(bundle) {
+    if (extRe.test(bundle)) {
+      var alias = bundle.replace(extRe, '');
+      if (!has.call(aliases, alias) || aliases[alias].replace(extRe, '') === alias + '/index') {
+        aliases[alias] = bundle;
+      }
+    }
+
+    if (indexRe.test(bundle)) {
+      var iAlias = bundle.replace(indexRe, '');
+      if (!has.call(aliases, iAlias)) {
+        aliases[iAlias] = bundle;
+      }
+    }
+  };
+
+  require.register = require.define = function(bundle, fn) {
+    if (bundle && typeof bundle === 'object') {
+      for (var key in bundle) {
+        if (has.call(bundle, key)) {
+          require.register(key, bundle[key]);
+        }
+      }
+    } else {
+      modules[bundle] = fn;
+      delete cache[bundle];
+      addExtensions(bundle);
+    }
+  };
+
+  require.list = function() {
+    var list = [];
+    for (var item in modules) {
+      if (has.call(modules, item)) {
+        list.push(item);
+      }
+    }
+    return list;
+  };
+
+  var hmr = globals._hmr && new globals._hmr(_resolve, require, modules, cache);
+  require._cache = cache;
+  require.hmr = hmr && hmr.wrap;
+  require.brunch = true;
+  globals.require = require;
+})();
+
+(function() {
+var global = typeof window === 'undefined' ? this : window;
+var process;
+var __makeRelativeRequire = function(require, mappings, pref) {
+  var none = {};
+  var tryReq = function(name, pref) {
+    var val;
+    try {
+      val = require(pref + '/node_modules/' + name);
+      return val;
+    } catch (e) {
+      if (e.toString().indexOf('Cannot find module') === -1) {
+        throw e;
+      }
+
+      if (pref.indexOf('node_modules') !== -1) {
+        var s = pref.split('/');
+        var i = s.lastIndexOf('node_modules');
+        var newPref = s.slice(0, i).join('/');
+        return tryReq(name, newPref);
+      }
+    }
+    return none;
+  };
+  return function(name) {
+    if (name in mappings) name = mappings[name];
+    if (!name) return;
+    if (name[0] !== '.' && pref) {
+      var val = tryReq(name, pref);
+      if (val !== none) return val;
+    }
+    return require(name);
+  }
+};
+require.register("Http.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = exports.parseHttpSuccess = exports.parseHttpError = void 0;
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var api = "https://conduit.productionready.io/api/";
+
+var onProgress = function onProgress(mdl) {
+  return function (e) {
+    if (e.lengthComputable) {
+      mdl.state.loadingProgress.max = e.total;
+      mdl.state.loadingProgress.value = e.loaded;
+      m.redraw();
+    }
+  };
+};
+
+function onLoad() {
+  return false;
+}
+
+var onLoadStart = function onLoadStart(mdl) {
+  return function (e) {
+    mdl.state.isLoading = true;
+    return false;
+  };
+};
+
+var onLoadEnd = function onLoadEnd(mdl) {
+  return function (e) {
+    mdl.state.isLoading = false;
+    mdl.state.loadingProgress.max = 0;
+    mdl.state.loadingProgress.value = 0;
+    return false;
+  };
+};
+
+var xhrProgress = function xhrProgress(mdl) {
+  return {
+    config: function config(xhr) {
+      xhr.onprogress = onProgress(mdl);
+      xhr.onload = onLoad;
+      xhr.onloadstart = onLoadStart(mdl);
+      xhr.onloadend = onLoadEnd(mdl);
+    }
+  };
+};
+
+var parseHttpError = function parseHttpError(mdl) {
+  return function (rej) {
+    return function (e) {
+      mdl.state.isLoading = false;
+      return rej(e.response.errors);
+    };
+  };
+};
+
+exports.parseHttpError = parseHttpError;
+
+var parseHttpSuccess = function parseHttpSuccess(mdl) {
+  return function (res) {
+    return function (data) {
+      mdl.state.isLoading = false;
+      return res(data);
+    };
+  };
+};
+
+exports.parseHttpSuccess = parseHttpSuccess;
+
+var getUserToken = function getUserToken() {
+  return sessionStorage.getItem("token") ? {
+    authorization: sessionStorage.getItem("token")
+  } : "";
+};
+
+var call = function call(_headers) {
+  return function (method) {
+    return function (mdl) {
+      return function (url) {
+        return function (body) {
+          if (["POST", "PUT", "DELETE"].includes(method) && !mdl.state.isLoggedIn()) {
+            if (!["/login", "/register"].includes(mdl.slug)) {
+              return Task.rejected(m.route.set("/register"));
+            }
+          }
+
+          mdl.state.isLoading = true;
+          return new Task(function (rej, res) {
+            return m.request(_objectSpread({
+              method: method,
+              url: api + url,
+              headers: _objectSpread({
+                "content-type": "application/json"
+              }, _headers),
+              body: body,
+              withCredentials: false
+            }, xhrProgress(mdl))).then(parseHttpSuccess(mdl)(res), parseHttpError(mdl)(rej));
+          });
+        };
+      };
+    };
+  };
+};
+
+var Http = {
+  getTask: function getTask(mdl) {
+    return function (url) {
+      return call(getUserToken())("GET")(mdl)(url)(null);
+    };
+  },
+  deleteTask: function deleteTask(mdl) {
+    return function (url) {
+      return call(getUserToken())("DELETE")(mdl)(url)(null);
+    };
+  },
+  postTask: function postTask(mdl) {
+    return function (url) {
+      return function (data) {
+        return call(getUserToken())("POST")(mdl)(url)(data);
+      };
+    };
+  },
+  putTask: function putTask(mdl) {
+    return function (url) {
+      return function (data) {
+        return call(getUserToken())("PUT")(mdl)(url)(data);
+      };
+    };
+  }
+};
+var _default = Http;
+exports["default"] = _default;
+});
+
+;require.register("Utils.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.errorViewModel = exports.sanitizeImg = exports.log = void 0;
+
+var log = function log(m) {
+  return function (v) {
+    console.log(m, v);
+    return v;
+  };
+};
+
+exports.log = log;
+
+var secureImg = function secureImg(url) {
+  return url.match(/(https)./) ? url : url.replace("http", "https");
+};
+
+var sanitizeImg = function sanitizeImg(url) {
+  return url && url.match(/\.(jpeg|jpg|gif|png|svg)$/) ? secureImg(url) : "https://static.productionready.io/images/smiley-cyrus.jpg";
+};
+
+exports.sanitizeImg = sanitizeImg;
+
+var errorViewModel = function errorViewModel(err) {
+  return Object.keys(err).map(function (k) {
+    return {
+      key: k.toUpperCase(),
+      errors: err[k]
+    };
+  });
+};
+
+exports.errorViewModel = errorViewModel;
+});
+
+;require.register("app.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var toRouter = function toRouter(mdl) {
+  return function (Router, route) {
+    var match = route.url.includes(":slug") ? mdl.state.isLoggedIn() ? function (_ref) {
+      var slug = _ref.slug;
+      mdl.slug = slug;
+    } : function () {
+      return m.route.set("/login");
+    } : function (_, b) {
+      mdl.slug = b;
+    };
+    Router[route.url] = {
+      onmatch: match,
+      render: function render() {
+        return route.component(mdl);
+      }
+    };
+    return Router;
+  };
+};
+
+var App = function App(mdl) {
+  return mdl.Routes.reduce(toRouter(mdl), {});
+};
+
+var _default = App;
+exports["default"] = _default;
+});
+
+;require.register("components/articles.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Articles = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var favoriteArticleUrl = function favoriteArticleUrl(slug) {
+  return "articles/".concat(slug, "/favorite");
+};
+
+var favoriteArticleTask = function favoriteArticleTask(http) {
+  return function (mdl) {
+    return function (slug) {
+      return http.postTask(mdl)(favoriteArticleUrl(slug))();
+    };
+  };
+};
+
+var unFavoriteArticleTask = function unFavoriteArticleTask(http) {
+  return function (mdl) {
+    return function (slug) {
+      return http.deleteTask(mdl)(favoriteArticleUrl(slug));
+    };
+  };
+};
+
+var ArticlePreview = function ArticlePreview(_ref) {
+  var _ref$attrs = _ref.attrs,
+      mdl = _ref$attrs.mdl,
+      article = _ref$attrs.article;
+  var data = article;
+
+  var toggleArticleLike = function toggleArticleLike(favorited, slug) {
+    var onError = (0, _Utils.log)("toggleArticleLike err-art");
+
+    var onSuccess = function onSuccess(_ref2) {
+      var _ref2$article = _ref2.article,
+          favorited = _ref2$article.favorited,
+          favoritesCount = _ref2$article.favoritesCount;
+      data.favorited = favorited;
+      data.favoritesCount = favoritesCount;
+    };
+
+    var toggle = favorited ? unFavoriteArticleTask : favoriteArticleTask;
+    toggle(_Http["default"])(mdl)(slug).fork(onError, onSuccess);
+  };
+
+  return {
+    view: function view() {
+      return m("ion-item", {
+        button: true
+      }, m("ion-grid", [m("ion-row", m("ion-col", m(m.route.Link, {
+        "class": "preview-link",
+        href: "/article/".concat(data.slug)
+      }, m("ion-text", m("h1", data.title)), m("ion-text", m("p", data.description))))), m("ion-row", m("ion-col", m("ion-list", {
+        side: "end"
+      }, data.tagList.map(function (tag) {
+        return m("ion-chip", tag);
+      })))), m("ion-row", [m(m.route.Link, {
+        href: "/profile/".concat(data.author.username),
+        options: {
+          replace: true
+        }
+      }, m("ion-avatar", {
+        slot: "start"
+      }, m("img", {
+        src: (0, _Utils.sanitizeImg)(data.author.image)
+      }))), m("ion-label", m("ion-text", m("h2", data.author.username)), m("p", data.createdAt)), m("ion-chip", {
+        onclick: function onclick(e) {
+          return toggleArticleLike(data.favorited, data.slug);
+        }
+      }, [m("ion-icon", {
+        name: data.favorited ? "heart-dislike-outline" : "heart-outline"
+      }), m("ion-text", data.favoritesCount)])])]));
+    }
+  };
+};
+
+var Articles = function Articles() {
+  return {
+    view: function view(_ref3) {
+      var _ref3$attrs = _ref3.attrs,
+          mdl = _ref3$attrs.mdl,
+          data = _ref3$attrs.data;
+      return data.articles.length ? m("ion-list", {
+        button: true
+      }, data.articles.map(function (article) {
+        return m(ArticlePreview, {
+          mdl: mdl,
+          data: data,
+          article: article
+        });
+      })) : m("p", "No articles are here... yet.");
+    }
+  };
+};
+
+exports.Articles = Articles;
+});
+
+;require.register("components/banner.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Banner = void 0;
+
+var Banner = function Banner() {
+  return {
+    view: function view(_ref) {
+      var children = _ref.children;
+      return m(".banner", m(".container", children));
+    }
+  };
+};
+
+exports.Banner = Banner;
+});
+
+;require.register("components/card.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Card = void 0;
+var Card = {
+  view: function view(_ref) {
+    var _ref$attrs = _ref.attrs,
+        options = _ref$attrs.options,
+        header = _ref$attrs.header,
+        content = _ref$attrs.content,
+        footer = _ref$attrs.footer;
+    return m("ion-card", options, m("ion-card-header", {
+      translucent: true
+    }, header), m("ion-card-content", content), m("ion-card-footer", footer));
+  }
+};
+exports.Card = Card;
+});
+
+;require.register("components/comments.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Comments = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+var _ramda = require("ramda");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var getCommentsTask = function getCommentsTask(http) {
+  return function (mdl) {
+    return function (slug) {
+      return http.getTask(mdl)("articles/".concat(slug, "/comments"));
+    };
+  };
+};
+
+var deleteCommentTask = function deleteCommentTask(http) {
+  return function (mdl) {
+    return function (slug) {
+      return function (id) {
+        return http.deleteTask(mdl)("articles/".concat(slug, "/comments/").concat(id));
+      };
+    };
+  };
+};
+
+var trimBody = (0, _ramda.over)((0, _ramda.lensProp)("body"), _ramda.trim);
+
+var submitTask = function submitTask(http) {
+  return function (mdl) {
+    return function (comment) {
+      return http.postTask(mdl)("articles/".concat(mdl.slug, "/comments"))({
+        comment: comment
+      });
+    };
+  };
+};
+
+var CommentForm = function CommentForm(_ref) {
+  var _ref$attrs = _ref.attrs,
+      mdl = _ref$attrs.mdl,
+      reload = _ref$attrs.reload;
+  var comment = {
+    body: ""
+  };
+  var state = {
+    errors: [],
+    disabled: false
+  };
+
+  var onError = function onError(errors) {
+    state.errors = (0, _Utils.errorViewModel)(errors);
+    console.log("Error with form ", state);
+    state.disabled = false;
+  };
+
+  var onSuccess = function onSuccess() {
+    comment.body = "";
+    state.errors = [];
+    state.disabled = false;
+    reload();
+  };
+
+  var submit = function submit(comment) {
+    return submitTask(_Http["default"])(mdl)(trimBody(comment)).fork(onError, onSuccess);
+  };
+
+  return {
+    oninit: function oninit() {
+      return comment.body = "";
+    },
+    view: function view(_ref2) {
+      var mdl = _ref2.attrs.mdl;
+      return [m("ion-grid", m("ion-row", m("ion-col", m("ion-textarea", {
+        rows: 3,
+        placeholder: "Write a comment ...",
+        onchange: function onchange(e) {
+          return comment.body = e.target.value;
+        },
+        disabled: state.disabled,
+        value: comment.body
+      }))), m("ion-row", m("ion-col", m("ion-avatar", m("img", {
+        src: (0, _Utils.sanitizeImg)(mdl.user.image)
+      }))), m("ion-col", m("ion-button", {
+        onclick: function onclick(e) {
+          state.disabled = true;
+          submit(comment);
+        }
+      }, " Post Comment ")))), state.errors.map(function (e) {
+        return e.values.map(function (err) {
+          return m("p.error-messages", "".concat(e.key, " ").concat(err));
+        });
+      })];
+    }
+  };
+};
+
+var Comment = function Comment() {
+  return {
+    view: function view(_ref3) {
+      var _ref3$attrs = _ref3.attrs,
+          mdl = _ref3$attrs.mdl,
+          _ref3$attrs$comment = _ref3$attrs.comment,
+          _ref3$attrs$comment$a = _ref3$attrs$comment.author,
+          image = _ref3$attrs$comment$a.image,
+          username = _ref3$attrs$comment$a.username,
+          body = _ref3$attrs$comment.body,
+          createdAt = _ref3$attrs$comment.createdAt,
+          id = _ref3$attrs$comment.id,
+          deleteComment = _ref3$attrs.deleteComment;
+      return m("ion-item", m("ion-grid", ("ion-row", m("ion-text", body)), m("ion-row", m(m.route.Link, {
+        href: "/profile/".concat(username),
+        "class": "comment-author m-5"
+      }, m("ion-avatar", m("img", {
+        src: (0, _Utils.sanitizeImg)(image)
+      })), m("ion-text", username)), m("ion-text", createdAt), username == mdl.user.username && m("ion-icon", {
+        name: "trash-outline",
+        onclick: function onclick(e) {
+          return deleteComment(id);
+        }
+      }))));
+    }
+  };
+};
+
+var Comments = function Comments(_ref4) {
+  var mdl = _ref4.attrs.mdl;
+  var data = {
+    comments: []
+  };
+
+  var loadComments = function loadComments(mdl) {
+    var onSuccess = function onSuccess(_ref5) {
+      var comments = _ref5.comments;
+      return data.comments = comments;
+    };
+
+    var onError = (0, _Utils.log)("error with comments");
+    getCommentsTask(_Http["default"])(mdl)(mdl.slug).fork(onError, onSuccess);
+  };
+
+  var _deleteComment = function deleteComment(id) {
+    var onSuccess = function onSuccess(_ref6) {
+      var comments = _ref6.comments;
+      return data.comments = comments;
+    };
+
+    var onError = (0, _Utils.log)("error with comments");
+    deleteCommentTask(_Http["default"])(mdl)(mdl.slug)(id).chain(function (x) {
+      return getCommentsTask(_Http["default"])(mdl)(mdl.slug);
+    }).fork(onError, onSuccess);
+  };
+
+  return {
+    oninit: function oninit(_ref7) {
+      var mdl = _ref7.attrs.mdl;
+      return loadComments(mdl);
+    },
+    view: function view(_ref8) {
+      var mdl = _ref8.attrs.mdl;
+      return m("item-list", m(CommentForm, {
+        mdl: mdl,
+        reload: function reload() {
+          return loadComments(mdl);
+        }
+      }), data.comments.map(function (c) {
+        return m(Comment, {
+          mdl: mdl,
+          comment: c,
+          deleteComment: function deleteComment(id) {
+            return _deleteComment(id);
+          }
+        });
+      }));
+    }
+  };
+};
+
+exports.Comments = Comments;
+});
+
+;require.register("components/feed-nav.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.FeedNav = void 0;
+
+var FeedNav = function FeedNav(_ref) {
+  var fetchData = _ref.attrs.fetchData;
+  return {
+    view: function view(_ref2) {
+      var _ref2$attrs = _ref2.attrs,
+          mdl = _ref2$attrs.mdl,
+          data = _ref2$attrs.data;
+      return [m("ion-toolbar", m("ion-row", m("ion-col", m("ion-button", {
+        fill: "solid",
+        expand: "full",
+        id: "",
+        color: data.tags.current == "" ? "primary" : "secondary",
+        onclick: function onclick(e) {
+          data.tags.current = e.target.id;
+          fetchData(mdl);
+        }
+      }, "Global Feed")), mdl.state.isLoggedIn() && m("ion-col", m("ion-button", {
+        fill: "solid",
+        expand: "full",
+        id: "feed",
+        color: data.tags.current == "feed" ? "primary" : "secondary",
+        onclick: function onclick(e) {
+          console.log("data.tags.current", e.target.id, e);
+          data.tags.current = e.target.id;
+          fetchData(mdl);
+        }
+      }, "Your Feed"))), m("ion-row", m("ion-col", data.tags.selected.map(function (tag) {
+        return m("ion-button", {
+          fill: "solid",
+          size: "small",
+          color: data.tags.current == tag ? "primary" : "secondary",
+          id: tag,
+          onclick: function onclick(e) {
+            data.tags.current = tag;
+            fetchData(mdl);
+          }
+        }, m("ion-text", "# ".concat(tag)) //Move this to user profile
+        // import { without } from "ramda"
+        // m("ion-icon", {
+        //   name: "close-circle-outline",
+        //   onclick: (e) =>
+        //     (data.tags.selected = without(tag, data.tags.selected)),
+        // })
+        );
+      }))))];
+    }
+  };
+};
+
+exports.FeedNav = FeedNav;
+});
+
+;require.register("components/follow-favorite.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.FollowFavorite = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var deleteArticleUrl = function deleteArticleUrl(slug) {
+  return "articles/".concat(slug);
+};
+
+var favoriteArticleUrl = function favoriteArticleUrl(slug) {
+  return "articles/".concat(slug, "/favorite");
+};
+
+var followAuthorUrl = function followAuthorUrl(author) {
+  return "profiles/".concat(author, "/follow");
+};
+
+var deleteArticleTask = function deleteArticleTask(http) {
+  return function (mdl) {
+    return http.deleteTask(mdl)(deleteArticleUrl(mdl.slug));
+  };
+};
+
+var favoriteArticleTask = function favoriteArticleTask(http) {
+  return function (mdl) {
+    return http.postTask(mdl)(favoriteArticleUrl(mdl.slug))();
+  };
+};
+
+var unFavoriteArticleTask = function unFavoriteArticleTask(http) {
+  return function (mdl) {
+    return http.deleteTask(mdl)(favoriteArticleUrl(mdl.slug));
+  };
+};
+
+var followAuthorTask = function followAuthorTask(http) {
+  return function (mdl) {
+    return function (author) {
+      return http.postTask(mdl)(followAuthorUrl(author))();
+    };
+  };
+};
+
+var unFollowAuthorTask = function unFollowAuthorTask(http) {
+  return function (mdl) {
+    return function (author) {
+      return http.deleteTask(mdl)(followAuthorUrl(author));
+    };
+  };
+};
+
+var FollowFavorite = function FollowFavorite(_ref) {
+  var _ref$attrs = _ref.attrs,
+      mdl = _ref$attrs.mdl,
+      data = _ref$attrs.data;
+
+  var toggleArticleLike = function toggleArticleLike(_ref2) {
+    var favorited = _ref2.favorited;
+    var onError = (0, _Utils.log)("toggleArticleLike err-art");
+
+    var onSuccess = function onSuccess(_ref3) {
+      var _ref3$article = _ref3.article,
+          favorited = _ref3$article.favorited,
+          favoritesCount = _ref3$article.favoritesCount;
+      data.favorited = favorited;
+      data.favoritesCount = favoritesCount;
+    };
+
+    var toggle = favorited ? unFavoriteArticleTask : favoriteArticleTask;
+    toggle(_Http["default"])(mdl).fork(onError, onSuccess);
+  };
+
+  var toggleAuthorFollow = function toggleAuthorFollow(_ref4) {
+    var _ref4$author = _ref4.author,
+        username = _ref4$author.username,
+        following = _ref4$author.following;
+    var onError = (0, _Utils.log)("toggleAuthorFollow, err-auth");
+
+    var onSuccess = function onSuccess(_ref5) {
+      var following = _ref5.profile.following;
+      return data.author.following = following;
+    };
+
+    var toggle = following ? unFollowAuthorTask : followAuthorTask;
+    toggle(_Http["default"])(mdl)(username).fork(onError, onSuccess);
+  };
+
+  var deleteArticle = function deleteArticle(slug) {
+    var onError = (0, _Utils.log)("deleteArticle, err-auth");
+
+    var onSuccess = function onSuccess(s) {
+      console.log(s);
+      m.route.set("/home");
+    };
+
+    deleteArticleTask(_Http["default"])(mdl).fork(onError, onSuccess);
+  };
+
+  return {
+    view: function view(_ref6) {
+      var _ref6$attrs = _ref6.attrs,
+          mdl = _ref6$attrs.mdl,
+          _ref6$attrs$data = _ref6$attrs.data,
+          _ref6$attrs$data$auth = _ref6$attrs$data.author,
+          username = _ref6$attrs$data$auth.username,
+          image = _ref6$attrs$data$auth.image,
+          following = _ref6$attrs$data$auth.following,
+          favoritesCount = _ref6$attrs$data.favoritesCount,
+          favorited = _ref6$attrs$data.favorited,
+          slug = _ref6$attrs$data.slug;
+      return m("ion-grid", m("ion-row", [m(m.route.Link, {
+        href: "profile/".concat(username)
+      }, m("ion-chip", m("ion-avatar", m("ion-img", {
+        src: (0, _Utils.sanitizeImg)(image)
+      })), m("ion-text", username))), mdl.user.username == username ? [m(m.route.Link, {
+        "class": "btn btn-sm btn-outline-secondary",
+        href: "/editor/".concat(slug),
+        selector: "button"
+      }, [m("ion-icon", {
+        name: "edit"
+      }), "Edit Article"]), m("ion-button", {
+        onclick: function onclick(e) {
+          return deleteArticle(slug);
+        }
+      }, [m("ion-icon", {
+        name: "trash-outline"
+      }), "Delete Article "])] : [m("ion-chip", {
+        onclick: function onclick(e) {
+          return toggleAuthorFollow(data);
+        }
+      }, [m("ion-icon", {
+        name: following ? "people-circle-outline" : "people-outline"
+      }), m("ion-label", "".concat(username))]), m("ion-chip", {
+        onclick: function onclick(e) {
+          return toggleArticleLike(data);
+        }
+      }, [m("ion-icon", {
+        name: favorited ? "heart-dislike-outline" : "heart-outline"
+      }), m("ion-label", favoritesCount)])]]));
+    }
+  };
+};
+
+exports.FollowFavorite = FollowFavorite;
+});
+
+;require.register("components/index.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _banner = require("./banner");
+
+Object.keys(_banner).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _banner[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _banner[key];
+    }
+  });
+});
+
+var _loader = require("./loader");
+
+Object.keys(_loader).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _loader[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _loader[key];
+    }
+  });
+});
+
+var _paginator = require("./paginator");
+
+Object.keys(_paginator).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _paginator[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _paginator[key];
+    }
+  });
+});
+
+var _articles = require("./articles");
+
+Object.keys(_articles).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _articles[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _articles[key];
+    }
+  });
+});
+
+var _followFavorite = require("./follow-favorite");
+
+Object.keys(_followFavorite).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _followFavorite[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _followFavorite[key];
+    }
+  });
+});
+
+var _comments = require("./comments");
+
+Object.keys(_comments).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _comments[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _comments[key];
+    }
+  });
+});
+
+var _feedNav = require("./feed-nav");
+
+Object.keys(_feedNav).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _feedNav[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _feedNav[key];
+    }
+  });
+});
+
+var _taglist = require("./taglist");
+
+Object.keys(_taglist).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _taglist[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _taglist[key];
+    }
+  });
+});
+
+var _card = require("./card");
+
+Object.keys(_card).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _card[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _card[key];
+    }
+  });
+});
+
+var _menu = require("./menu");
+
+Object.keys(_menu).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _menu[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _menu[key];
+    }
+  });
+});
+
+var _sidebars = require("./sidebars");
+
+Object.keys(_sidebars).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _sidebars[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _sidebars[key];
+    }
+  });
+});
+
+var _toaster = require("./toaster");
+
+Object.keys(_toaster).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _toaster[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _toaster[key];
+    }
+  });
+});
+});
+
+;require.register("components/loader.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Loader = void 0;
+
+var Loader = function Loader() {
+  return {
+    view: function view(_ref) {
+      var children = _ref.children;
+      return m(".container", m(".banner", m(".container", children)));
+    }
+  };
+};
+
+exports.Loader = Loader;
+});
+
+;require.register("components/menu.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Menu = exports.MenuButton = void 0;
+
+var _core = require("@ionic/core");
+
+var MenuButton = function MenuButton() {
+  var toggleMenu = function toggleMenu(menuId) {
+    console.log(_core.menuController);
+
+    _core.menuController.open(menuId).then(function (s) {
+      return console.log(s);
+    }, function (e) {
+      return console.log(e);
+    });
+  };
+
+  return {
+    view: function view(_ref) {
+      var _ref$attrs = _ref.attrs,
+          name = _ref$attrs.name,
+          menuId = _ref$attrs.menuId;
+      return m("ion-menu-toggle", {
+        oncreate: function oncreate(_ref2) {
+          var dom = _ref2.dom;
+
+          _core.menuController.enable(true, menuId);
+        },
+        onclick: function onclick(e) {
+          return toggleMenu(menuId);
+        }
+      }, m("ion-button", m("ion-icon", {
+        name: name
+      })));
+    }
+  };
+};
+
+exports.MenuButton = MenuButton;
+
+var Menu = function Menu() {
+  return {
+    view: function view(_ref3) {
+      var _ref3$attrs = _ref3.attrs,
+          title = _ref3$attrs.title,
+          side = _ref3$attrs.side,
+          menuId = _ref3$attrs.menuId,
+          contentId = _ref3$attrs.contentId,
+          contents = _ref3$attrs.contents;
+      return m("ion-menu[main]", {
+        side: side,
+        menuId: menuId,
+        contentId: contentId
+      }, [m("ion-header", m("ion-toolbar[translucent]", m("ion-title", title))), m("ion-content", contents)]);
+    }
+  };
+};
+
+exports.Menu = Menu;
+});
+
+;require.register("components/paginator.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Paginator = void 0;
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+var Paginator = function Paginator() {
+  return {
+    view: function view(_ref) {
+      var _ref$attrs = _ref.attrs,
+          state = _ref$attrs.state,
+          fetchDataFor = _ref$attrs.fetchDataFor;
+      var total = Math.ceil(state.total / state.limit) + 1;
+      var current = state.offset / state.limit + 1;
+
+      var range = _toConsumableArray(Array(total).keys()).slice(1);
+
+      return state.total > state.limit && range.map(function (page, idx) {
+        return m("ion-chip", {
+          color: page == current && "primary",
+          onclick: function onclick(e) {
+            return fetchDataFor(idx * state.limit);
+          }
+        }, page);
+      });
+    }
+  };
+};
+
+exports.Paginator = Paginator;
+});
+
+;require.register("components/sidebars.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SideBars = exports.SettingsMenu = void 0;
+
+var _menu = require("./menu");
+
+var _core = require("@ionic/core");
+
+var SettingsMenu = function SettingsMenu() {
+  return {
+    view: function view(_ref) {
+      var mdl = _ref.attrs.mdl;
+      return m("ion-list", [m("ion-item", m(m.route.Link, {
+        onclick: function onclick(e) {
+          return _core.menuController.toggle("settings");
+        },
+        href: "/settings/".concat(mdl.user.username)
+      }, [m("i.ion-gear-a.p-5"), "Settings"])), m("ion-item", m(m.route.Link, {
+        onclick: function onclick(e) {
+          return _core.menuController.toggle("settings");
+        },
+        href: "/profile/".concat(mdl.user.username)
+      }, mdl.user.username))]);
+    }
+  };
+};
+
+exports.SettingsMenu = SettingsMenu;
+
+var SideBars = function SideBars() {
+  return {
+    view: function view(_ref2) {
+      var mdl = _ref2.attrs.mdl;
+      return [m(_menu.Menu, {
+        mdl: mdl,
+        title: "Settings",
+        side: "start",
+        menuId: "settings",
+        contentId: "layout",
+        contents: m(SettingsMenu, {
+          mdl: mdl
+        })
+      }), m(_menu.Menu, {
+        mdl: mdl,
+        title: "Options",
+        side: "end",
+        menuId: "options",
+        contentId: "layout",
+        contents: m(SettingsMenu, {
+          mdl: mdl
+        })
+      })];
+    }
+  };
+};
+
+exports.SideBars = SideBars;
+});
+
+;require.register("components/taglist.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.TagList = void 0;
+
+var _ramda = require("ramda");
+
+var TagList = function TagList() {
+  var selectTag = function selectTag(data, tag) {
+    return data.tags.selected = (0, _ramda.uniq)(data.tags.selected.concat([tag]));
+  };
+
+  return {
+    view: function view(_ref) {
+      var data = _ref.attrs.data;
+
+      var isSelected = function isSelected(tag) {
+        return data.tags.selected.includes(tag) ? "primary" : "secondary";
+      };
+
+      return [m("ion-text", "Popular Tags"), data.tags.tagList.filter(function (tag) {
+        return !data.tags.selected.includes(tag);
+      }).map(function (tag) {
+        return m("ion-chip", {
+          color: isSelected(tag),
+          onclick: function onclick(e) {
+            return selectTag(data, tag);
+          }
+        }, tag);
+      })];
+    }
+  };
+};
+
+exports.TagList = TagList;
+});
+
+;require.register("components/toaster.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Toaster = void 0;
+
+var _core = require("@ionic/core");
+
+var Toaster = function Toaster() {
+  return {
+    view: function view(_ref) {
+      var mdl = _ref.attrs.mdl;
+      return m("ion-toast", {
+        oncreate: function oncreate(_ref2) {
+          var dom = _ref2.dom;
+
+          _core.toastController.create({
+            component: dom,
+            message: mdl.toast.msg,
+            duration: mdl.toast.duration || 2000,
+            showCloseButton: true,
+            animated: true,
+            color: mdl.toast.status ? "success" : "danger"
+          }).then(function (toast) {
+            return toast.present();
+          });
+        }
+      });
+    }
+  };
+};
+
+exports.Toaster = Toaster;
+});
+
+;require.register("index.js", function(exports, require, module) {
+"use strict";
+
+var _app = _interopRequireDefault(require("./app.js"));
+
+var _model = _interopRequireDefault(require("./model.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var root = document.body;
+var winW = window.innerWidth;
+
+if (module.hot) {
+  module.hot.accept();
+}
+
+if ('development' !== "production") {
+  console.log("Looks like we are in development mode!");
+} else {
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("./service-worker.js").then(function (registration) {
+        console.log("⚙️ SW registered: ", registration);
+      })["catch"](function (registrationError) {
+        console.log("🧟 SW registration failed: ", registrationError);
+      });
+    });
+  }
+} // set display profiles
+
+
+var getProfile = function getProfile(w) {
+  if (w < 668) return "phone";
+  if (w < 920) return "tablet";
+  return "desktop";
+};
+
+var checkWidth = function checkWidth(winW) {
+  var w = window.innerWidth;
+
+  if (winW !== w) {
+    winW = w;
+    var lastProfile = _model["default"].settings.profile;
+    _model["default"].settings.profile = getProfile(w);
+    if (lastProfile != _model["default"].settings.profile) m.redraw();
+  }
+
+  return requestAnimationFrame(checkWidth);
+};
+
+_model["default"].settings.profile = getProfile(winW);
+checkWidth(winW);
+
+if (sessionStorage.getItem("user")) {
+  _model["default"].user = JSON.parse(sessionStorage.getItem("user"));
+}
+
+m.route(root, "/home", (0, _app["default"])(_model["default"]));
+});
+
+;require.register("initialize.js", function(exports, require, module) {
+"use strict";
+
+document.addEventListener("DOMContentLoaded", function () {
+  require("./index.js");
+});
+});
+
+;require.register("layout/footer.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var Footer = function Footer() {
+  return {
+    view: function view() {
+      return m("ion-footer", m("div", {
+        "class": "container"
+      }, [m("a", {
+        "class": "logo-font",
+        href: "https://github.com/gothinkster/realworld"
+      }, "conduit"), m("span", {
+        "class": "attribution"
+      }, [" An interactive learning project from ", m("a", {
+        href: "https://thinkster.io"
+      }, "Thinkster"), ". Code ", m.trust("&amp;"), " design licensed under MIT. "])]));
+    }
+  };
+};
+
+var _default = Footer;
+exports["default"] = _default;
+});
+
+;require.register("layout/header.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _components = require("components");
+
+var Header = function Header() {
+  return {
+    view: function view(_ref) {
+      var mdl = _ref.attrs.mdl;
+      return m("ion-header", m("ion-toolbar", m("ion-buttons", {
+        slot: "start"
+      }, m.route.get() !== "/home" && m("ion-back-button", {
+        slot: "start",
+        onclick: function onclick() {
+          return history.back();
+        },
+        defaultHref: "/"
+      }), mdl.state.isLoggedIn() ? m(_components.MenuButton, {
+        mdl: mdl,
+        name: "settings"
+      }) : [m("ion-item", m(m.route.Link, {
+        href: "/register"
+      }, "Sign up")), m("ion-item", m(m.route.Link, {
+        href: "/login"
+      }, "Login"))], m(m.route.Link, {
+        href: "#"
+      }, "Home")), m("ion-buttons", {
+        slot: "end"
+      }, m(_components.MenuButton, {
+        mdl: mdl,
+        name: "options"
+      }))));
+    }
+  };
+};
+
+var _default = Header;
+exports["default"] = _default;
+});
+
+;require.register("layout/index.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _header = _interopRequireDefault(require("./header.js"));
+
+var _footer = _interopRequireDefault(require("./footer.js"));
+
+var _components = require("components");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var Layout = function Layout() {
+  return {
+    view: function view(_ref) {
+      var children = _ref.children,
+          mdl = _ref.attrs.mdl;
+      return m("ion-app", m(_header["default"], {
+        mdl: mdl
+      }), m("ion-content", {
+        id: "layout"
+      }, children), m(_components.SideBars, {
+        mdl: mdl
+      }), mdl.toast.msg && m(_components.Toaster, {
+        mdl: mdl
+      }), m(_footer["default"], {
+        mdl: mdl
+      }));
+    }
+  };
+};
+
+var _default = Layout;
+exports["default"] = _default;
+});
+
+;require.register("layout/info.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var info = function info() {
+  return {
+    view: function view() {
+      return m("footer", m("div", {
+        "class": "container"
+      }, [m("a", {
+        "class": "logo-font",
+        href: "https://github.com/gothinkster/realworld"
+      }, "conduit"), m("span", {
+        "class": "attribution"
+      }, [" An interactive learning project from ", m("a", {
+        href: "https://thinkster.io"
+      }, "Thinkster"), ". Code ", m.trust("&amp;"), " design licensed under MIT. "])]));
+    }
+  };
+};
+
+var _default = info;
+exports["default"] = _default;
+});
+
+;require.register("model.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _routes = _interopRequireDefault(require("./routes"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var model = {
+  Routes: _routes["default"],
+  state: {
+    isLoading: false,
+    loadingProgress: {
+      max: 0,
+      value: 0
+    },
+    isLoggedIn: function isLoggedIn() {
+      return sessionStorage.getItem("token");
+    }
+  },
+  settings: {},
+  page: "",
+  user: {},
+  toast: {
+    show: false,
+    duration: 2000,
+    status: null,
+    msg: null
+  }
+};
+var _default = model;
+exports["default"] = _default;
+});
+
+;require.register("pages/article.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _components = require("components");
+
+var _marked = _interopRequireDefault(require("marked"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var getArticleTask = function getArticleTask(http) {
+  return function (mdl) {
+    return function (slug) {
+      return http.getTask(mdl)("articles/".concat(slug));
+    };
+  };
+};
+
+var Article = function Article() {
+  var data = {};
+  var state = {
+    status: "loading",
+    error: null
+  };
+
+  var onSuccess = function onSuccess(_ref) {
+    var article = _ref.article,
+        comments = _ref.comments;
+    data.article = article;
+    data.comments = comments;
+    state.status = "success";
+  };
+
+  var onError = function onError(error) {
+    console.log("error", error);
+    state.error = error;
+    state.status = "error";
+  };
+
+  var loadData = function loadData(mdl) {
+    state.status = "loading";
+    getArticleTask(_Http["default"])(mdl)(mdl.slug).fork(onError, onSuccess);
+  };
+
+  return {
+    oninit: function oninit(_ref2) {
+      var mdl = _ref2.attrs.mdl;
+      return loadData(mdl);
+    },
+    view: function view(_ref3) {
+      var mdl = _ref3.attrs.mdl;
+      return [state.status == "loading" && m(_components.Banner, [m("h1.logo-font", "Loading ...")]), state.status == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.status == "success" && [m("ion-text", m("h1", data.article.title)), m("ion-text", m.trust((0, _marked["default"])(data.article.body))), m(_components.FollowFavorite, {
+        mdl: mdl,
+        data: data.article
+      }), // m("ion-item-divider"),
+      m(_components.Comments, {
+        mdl: mdl,
+        comments: data.comments,
+        reloadArticle: function reloadArticle() {
+          return loadData(mdl);
+        }
+      })]];
+    }
+  };
+};
+
+var _default = Article;
+exports["default"] = _default;
+});
+
+;require.register("pages/editor.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = exports.submitArticleTask = exports.loadArticleTask = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+var _ramda = require("ramda");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var loadArticleTask = function loadArticleTask(http) {
+  return function (mdl) {
+    return function (slug) {
+      return http.getTask(mdl)("articles/".concat(slug));
+    };
+  };
+};
+
+exports.loadArticleTask = loadArticleTask;
+var formatTags = (0, _ramda.over)((0, _ramda.lensProp)("tagList"), (0, _ramda.compose)(_ramda.uniq, (0, _ramda.split)(" "), _ramda.trim));
+
+var submitArticleTask = function submitArticleTask(http) {
+  return function (mdl) {
+    return function (article) {
+      return http.postTask(mdl)("articles")({
+        article: article
+      });
+    };
+  };
+};
+
+exports.submitArticleTask = submitArticleTask;
+
+var Editor = function Editor(_ref) {
+  var mdl = _ref.attrs.mdl;
+  var data = {
+    description: "",
+    title: "",
+    body: "",
+    tagList: ""
+  };
+  var state = {
+    disabled: false
+  };
+
+  var initEditor = function initEditor(mdl) {
+    state.disabled = false;
+
+    var onSuccess = function onSuccess(_ref2) {
+      var article = _ref2.article;
+      return data = article;
+    };
+
+    var onError = function onError(errors) {
+      return state.errors = (0, _Utils.errorViewModel)(errors);
+    };
+
+    if (mdl.slug !== "/editor") {
+      loadArticleTask(_Http["default"])(mdl)(mdl.slug).fork(onError, onSuccess);
+    }
+  };
+
+  var submitData = function submitData(data) {
+    state.disabled = true;
+
+    var onSuccess = function onSuccess(_ref3) {
+      var slug = _ref3.article.slug;
+      return m.route.set("/article/".concat(slug));
+    };
+
+    var onError = function onError(errors) {
+      state.errors = (0, _Utils.errorViewModel)(errors);
+      state.disabled = false;
+    };
+
+    submitArticleTask(_Http["default"])(mdl)(data).fork(onError, onSuccess);
+  };
+
+  return {
+    oninit: function oninit(_ref4) {
+      var mdl = _ref4.attrs.mdl;
+      return initEditor(mdl);
+    },
+    view: function view() {
+      return m(".editor-page", m(".container.page", m(".row", m(".col-md-10.offset-md-1.col-xs-12", m("form", [state.errors && state.errors.map(function (e) {
+        return m(".error-messages", m("ul", "".concat(e.key), e.values.map(function (error) {
+          return m("li", error);
+        })));
+      }), m("fieldset.form-group", m("input.form-control.form-control-lg", {
+        type: "text",
+        disabled: state.disabled,
+        placeholder: "Article Title",
+        onchange: function onchange(e) {
+          return data.title = e.target.value;
+        },
+        value: data.title
+      })), m("fieldset.form-group", m("input.form-control.form-control-lg", {
+        type: "text",
+        disabled: state.disabled,
+        placeholder: "What's this article about?",
+        onchange: function onchange(e) {
+          return data.description = e.target.value;
+        },
+        value: data.description
+      })), m("fieldset.form-group", m("textarea.form-control.form-control-lg", {
+        rows: 8,
+        placeholder: "Write your article (in markdown)",
+        disabled: state.disabled,
+        onchange: function onchange(e) {
+          return data.body = e.target.value;
+        },
+        value: data.body
+      })), m("fieldset.form-group", m("input.form-control.form-control-lg", {
+        type: "text",
+        disabled: state.disabled,
+        placeholder: "Enter tags",
+        onchange: function onchange(e) {
+          return data.tagList = e.target.value;
+        },
+        value: data.tagList
+      })), m("button.btn-lg.pull-xs-right.btn-primary", {
+        onclick: function onclick(e) {
+          return submitData(data);
+        }
+      }, " Publish Article ")])))));
+    }
+  };
+};
+
+var _default = Editor;
+exports["default"] = _default;
+});
+
+;require.register("pages/home.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _components = require("components");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var getTagsTask = function getTagsTask(http) {
+  return function (mdl) {
+    return http.getTask(mdl)("tags");
+  };
+};
+
+var getArticlesTask = function getArticlesTask(http) {
+  return function (mdl) {
+    return function (state) {
+      return function (data) {
+        return data.tags.current == "feed" ? http.getTask(mdl)("articles/feed?limit=20&offset=".concat(state.offset)) : http.getTask(mdl)("articles?limit=20&offset=".concat(state.offset, "&tag=").concat(data.tags.current));
+      };
+    };
+  };
+};
+
+var loadDataTask = function loadDataTask(http) {
+  return function (mdl) {
+    return function (state) {
+      return function (data) {
+        return Task.of(function (tags) {
+          return function (articles) {
+            return _objectSpread(_objectSpread({}, tags), articles);
+          };
+        }).ap(getTagsTask(http)(mdl)).ap(getArticlesTask(http)(mdl)(state)(data));
+      };
+    };
+  };
+};
+
+var Home = function Home() {
+  var data = {
+    tags: {
+      tagList: [],
+      selected: [],
+      current: ""
+    },
+    articles: {}
+  };
+  var state = {
+    feedStatus: "loading",
+    pageStatus: "loading",
+    limit: 20,
+    offset: 0,
+    total: 0,
+    error: null
+  };
+
+  var loadInitData = function loadInitData(mdl) {
+    var onSuccess = function onSuccess(_ref) {
+      var articles = _ref.articles,
+          articlesCount = _ref.articlesCount,
+          tags = _ref.tags;
+      data.articles = articles;
+      state.total = articlesCount;
+      data.tags.tagList = tags;
+      state.pageStatus = "success";
+      state.feedStatus = "success";
+    };
+
+    var onError = function onError(error) {
+      console.log("error", error);
+      state.error = error;
+      state.pageStatus = "error";
+    };
+
+    state.pageStatus = "loading";
+    loadDataTask(_Http["default"])(mdl)(state)(data).fork(onError, onSuccess);
+  };
+
+  var loadArticles = function loadArticles(mdl) {
+    var onSuccess = function onSuccess(_ref2) {
+      var articles = _ref2.articles,
+          articlesCount = _ref2.articlesCount;
+      data.articles = articles;
+      state.total = articlesCount;
+      state.feedStatus = "success";
+    };
+
+    var onError = function onError(error) {
+      console.log("error", error);
+      state.error = error;
+      state.feedStatus = "error";
+    };
+
+    state.feedStatus = "loading";
+    getArticlesTask(_Http["default"])(mdl)(state)(data).fork(onError, onSuccess);
+  };
+
+  return {
+    oninit: function oninit(_ref3) {
+      var mdl = _ref3.attrs.mdl;
+      return loadInitData(mdl);
+    },
+    view: function view(_ref4) {
+      var mdl = _ref4.attrs.mdl;
+      return [!mdl.state.isLoggedIn() && m(_components.Banner, [m("h1.logo-font", "conduit"), m("p", "A place to share your knowledge.")]), state.pageStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading Data")]), state.pageStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && [m(_components.FeedNav, {
+        fetchData: loadArticles,
+        mdl: mdl,
+        data: data
+      }), state.feedStatus == "loading" && m("ion-text", "Loading Articles ..."), state.feedStatus == "success" && state.total ? [m(_components.Articles, {
+        mdl: mdl,
+        data: data
+      }), m(_components.Paginator, {
+        mdl: mdl,
+        state: state,
+        fetchDataFor: function fetchDataFor(offset) {
+          state.offset = offset;
+          loadArticles(mdl);
+        }
+      })] : m("ion-text", "No articles are here... yet."), mdl.state.isLoggedIn() && m("ion-fab", {
+        vertical: "bottom",
+        horizontal: "end",
+        slot: "fixed"
+      }, m(m.route.Link, {
+        "class": "nav-link",
+        href: "/editor"
+      }, [m("ion-fab-button", m("ion-icon", {
+        name: "add-circle"
+      }))])), m("", m(_components.TagList, {
+        mdl: mdl,
+        data: data
+      }))]];
+    }
+  };
+};
+
+var _default = Home;
+exports["default"] = _default;
+});
+
+;require.register("pages/login.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = exports.loginTask = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var loginTask = function loginTask(http) {
+  return function (mdl) {
+    return function (user) {
+      return http.postTask(mdl)("users/login")({
+        user: user
+      });
+    };
+  };
+};
+
+exports.loginTask = loginTask;
+
+var Login = function Login() {
+  var state = {
+    errors: null,
+    disabled: false
+  };
+  var data = {
+    email: "",
+    password: ""
+  };
+
+  var onSubmit = function onSubmit(mdl, e) {
+    e.preventDefault();
+    state.disabled = true;
+
+    var onSuccess = function onSuccess(_ref) {
+      var user = _ref.user;
+      sessionStorage.setItem("token", "Token ".concat(user.token));
+      sessionStorage.setItem("user", JSON.stringify(user));
+      mdl.user = user;
+      state.disabled = false;
+      m.route.set("/home");
+    };
+
+    var onError = function onError(errors) {
+      state.disabled = false;
+      state.errors = (0, _Utils.errorViewModel)(errors);
+    };
+
+    loginTask(_Http["default"])(mdl)(data).fork(onError, onSuccess);
+  };
+
+  return {
+    view: function view(_ref2) {
+      var mdl = _ref2.attrs.mdl;
+      return m("form", [m("ion-text", m("h1", "Login")), state.errors && state.errors.map(function (_ref3) {
+        var key = _ref3.key,
+            errors = _ref3.errors;
+        return m(".error-messages", m("ion-list", m("ion-label", {
+          color: "danger"
+        }, "".concat(key)), m("ion-list", errors.map(function (error) {
+          return m("ion-item", {
+            color: "danger"
+          }, error);
+        }))));
+      }), m("ion-input", {
+        type: "text",
+        disabled: state.disabled,
+        placeholder: "email",
+        onchange: function onchange(e) {
+          return data.email = e.target.value;
+        },
+        value: data.email,
+        onblur: function onblur(e) {
+          return state.isSubmitted && validate;
+        }
+      }), m("ion-input", {
+        type: "password",
+        disabled: state.disabled,
+        placeholder: "password",
+        onchange: function onchange(e) {
+          return data.password = e.target.value;
+        },
+        value: data.password,
+        onblur: function onblur(e) {
+          return state.isSubmitted && validate;
+        }
+      }), m("ion-button", {
+        onclick: function onclick(e) {
+          return onSubmit(mdl, e);
+        }
+      }, "Login"), m("ion-link", m(m.route.Link, {
+        href: "/register"
+      }, m("ion-label", "Need an Account?")))]);
+    }
+  };
+};
+
+var _default = Login;
+exports["default"] = _default;
+});
+
+;require.register("pages/profile.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = exports.loadInitDataTask = exports.loadDataTask = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+var _components = require("components");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var followAuthorUrl = function followAuthorUrl(author) {
+  return "profiles/".concat(author, "/follow");
+};
+
+var followAuthorTask = function followAuthorTask(http) {
+  return function (mdl) {
+    return function (author) {
+      return http.postTask(mdl)(followAuthorUrl(author))();
+    };
+  };
+};
+
+var unFollowAuthorTask = function unFollowAuthorTask(http) {
+  return function (mdl) {
+    return function (author) {
+      return http.deleteTask(mdl)(followAuthorUrl(author));
+    };
+  };
+};
+
+var getProfileTask = function getProfileTask(http) {
+  return function (mdl) {
+    return function (username) {
+      return http.getTask(mdl)("profiles/".concat(username));
+    };
+  };
+};
+
+var getAuthorArticlesTask = function getAuthorArticlesTask(http) {
+  return function (mdl) {
+    return function (state) {
+      return function (username) {
+        return http.getTask(mdl)("articles?limit=".concat(state.limit, "&offset=").concat(state.offset, "&author=").concat(username));
+      };
+    };
+  };
+};
+
+var getAuthorFavoriteArticlesTask = function getAuthorFavoriteArticlesTask(http) {
+  return function (mdl) {
+    return function (state) {
+      return function (username) {
+        return http.getTask(mdl)("articles?limit=".concat(state.limit, "&offset=").concat(state.offset, "&favorited=").concat(username));
+      };
+    };
+  };
+};
+
+var loadDataTask = function loadDataTask(http) {
+  return function (mdl) {
+    return function (state) {
+      return state.showFaveArticles ? getAuthorFavoriteArticlesTask(http)(mdl)(state)(mdl.slug) : getAuthorArticlesTask(http)(mdl)(state)(mdl.slug);
+    };
+  };
+};
+
+exports.loadDataTask = loadDataTask;
+
+var loadInitDataTask = function loadInitDataTask(http) {
+  return function (mdl) {
+    return function (state) {
+      return Task.of(function (profile) {
+        return function (authorArticles) {
+          return _objectSpread(_objectSpread({}, profile), {}, {
+            authorArticles: authorArticles
+          });
+        };
+      }).ap(getProfileTask(http)(mdl)(mdl.slug)).ap(getAuthorArticlesTask(http)(mdl)(state)(mdl.slug));
+    };
+  };
+};
+
+exports.loadInitDataTask = loadInitDataTask;
+
+var Profile = function Profile(_ref) {
+  var mdl = _ref.attrs.mdl;
+  var data = {
+    authorArticles: {
+      articles: [],
+      articlesCount: 0
+    },
+    authorFavoriteArticles: {
+      articles: [],
+      articlesCount: 0
+    }
+  };
+  var state = {
+    pageStatus: "loading",
+    feedStatus: "loading",
+    showFaveArticles: false,
+    limit: 5,
+    offset: 0,
+    total: 0,
+    error: null
+  };
+
+  var loadData = function loadData(mdl) {
+    var onSuccess = function onSuccess(result) {
+      state.showFaveArticles ? data.authorFavoriteArticles = result : data.authorArticles = result;
+      state.total = state.showFaveArticles ? data.authorFavoriteArticles.articlesCount : data.authorArticles.articlesCount;
+      state.feedStatus = "success";
+    };
+
+    var onError = function onError(error) {
+      console.log("error", error);
+      state.error = error;
+      state.feedStatus = "error";
+    };
+
+    state.feedStatus = "loading";
+    loadDataTask(_Http["default"])(mdl)(state).fork(onError, onSuccess);
+  };
+
+  var loadInitData = function loadInitData(mdl) {
+    var onSuccess = function onSuccess(_ref2) {
+      var authorArticles = _ref2.authorArticles,
+          profile = _ref2.profile;
+      data.authorArticles = authorArticles;
+      data.profile = profile;
+      state.pageStatus = "success";
+      state.feedStatus = "success";
+      state.total = data.authorArticles.articlesCount;
+    };
+
+    var onError = function onError(error) {
+      console.log("error", error);
+      state.error = error;
+      state.pageStatus = "error";
+      m.route.set("/home");
+    };
+
+    state.pageStatus = "loading";
+    loadInitDataTask(_Http["default"])(mdl)(state).fork(onError, onSuccess);
+  };
+
+  var selectFeed = function selectFeed(toShowFaveArticles) {
+    state.showFaveArticles = toShowFaveArticles;
+    state.offset = 0;
+    loadData(mdl);
+  };
+
+  var toggleAuthorFollow = function toggleAuthorFollow(_ref3) {
+    var _ref3$author = _ref3.author,
+        username = _ref3$author.username,
+        following = _ref3$author.following;
+    var onError = (0, _Utils.log)("toggleAuthorFollow, err-auth");
+
+    var onSuccess = function onSuccess(_ref4) {
+      var following = _ref4.profile.following;
+      return data.profile.following = following;
+    };
+
+    var toggleTask = following ? unFollowAuthorTask : followAuthorTask;
+    toggleTask(_Http["default"])(mdl)(username).fork(onError, onSuccess);
+  };
+
+  return {
+    oninit: function oninit(_ref5) {
+      var mdl = _ref5.attrs.mdl;
+      return loadInitData(mdl);
+    },
+    view: function view(_ref6) {
+      var mdl = _ref6.attrs.mdl;
+      return m(".profile-page", state.pageStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading ...")]), state.pageStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && [m(".user-info", m(".container", m(".row", m(".col-xs-12.col-md-10.offset-md-1", [m("img.user-img", {
+        src: (0, _Utils.sanitizeImg)(data.profile.image)
+      }), m("h4", data.profile.username), m("p", data.profile.bio), data.profile.username !== mdl.user.username ? m("button.btn.btn-sm.btn-outline-secondary.action-btn", {
+        onclick: function onclick(e) {
+          toggleAuthorFollow({
+            author: {
+              username: data.profile.username,
+              following: data.profile.following
+            }
+          });
+        }
+      }, [data.profile.following ? [m("i.ion-minus-round"), " Unfollow ".concat(data.profile.username, " ")] : [m("i.ion-plus-round"), " Follow ".concat(data.profile.username, " ")]]) : m("button.btn.btn-sm.btn-outline-secondary.action-btn", {
+        onclick: function onclick(e) {
+          return m.route.set("/settings/".concat(data.profile.username));
+        }
+      }, [m("i.ion-gear-a.p-5"), "Edit Profile Settings"])])))), m(".container", m(".row", m(".col-xs-12.col-md-10.offset-md-1", [m(".articles-toggle", m("ul.nav.nav-pills.outline-active", [m("li.nav-item", m("a.nav-link ".concat(!state.showFaveArticles && "active"), {
+        onclick: function onclick(e) {
+          return selectFeed(false);
+        }
+      }, "My Articles")), m("li.nav-item", m("a.nav-link ".concat(state.showFaveArticles && "active"), {
+        onclick: function onclick(e) {
+          return selectFeed(true);
+        }
+      }, "Favorited Articles"))])), state.feedStatus == "loading" && "Loading Articles...", state.feedStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.feedStatus == "success" && [state.showFaveArticles ? m(_components.Articles, {
+        mdl: mdl,
+        data: data.authorFavoriteArticles
+      }) : m(_components.Articles, {
+        mdl: mdl,
+        data: data.authorArticles
+      }), m(_components.Paginator, {
+        mdl: mdl,
+        state: state,
+        fetchDataFor: function fetchDataFor(offset) {
+          state.offset = offset;
+          loadData(mdl);
+        }
+      })]])))]);
+    }
+  };
+};
+
+var _default = Profile;
+exports["default"] = _default;
+});
+
+;require.register("pages/register.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var registerTask = function registerTask(http) {
+  return function (mdl) {
+    return function (user) {
+      return http.postTask(mdl)("users")({
+        user: user
+      });
+    };
+  };
+};
+
+var Register = function Register() {
+  var state = {
+    errors: null,
+    disabled: false
+  };
+  var data = {
+    username: "",
+    email: "",
+    password: ""
+  };
+
+  var onSubmit = function onSubmit(mdl, e) {
+    e.preventDefault();
+    console.log(mdl);
+    state.disabled = true;
+
+    var onSuccess = function onSuccess(_ref) {
+      var user = _ref.user;
+      mdl.user = user;
+      sessionStorage.setItem("token", "Token ".concat(user.token));
+      sessionStorage.setItem("user", JSON.stringify(user));
+      state.disabled = false;
+      m.route.set("/home");
+      console.log("success", user);
+    };
+
+    var onError = function onError(errors) {
+      state.disabled = false;
+      state.errors = (0, _Utils.errorViewModel)(errors);
+    };
+
+    state.isSubmitted = true;
+    registerTask(_Http["default"])(mdl)(data).fork(onError, onSuccess);
+  };
+
+  return {
+    view: function view(_ref2) {
+      var mdl = _ref2.attrs.mdl;
+      return m("form", [m("ion-text", m("h1", "Sign Up")), state.errors && state.errors.map(function (_ref3) {
+        var key = _ref3.key,
+            errors = _ref3.errors;
+        return m(".error-messages", m("ion-list", m("ion-label", {
+          color: "danger"
+        }, "".concat(key)), m("ion-list", errors.map(function (error) {
+          return m("ion-item", {
+            color: "danger"
+          }, error);
+        }))));
+      }), m("ion-input", {
+        type: "text",
+        disabled: state.disabled,
+        placeholder: "Your Name",
+        onchange: function onchange(e) {
+          return data.username = e.target.value;
+        },
+        value: data.username
+      }), m("ion-input", {
+        type: "text",
+        disabled: state.disabled,
+        placeholder: "email",
+        onchange: function onchange(e) {
+          return data.email = e.target.value;
+        },
+        value: data.email
+      }), m("ion-input", {
+        type: "password",
+        disabled: state.disabled,
+        placeholder: "password",
+        onchange: function onchange(e) {
+          return data.password = e.target.value;
+        },
+        value: data.password
+      }), m("ion-button", {
+        onclick: function onclick(e) {
+          return onSubmit(mdl, e);
+        }
+      }, "Sign Up"), m("ion-link", m(m.route.Link, {
+        href: "/login"
+      }, m("ion-label", "Have an account?")))]);
+    }
+  };
+};
+
+var _default = Register;
+exports["default"] = _default;
+});
+
+;require.register("pages/user.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var logout = function logout() {
+  sessionStorage.clear();
+  m.route.set("/home");
+};
+
+var submitTask = function submitTask(http) {
+  return function (mdl) {
+    return function (data) {
+      return http.putTask(mdl)("user")(data);
+    };
+  };
+};
+
+var User = function User(_ref) {
+  var _ref$attrs$mdl$user = _ref.attrs.mdl.user,
+      image = _ref$attrs$mdl$user.image,
+      username = _ref$attrs$mdl$user.username,
+      password = _ref$attrs$mdl$user.password,
+      bio = _ref$attrs$mdl$user.bio,
+      email = _ref$attrs$mdl$user.email;
+  var data = {
+    image: image,
+    username: username,
+    password: password,
+    bio: bio,
+    email: email
+  };
+
+  var submit = function submit(mdl, data) {
+    var onSuccess = function onSuccess(_ref2) {
+      var user = _ref2.user;
+      sessionStorage.setItem("user", JSON.stringify(user));
+      mdl.user = user;
+      console.log(mdl.user);
+      m.route.set("/home");
+    };
+
+    var onError = (0, _Utils.log)("error");
+    submitTask(_Http["default"])(mdl)(data).fork(onError, onSuccess);
+  };
+
+  return {
+    view: function view(_ref3) {
+      var mdl = _ref3.attrs.mdl;
+      return m(".settings-page", m(".container.page", m(".row", m(".col-md-6.offset-md-3.col-xs-12", [m("h1.text-xs-center", "Your Settings"), m("form", m("fieldset", [m("fieldset.form-group", m("input.form-control.form-control-lg", {
+        type: "text",
+        placeholder: "URL of profile picture",
+        onchange: function onchange(e) {
+          return data.image = e.target.value;
+        },
+        value: data.image
+      })), m("fieldset.form-group", m("input.form-control.form-control-lg", {
+        type: "text",
+        placeholder: "Your Name",
+        onchange: function onchange(e) {
+          return data.username = e.target.value;
+        },
+        value: data.username
+      })), m("fieldset.form-group", m("textarea.form-control.form-control-lg", {
+        placeholder: "Short bio about you",
+        onchange: function onchange(e) {
+          return data.bio = e.target.value;
+        },
+        value: data.bio
+      })), m("fieldset.form-group", m("fieldset.form-group", m("input.form-control.form-control-lg", {
+        type: "text",
+        placeholder: "Email",
+        onchange: function onchange(e) {
+          return data.email = e.target.value;
+        },
+        value: data.email
+      }))), m("fieldset.form-group", m("fieldset.form-group", m("input.form-control.form-control-lg", {
+        type: "password",
+        placeholder: "Password",
+        onchange: function onchange(e) {
+          return data.password = e.target.value;
+        },
+        value: data.password
+      }))), m("button.btn.btn-lg.btn-primary.pull-xs-right", {
+        onclick: function onclick(e) {
+          return submit(mdl, data);
+        }
+      }, " Update Settings "), m("button.btn.btn-outline-danger.pull-xs-right", {
+        onclick: function onclick(e) {
+          return logout(mdl, data);
+        }
+      }, "Or click here to logout.")]))]))));
+    }
+  };
+};
+
+var _default = User;
+exports["default"] = _default;
+});
+
+;require.register("routes.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _index = _interopRequireDefault(require("./layout/index"));
+
+var _home = _interopRequireDefault(require("./pages/home"));
+
+var _article = _interopRequireDefault(require("./pages/article"));
+
+var _profile = _interopRequireDefault(require("./pages/profile"));
+
+var _register = _interopRequireDefault(require("./pages/register"));
+
+var _login = _interopRequireDefault(require("./pages/login"));
+
+var _user = _interopRequireDefault(require("./pages/user"));
+
+var _editor = _interopRequireDefault(require("./pages/editor"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var Routes = [{
+  url: "/home",
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_home["default"], {
+      mdl: mdl
+    }));
+  }
+}, {
+  url: "/editor",
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_editor["default"], {
+      mdl: mdl,
+      key: mdl.slug
+    }));
+  }
+}, {
+  url: "/editor/:slug",
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_editor["default"], {
+      mdl: mdl
+    }));
+  }
+}, {
+  url: "/article/:slug",
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_article["default"], {
+      mdl: mdl
+    }));
+  }
+}, {
+  url: "/profile/:slug",
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_profile["default"], {
+      mdl: mdl,
+      key: mdl.slug
+    }));
+  }
+}, {
+  url: "/settings/:slug",
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_user["default"], {
+      mdl: mdl,
+      key: mdl.slug
+    }));
+  }
+}, {
+  url: "/login",
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_login["default"], {
+      mdl: mdl
+    }));
+  }
+}, {
+  url: "/register",
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_register["default"], {
+      mdl: mdl
+    }));
+  }
+}];
+var _default = Routes;
+exports["default"] = _default;
+});
+
+;require.alias("process/browser.js", "process");process = require('process');require.register("___globals___", function(exports, require, module) {
+  
+
+// Auto-loaded modules from config.npm.globals.
+window.m = require("mithril");
+window.Task = require("data.task");
+
+
+});})();require('___globals___');
+
+
+//# sourceMappingURL=app.js.map

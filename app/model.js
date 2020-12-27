@@ -1,4 +1,7 @@
+import Routes from "./routes"
+
 const model = {
+  Routes,
   state: {
     isLoading: false,
     loadingProgress: { max: 0, value: 0 },
@@ -7,6 +10,12 @@ const model = {
   settings: {},
   page: "",
   user: {},
+  toast: {
+    show: false,
+    duration: 2000,
+    status: null,
+    msg: null,
+  },
 }
 
 export default model

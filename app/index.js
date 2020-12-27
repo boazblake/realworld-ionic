@@ -1,4 +1,4 @@
-import routes from "./routes.js"
+import App from "./app.js"
 import model from "./model.js"
 
 const root = document.body
@@ -51,4 +51,4 @@ if (sessionStorage.getItem("user")) {
   model.user = JSON.parse(sessionStorage.getItem("user"))
 }
 
-m.route(root, "/home", routes(model))
+m.route(root, "/home", App(model))

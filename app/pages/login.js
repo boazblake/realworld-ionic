@@ -1,10 +1,11 @@
 import Http from "Http"
+import { errorViewModel } from "Utils"
 
 export const loginTask = (http) => (mdl) => (user) =>
   http.postTask(mdl)("users/login")({ user })
 
 const Login = () => {
-  const state = { errors: {}, disabled: false }
+  const state = { errors: null, disabled: false }
   const data = {
     email: "",
     password: "",
@@ -22,9 +23,8 @@ const Login = () => {
     }
 
     const onError = (errors) => {
-      state.errors = errors
       state.disabled = false
-      console.log(state.errors)
+      state.errors = errorViewModel(errors)
     }
 
     loginTask(Http)(mdl)(data).fork(onError, onSuccess)
@@ -32,61 +32,54 @@ const Login = () => {
 
   return {
     view: ({ attrs: { mdl } }) =>
-      m(
-        "div.auth-page",
-        m(
-          "div.container.page",
-          m(
-            "div.row",
-            m("div.col-md-6.offset-md-3.col-xs-12", [
-              m("h1.text-xs-center", "Login"),
+      m("form", [
+        m("ion-text", m("h1", "Login")),
+
+        state.errors &&
+          state.errors.map(({ key, errors }) =>
+            m(
+              ".error-messages",
               m(
-                "p.text-xs-center",
-                m(m.route.Link, { href: "/register" }, "Need an account?"),
-                state.errors["email or password"] &&
-                  m(
-                    ".error-messages",
-                    m(
-                      "span",
-                      `email or password  ${state.errors["email or password"]}`
-                    )
+                "ion-list",
+                m("ion-label", { color: "danger" }, `${key}`),
+                m(
+                  "ion-list",
+                  errors.map((error) =>
+                    m("ion-item", { color: "danger" }, error)
                   )
-              ),
-              m("form", [
-                m(
-                  "fieldset.form-group",
-                  m("input.form-control.form-control-lg", {
-                    type: "text",
-                    disabled: state.disabled,
-                    placeholder: "email",
-                    onchange: (e) => (data.email = e.target.value),
-                    value: data.email,
-                    onblur: (e) => state.isSubmitted && validate,
-                  }),
-                  state.errors.email &&
-                    m(".error-messages", m("span", state.errors.email))
-                ),
-                m(
-                  "fieldset.form-group",
-                  m("input.form-control.form-control-lg", {
-                    type: "password",
-                    disabled: state.disabled,
-                    placeholder: "password",
-                    onchange: (e) => (data.password = e.target.value),
-                    value: data.password,
-                    onblur: (e) => state.isSubmitted && validate,
-                  })
-                ),
-                m(
-                  "button.btn.btn-lg.btn-primary.pull-xs-right",
-                  { type: "submit", onclick: (e) => onSubmit(mdl, e) },
-                  "Login"
-                ),
-              ]),
-            ])
+                )
+              )
+            )
+          ),
+
+        m("ion-input", {
+          type: "text",
+          disabled: state.disabled,
+          placeholder: "email",
+          onchange: (e) => (data.email = e.target.value),
+          value: data.email,
+          onblur: (e) => state.isSubmitted && validate,
+        }),
+
+        m("ion-input", {
+          type: "password",
+          disabled: state.disabled,
+          placeholder: "password",
+          onchange: (e) => (data.password = e.target.value),
+          value: data.password,
+          onblur: (e) => state.isSubmitted && validate,
+        }),
+
+        m("ion-button", { onclick: (e) => onSubmit(mdl, e) }, "Login"),
+        m(
+          "ion-link",
+          m(
+            m.route.Link,
+            { href: "/register" },
+            m("ion-label", "Need an Account?")
           )
-        )
-      ),
+        ),
+      ]),
   }
 }
 

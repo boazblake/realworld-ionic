@@ -1,6 +1,6 @@
 import Header from "./header.js"
 import Footer from "./footer.js"
-import { SideBars } from "components"
+import { Toaster, SideBars } from "components"
 
 const Layout = () => {
   return {
@@ -10,6 +10,7 @@ const Layout = () => {
         m(Header, { mdl }),
         m("ion-content", { id: "layout" }, children),
         m(SideBars, { mdl }),
+        mdl.toast.msg && m(Toaster, { mdl }),
         m(Footer, { mdl })
       ),
   }
