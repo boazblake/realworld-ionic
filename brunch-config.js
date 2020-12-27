@@ -1,4 +1,4 @@
-/// See http://brunch.io for documentation.
+// See http://brunch.io for documentation.
 exports.files = {
   javascripts: {
     joinTo: {
@@ -28,7 +28,8 @@ exports.modules = {
 }
 
 exports.plugins = {
-  uglify: {
+  terser: {
+    ignored: [/^(vendor)/, /^node_modules\/(?!@ionic)/],
     mangle: false,
     compress: {
       global_defs: {
@@ -52,14 +53,15 @@ exports.plugins = {
     pattern: /\.(gif|jpg|jpeg|jpe|jif|jfif|jfi|png|svg|svgz)$/,
   },
   babel: {
-    // ignore: [/^(vendor)/, /^node_modules\/(?!@ionic)/],
-    //   plugins:[
-    //   ["@babel/plugin-transform-runtime",
-    //     {
-    //       "regenerator": true
-    //     }
-    //   ]
-    // ],
+    ignore: [/^(vendor)/, /^node_modules\/(?!@ionic)/],
+    plugins: [
+      [
+        "@babel/plugin-transform-runtime",
+        {
+          regenerator: true,
+        },
+      ],
+    ],
     presets: [
       [
         "@babel/preset-env",
@@ -108,13 +110,7 @@ exports.plugins = {
 
 exports.paths = {
   public: "docs",
-  watched: [
-    "app",
-    "app/components",
-    "app/Http",
-    "app/Validations",
-    "app/Utils",
-  ],
+  watched: ["app", "app/components", "app/pages", "app/assets", "app/Models"],
 }
 
 exports.npm = {
