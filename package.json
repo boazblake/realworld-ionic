@@ -1,46 +1,49 @@
 {
-  "name": "realworld-ionic",
+  "name": "ionic-realworld",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "clean": "yarn cache clean && rm -rf ./docs && rm -rf ./node_modules",
-    "restart": "rm -rf docs && yarn run start",
+    "clean-start": "rm -rf docs && yarn run start",
     "fresh": "yarn run clean && yarn install && yarn run start",
     "debug": "export LOGGY_STACKS=1 && yarn run start",
     "start": "brunch watch --server",
     "ionic:build": "yarn build",
     "build:pre": "rm -rf docs",
-    "build": "yarn run build:pre ; brunch build --production",
+    "build": "yarn run build:pre && brunch build --production",
     "gitcommit": "git add .; git commit -m",
     "gitbuild": "git add .; git commit -m 'build'; git push",
     "sync": "ionic cap sync"
   },
   "dependencies": {
-    "@babel/plugin-transform-runtime": "^7.12.10",
-    "@babel/plugin-transform-spread": "^7.7.4",
+    "@babel/plugin-transform-runtime": "^7.12.1",
     "@capacitor/android": "2.4.1",
     "@capacitor/core": "2.4.1",
     "@capacitor/ios": "2.4.1",
     "@ionic-native/camera": "^5.30.0",
     "@ionic-native/core": "^5.30.0",
-    "@ionic/core": "^5.5.2",
+    "@ionic/core": "^5.3.3",
     "data.task": "^3.1.2",
-    "marked": "^1.1.0",
+    "marked": "^1.2.7",
     "mithril": "^2.0.4",
-    "ramda": "^0.27.0"
+    "mithril-stream": "^2.0.0",
+    "ramda": "^0.27.1"
   },
   "devDependencies": {
+    "@babel/plugin-transform-spread": "^7.7.4",
     "@capacitor/cli": "2.4.1",
-    "auto-reload-brunch": "git+https://github.com/brunch/auto-reload-brunch.git",
+    "auto-reload-brunch": "^2.7.1",
     "babel-brunch": "7.0.1",
-    "brunch": "^3.0.0",
+    "brunch": "3.0.0",
     "clean-css-brunch": "3.0.0",
     "copycat-brunch": "1.1.1",
     "imagemin-brunch": "^1.1.0",
     "sass-brunch": "3.0.0",
-    "size-limit": "^4.9.1",
+    "size-limit": "^4.5.0",
     "sw-precache-brunch": "^2.0.1",
     "terser-brunch": "^4.0.0"
-  }
+  },
+  "author": "boaz blake<boazblake@gmail.com>",
+  "private": true
 }

@@ -1,6 +1,6 @@
 {
   "appId": "boazblake.github.io",
-  "appName": "realworld-ionic",
+  "appName": "ionic-realworld",
   "bundledWebRuntime": false,
   "npmClient": "yarn",
   "webDir": "docs",

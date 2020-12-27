@@ -1,7 +1,8 @@
 {
-  "name": "realworld-ionic",
+  "name": "ionic-realworld",
   "integrations": {
     "capacitor": {}
   },
-  "type": "custom"
+  "type": "custom",
+  "id": "44133327"
 }
