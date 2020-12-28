@@ -17,7 +17,7 @@ const Header = () => {
                 defaultHref: "/",
               }),
             mdl.state.isLoggedIn()
-              ? m(MenuButton, { mdl, name: "settings" })
+              ? m(MenuButton, { side: "left", mdl, name: "settings" })
               : [
                   m(
                     "ion-item",
@@ -30,7 +30,7 @@ const Header = () => {
           m(
             "ion-buttons",
             { slot: "end" },
-            m(MenuButton, { mdl, name: "options" })
+            m(MenuButton, { side: "right", mdl, name: "options" })
           )
         )
       ),

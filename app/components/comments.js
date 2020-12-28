@@ -1,14 +1,28 @@
 import Http from "Http"
 import { log, sanitizeImg, errorViewModel } from "Utils"
-import { lensProp, over, trim } from "ramda"
+import { map, lensProp, over, trim, prop } from "ramda"
+import dayjs from "dayjs"
+
+const trimBody = over(lensProp("body"), trim)
+
+const formatComment = ({ author, body, id, createdAt }) => {
+  return {
+    author,
+    body,
+    id,
+    date: dayjs().format("MM/DD/YYYY HH:mm", createdAt),
+  }
+}
 
 const getCommentsTask = (http) => (mdl) => (slug) =>
-  http.getTask(mdl)(`articles/${slug}/comments`)
+  http
+    .getTask(mdl)(`articles/${slug}/comments`)
+    .map(prop("comments"))
+    .map(map(formatComment))
+    .map(log("??"))
 
 const deleteCommentTask = (http) => (mdl) => (slug) => (id) =>
   http.deleteTask(mdl)(`articles/${slug}/comments/${id}`)
-
-const trimBody = over(lensProp("body"), trim)
 
 const submitTask = (http) => (mdl) => (comment) =>
   http.postTask(mdl)(`articles/${mdl.slug}/comments`)({ comment })
@@ -39,7 +53,7 @@ const CommentForm = ({ attrs: { mdl, reload } }) => {
       m(
         "ion-grid",
         m(
-          "ion-row",
+          "ion-row.ion-justify-content-between.ion-align-items-end",
           m(
             "ion-col",
             m("ion-textarea", {
@@ -52,7 +66,7 @@ const CommentForm = ({ attrs: { mdl, reload } }) => {
           )
         ),
         m(
-          "ion-row",
+          "ion-row.ion-justify-content-between.ion-align-items-end",
           m(
             "ion-col",
             m("ion-avatar", m("img", { src: sanitizeImg(mdl.user.image) }))
@@ -89,7 +103,7 @@ const Comment = () => {
         comment: {
           author: { image, username },
           body,
-          createdAt,
+          date,
           id,
         },
         deleteComment,
@@ -100,9 +114,10 @@ const Comment = () => {
 
         m(
           "ion-grid",
-          ("ion-row", m("ion-text", body)),
+          ("ion-row.ion-justify-content-between.ion-align-items-end",
+          m("ion-text", body)),
           m(
-            "ion-row",
+            "ion-row.ion-justify-content-between.ion-align-items-end",
             m(
               m.route.Link,
               {
@@ -117,7 +132,7 @@ const Comment = () => {
               ),
               m("ion-text", username)
             ),
-            m("ion-text", createdAt),
+            m("ion-text", date),
 
             username == mdl.user.username &&
               m("ion-icon", {
@@ -134,7 +149,7 @@ export const Comments = ({ attrs: { mdl } }) => {
   const data = { comments: [] }
 
   const loadComments = (mdl) => {
-    const onSuccess = ({ comments }) => (data.comments = comments)
+    const onSuccess = (comments) => (data.comments = comments)
 
     const onError = log("error with comments")
 
@@ -142,7 +157,7 @@ export const Comments = ({ attrs: { mdl } }) => {
   }
 
   const deleteComment = (id) => {
-    const onSuccess = ({ comments }) => (data.comments = comments)
+    const onSuccess = (comments) => (data.comments = comments)
 
     const onError = log("error with comments")
 

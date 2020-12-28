@@ -1,16 +1,17 @@
 const toRouter = (mdl) => (Router, route) => {
-  let match = route.url.includes(":slug")
-    ? mdl.state.isLoggedIn()
-      ? ({ slug }) => {
-          mdl.slug = slug
+  let matcher = () =>
+    route.url.includes(":slug")
+      ? mdl.state.isLoggedIn()
+        ? ({ slug }) => {
+            mdl.slug = slug
+          }
+        : () => m.route.set("/login")
+      : (_, b) => {
+          mdl.slug = b
         }
-      : () => m.route.set("/login")
-    : (_, b) => {
-        mdl.slug = b
-      }
 
   Router[route.url] = {
-    onmatch: match,
+    onmatch: matcher(),
     render: () => route.component(mdl),
   }
   return Router

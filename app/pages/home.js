@@ -73,7 +73,7 @@ const Home = () => {
   return {
     oninit: ({ attrs: { mdl } }) => loadInitData(mdl),
     view: ({ attrs: { mdl } }) => {
-      return [
+      return m("ion-content", { id: "home", contentId: "home" }, [
         !mdl.state.isLoggedIn() &&
           m(Banner, [
             m("h1.logo-font", "conduit"),
@@ -115,9 +115,9 @@ const Home = () => {
               ])
             ),
 
-          m("", m(TagList, { mdl, data })),
+          m(TagList, { mdl, data }),
         ],
-      ]
+      ])
     },
   }
 }

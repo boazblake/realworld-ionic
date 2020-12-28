@@ -342,16 +342,19 @@ exports["default"] = void 0;
 
 var toRouter = function toRouter(mdl) {
   return function (Router, route) {
-    var match = route.url.includes(":slug") ? mdl.state.isLoggedIn() ? function (_ref) {
-      var slug = _ref.slug;
-      mdl.slug = slug;
-    } : function () {
-      return m.route.set("/login");
-    } : function (_, b) {
-      mdl.slug = b;
+    var matcher = function matcher() {
+      return route.url.includes(":slug") ? mdl.state.isLoggedIn() ? function (_ref) {
+        var slug = _ref.slug;
+        mdl.slug = slug;
+      } : function () {
+        return m.route.set("/login");
+      } : function (_, b) {
+        mdl.slug = b;
+      };
     };
+
     Router[route.url] = {
-      onmatch: match,
+      onmatch: matcher(),
       render: function render() {
         return route.component(mdl);
       }
@@ -427,14 +430,14 @@ var ArticlePreview = function ArticlePreview(_ref) {
     view: function view() {
       return m("ion-item", {
         button: true
-      }, m("ion-grid", [m("ion-row", m("ion-col", m(m.route.Link, {
+      }, m("ion-grid", [m("ion-row.ion-justify-content-between.ion-align-items-end", m("ion-col", m(m.route.Link, {
         "class": "preview-link",
         href: "/article/".concat(data.slug)
       }, m("ion-text", m("h1", data.title)), m("ion-text", m("p", data.description))))), m("ion-row", m("ion-col", m("ion-list", {
         side: "end"
       }, data.tagList.map(function (tag) {
         return m("ion-chip", tag);
-      })))), m("ion-row", [m(m.route.Link, {
+      })))), m("ion-row.ion-justify-content-between.ion-align-items-end", [m(m.route.Link, {
         href: "/profile/".concat(data.author.username),
         options: {
           replace: true
@@ -532,12 +535,29 @@ var _Utils = require("Utils");
 
 var _ramda = require("ramda");
 
+var _dayjs = _interopRequireDefault(require("dayjs"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var trimBody = (0, _ramda.over)((0, _ramda.lensProp)("body"), _ramda.trim);
+
+var formatComment = function formatComment(_ref) {
+  var author = _ref.author,
+      body = _ref.body,
+      id = _ref.id,
+      createdAt = _ref.createdAt;
+  return {
+    author: author,
+    body: body,
+    id: id,
+    date: (0, _dayjs["default"])().format("MM/DD/YYYY HH:mm", createdAt)
+  };
+};
 
 var getCommentsTask = function getCommentsTask(http) {
   return function (mdl) {
     return function (slug) {
-      return http.getTask(mdl)("articles/".concat(slug, "/comments"));
+      return http.getTask(mdl)("articles/".concat(slug, "/comments")).map((0, _ramda.prop)("comments")).map((0, _ramda.map)(formatComment)).map((0, _Utils.log)("??"));
     };
   };
 };
@@ -552,8 +572,6 @@ var deleteCommentTask = function deleteCommentTask(http) {
   };
 };
 
-var trimBody = (0, _ramda.over)((0, _ramda.lensProp)("body"), _ramda.trim);
-
 var submitTask = function submitTask(http) {
   return function (mdl) {
     return function (comment) {
@@ -564,10 +582,10 @@ var submitTask = function submitTask(http) {
   };
 };
 
-var CommentForm = function CommentForm(_ref) {
-  var _ref$attrs = _ref.attrs,
-      mdl = _ref$attrs.mdl,
-      reload = _ref$attrs.reload;
+var CommentForm = function CommentForm(_ref2) {
+  var _ref2$attrs = _ref2.attrs,
+      mdl = _ref2$attrs.mdl,
+      reload = _ref2$attrs.reload;
   var comment = {
     body: ""
   };
@@ -597,9 +615,9 @@ var CommentForm = function CommentForm(_ref) {
     oninit: function oninit() {
       return comment.body = "";
     },
-    view: function view(_ref2) {
-      var mdl = _ref2.attrs.mdl;
-      return [m("ion-grid", m("ion-row", m("ion-col", m("ion-textarea", {
+    view: function view(_ref3) {
+      var mdl = _ref3.attrs.mdl;
+      return [m("ion-grid", m("ion-row.ion-justify-content-between.ion-align-items-end", m("ion-col", m("ion-textarea", {
         rows: 3,
         placeholder: "Write a comment ...",
         onchange: function onchange(e) {
@@ -607,7 +625,7 @@ var CommentForm = function CommentForm(_ref) {
         },
         disabled: state.disabled,
         value: comment.body
-      }))), m("ion-row", m("ion-col", m("ion-avatar", m("img", {
+      }))), m("ion-row.ion-justify-content-between.ion-align-items-end", m("ion-col", m("ion-avatar", m("img", {
         src: (0, _Utils.sanitizeImg)(mdl.user.image)
       }))), m("ion-col", m("ion-button", {
         onclick: function onclick(e) {
@@ -625,23 +643,23 @@ var CommentForm = function CommentForm(_ref) {
 
 var Comment = function Comment() {
   return {
-    view: function view(_ref3) {
-      var _ref3$attrs = _ref3.attrs,
-          mdl = _ref3$attrs.mdl,
-          _ref3$attrs$comment = _ref3$attrs.comment,
-          _ref3$attrs$comment$a = _ref3$attrs$comment.author,
-          image = _ref3$attrs$comment$a.image,
-          username = _ref3$attrs$comment$a.username,
-          body = _ref3$attrs$comment.body,
-          createdAt = _ref3$attrs$comment.createdAt,
-          id = _ref3$attrs$comment.id,
-          deleteComment = _ref3$attrs.deleteComment;
-      return m("ion-item", m("ion-grid", ("ion-row", m("ion-text", body)), m("ion-row", m(m.route.Link, {
+    view: function view(_ref4) {
+      var _ref4$attrs = _ref4.attrs,
+          mdl = _ref4$attrs.mdl,
+          _ref4$attrs$comment = _ref4$attrs.comment,
+          _ref4$attrs$comment$a = _ref4$attrs$comment.author,
+          image = _ref4$attrs$comment$a.image,
+          username = _ref4$attrs$comment$a.username,
+          body = _ref4$attrs$comment.body,
+          date = _ref4$attrs$comment.date,
+          id = _ref4$attrs$comment.id,
+          deleteComment = _ref4$attrs.deleteComment;
+      return m("ion-item", m("ion-grid", ("ion-row.ion-justify-content-between.ion-align-items-end", m("ion-text", body)), m("ion-row.ion-justify-content-between.ion-align-items-end", m(m.route.Link, {
         href: "/profile/".concat(username),
         "class": "comment-author m-5"
       }, m("ion-avatar", m("img", {
         src: (0, _Utils.sanitizeImg)(image)
-      })), m("ion-text", username)), m("ion-text", createdAt), username == mdl.user.username && m("ion-icon", {
+      })), m("ion-text", username)), m("ion-text", date), username == mdl.user.username && m("ion-icon", {
         name: "trash-outline",
         onclick: function onclick(e) {
           return deleteComment(id);
@@ -651,15 +669,14 @@ var Comment = function Comment() {
   };
 };
 
-var Comments = function Comments(_ref4) {
-  var mdl = _ref4.attrs.mdl;
+var Comments = function Comments(_ref5) {
+  var mdl = _ref5.attrs.mdl;
   var data = {
     comments: []
   };
 
   var loadComments = function loadComments(mdl) {
-    var onSuccess = function onSuccess(_ref5) {
-      var comments = _ref5.comments;
+    var onSuccess = function onSuccess(comments) {
       return data.comments = comments;
     };
 
@@ -668,8 +685,7 @@ var Comments = function Comments(_ref4) {
   };
 
   var _deleteComment = function deleteComment(id) {
-    var onSuccess = function onSuccess(_ref6) {
-      var comments = _ref6.comments;
+    var onSuccess = function onSuccess(comments) {
       return data.comments = comments;
     };
 
@@ -680,12 +696,12 @@ var Comments = function Comments(_ref4) {
   };
 
   return {
-    oninit: function oninit(_ref7) {
-      var mdl = _ref7.attrs.mdl;
+    oninit: function oninit(_ref6) {
+      var mdl = _ref6.attrs.mdl;
       return loadComments(mdl);
     },
-    view: function view(_ref8) {
-      var mdl = _ref8.attrs.mdl;
+    view: function view(_ref7) {
+      var mdl = _ref7.attrs.mdl;
       return m("item-list", m(CommentForm, {
         mdl: mdl,
         reload: function reload() {
@@ -1117,29 +1133,32 @@ exports.Menu = exports.MenuButton = void 0;
 var _core = require("@ionic/core");
 
 var MenuButton = function MenuButton() {
-  var toggleMenu = function toggleMenu(menuId) {
-    console.log(_core.menuController);
+  var toggleMenu = function toggleMenu(mdl, side) {
+    _core.menuController.enable(true, side);
 
-    _core.menuController.open(menuId).then(function (s) {
-      return console.log(s);
+    mdl.menu ? mdl.menu = side : mdl.menu = null;
+    console.log("toggleMenu", side, _core.menuController);
+
+    _core.menuController // .open(side)
+    .toggle(side).then(function (s) {
+      return console.log("s", s);
     }, function (e) {
-      return console.log(e);
+      return console.log("e", e);
     });
   };
 
   return {
     view: function view(_ref) {
       var _ref$attrs = _ref.attrs,
+          mdl = _ref$attrs.mdl,
           name = _ref$attrs.name,
-          menuId = _ref$attrs.menuId;
+          side = _ref$attrs.side;
       return m("ion-menu-toggle", {
         oncreate: function oncreate(_ref2) {
           var dom = _ref2.dom;
-
-          _core.menuController.enable(true, menuId);
         },
         onclick: function onclick(e) {
-          return toggleMenu(menuId);
+          return toggleMenu(mdl, side);
         }
       }, m("ion-button", m("ion-icon", {
         name: name
@@ -1152,18 +1171,32 @@ exports.MenuButton = MenuButton;
 
 var Menu = function Menu() {
   return {
-    view: function view(_ref3) {
-      var _ref3$attrs = _ref3.attrs,
-          title = _ref3$attrs.title,
-          side = _ref3$attrs.side,
-          menuId = _ref3$attrs.menuId,
-          contentId = _ref3$attrs.contentId,
-          contents = _ref3$attrs.contents;
-      return m("ion-menu[main]", {
+    oncreate: function oncreate(_ref3) {
+      var dom = _ref3.dom;
+
+      _core.menuController.enable(dom).then(function (s) {
+        return console.log("doms", s);
+      }, function (e) {
+        return console.log("dome", e);
+      });
+    },
+    view: function view(_ref4) {
+      var _ref4$attrs = _ref4.attrs,
+          title = _ref4$attrs.title,
+          visible = _ref4$attrs.visible,
+          side = _ref4$attrs.side,
+          menuId = _ref4$attrs.menuId,
+          contentId = _ref4$attrs.contentId,
+          contents = _ref4$attrs.contents;
+      return m("ion-menu", {
         side: side,
+        visible: visible,
+        id: menuId,
         menuId: menuId,
         contentId: contentId
-      }, [m("ion-header", m("ion-toolbar[translucent]", m("ion-title", title))), m("ion-content", contents)]);
+      }, [m("ion-header", m("ion-toolbar[translucent]", m("ion-title", title))), m("ion-content", {
+        id: menuId
+      }, contents)]);
     }
   };
 };
@@ -1223,22 +1256,17 @@ exports.Paginator = Paginator;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SideBars = exports.SettingsMenu = void 0;
+exports.RightSideBar = exports.LeftSideBar = exports.SettingsMenu = exports.OptionsMenu = void 0;
 
 var _menu = require("./menu");
 
 var _core = require("@ionic/core");
 
-var SettingsMenu = function SettingsMenu() {
+var OptionsMenu = function OptionsMenu() {
   return {
     view: function view(_ref) {
       var mdl = _ref.attrs.mdl;
       return m("ion-list", [m("ion-item", m(m.route.Link, {
-        onclick: function onclick(e) {
-          return _core.menuController.toggle("settings");
-        },
-        href: "/settings/".concat(mdl.user.username)
-      }, [m("i.ion-gear-a.p-5"), "Settings"])), m("ion-item", m(m.route.Link, {
         onclick: function onclick(e) {
           return _core.menuController.toggle("settings");
         },
@@ -1248,14 +1276,41 @@ var SettingsMenu = function SettingsMenu() {
   };
 };
 
-exports.SettingsMenu = SettingsMenu;
+exports.OptionsMenu = OptionsMenu;
 
-var SideBars = function SideBars() {
+var SettingsMenu = function SettingsMenu() {
+  var test = function test() {
+    _core.menuController.getMenus().then(function (s) {
+      return console.log("s", s);
+    }, function (e) {
+      return console.log("e", e);
+    });
+  };
+
   return {
     view: function view(_ref2) {
       var mdl = _ref2.attrs.mdl;
-      return [m(_menu.Menu, {
+      return m("ion-list", [m("ion-item", m("ion-button", {
+        onclick: test
+      }, "test")), m("ion-item", m(m.route.Link, {
+        onclick: function onclick(e) {
+          return _core.menuController.toggle("settings");
+        },
+        href: "/settings/".concat(mdl.user.username)
+      }, [m("i.ion-gear-a.p-5"), "Settings"]))]);
+    }
+  };
+};
+
+exports.SettingsMenu = SettingsMenu;
+
+var LeftSideBar = function LeftSideBar() {
+  return {
+    view: function view(_ref3) {
+      var mdl = _ref3.attrs.mdl;
+      return m(_menu.Menu, {
         mdl: mdl,
+        // visibile: mdl.menu == "settings",
         title: "Settings",
         side: "start",
         menuId: "settings",
@@ -1263,21 +1318,33 @@ var SideBars = function SideBars() {
         contents: m(SettingsMenu, {
           mdl: mdl
         })
-      }), m(_menu.Menu, {
-        mdl: mdl,
-        title: "Options",
-        side: "end",
-        menuId: "options",
-        contentId: "layout",
-        contents: m(SettingsMenu, {
-          mdl: mdl
-        })
-      })];
+      });
     }
   };
 };
 
-exports.SideBars = SideBars;
+exports.LeftSideBar = LeftSideBar;
+
+var RightSideBar = function RightSideBar() {
+  return {
+    view: function view(_ref4) {
+      var mdl = _ref4.attrs.mdl;
+      return m(_menu.Menu, {
+        mdl: mdl,
+        // visibile: mdl.menu == "options",
+        title: "Options",
+        side: "end",
+        menuId: "options",
+        contentId: "layout",
+        contents: m(OptionsMenu, {
+          mdl: mdl
+        })
+      });
+    }
+  };
+};
+
+exports.RightSideBar = RightSideBar;
 });
 
 ;require.register("components/taglist.js", function(exports, require, module) {
@@ -1477,6 +1544,7 @@ var Header = function Header() {
         },
         defaultHref: "/"
       }), mdl.state.isLoggedIn() ? m(_components.MenuButton, {
+        side: "left",
         mdl: mdl,
         name: "settings"
       }) : [m("ion-item", m(m.route.Link, {
@@ -1488,6 +1556,7 @@ var Header = function Header() {
       }, "Home")), m("ion-buttons", {
         slot: "end"
       }, m(_components.MenuButton, {
+        side: "right",
         mdl: mdl,
         name: "options"
       }))));
@@ -1522,11 +1591,14 @@ var Layout = function Layout() {
           mdl = _ref.attrs.mdl;
       return m("ion-app", m(_header["default"], {
         mdl: mdl
-      }), m("ion-content", {
-        id: "layout"
-      }, children), m(_components.SideBars, {
+      }), m(_components.LeftSideBar, {
         mdl: mdl
-      }), mdl.toast.msg && m(_components.Toaster, {
+      }), m("ion-content", {
+        id: "layout",
+        contentId: "layout"
+      }, children), mdl.toast.msg && m(_components.Toaster, {
+        mdl: mdl
+      }), m(_components.RightSideBar, {
         mdl: mdl
       }), m(_footer["default"], {
         mdl: mdl
@@ -1581,6 +1653,14 @@ var _routes = _interopRequireDefault(require("./routes"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var model = {
+  menus: ["settings", "options"],
+  menu: {
+    title: "",
+    side: "",
+    menuId: "",
+    contentId: "",
+    contents: null
+  },
   Routes: _routes["default"],
   state: {
     isLoading: false,
@@ -1666,8 +1746,7 @@ var Article = function Article() {
       return [state.status == "loading" && m(_components.Banner, [m("h1.logo-font", "Loading ...")]), state.status == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.status == "success" && [m("ion-text", m("h1", data.article.title)), m("ion-text", m.trust((0, _marked["default"])(data.article.body))), m(_components.FollowFavorite, {
         mdl: mdl,
         data: data.article
-      }), // m("ion-item-divider"),
-      m(_components.Comments, {
+      }), m(_components.Comments, {
         mdl: mdl,
         comments: data.comments,
         reloadArticle: function reloadArticle() {
@@ -1937,7 +2016,10 @@ var Home = function Home() {
     },
     view: function view(_ref4) {
       var mdl = _ref4.attrs.mdl;
-      return [!mdl.state.isLoggedIn() && m(_components.Banner, [m("h1.logo-font", "conduit"), m("p", "A place to share your knowledge.")]), state.pageStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading Data")]), state.pageStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && [m(_components.FeedNav, {
+      return m("ion-content", {
+        id: "home",
+        contentId: "home"
+      }, [!mdl.state.isLoggedIn() && m(_components.Banner, [m("h1.logo-font", "conduit"), m("p", "A place to share your knowledge.")]), state.pageStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading Data")]), state.pageStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && [m(_components.FeedNav, {
         fetchData: loadArticles,
         mdl: mdl,
         data: data
@@ -1960,10 +2042,10 @@ var Home = function Home() {
         href: "/editor"
       }, [m("ion-fab-button", m("ion-icon", {
         name: "add-circle"
-      }))])), m("", m(_components.TagList, {
+      }))])), m(_components.TagList, {
         mdl: mdl,
         data: data
-      }))]];
+      })]]);
     }
   };
 };

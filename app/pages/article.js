@@ -1,5 +1,5 @@
 import Http from "Http"
-import { Banner, FollowFavorite, Comments, Card } from "components"
+import { Banner, FollowFavorite, Comments } from "components"
 import md from "marked"
 
 const getArticleTask = (http) => (mdl) => (slug) =>
@@ -46,7 +46,6 @@ const Article = () => {
           data: data.article,
         }),
 
-        // m("ion-item-divider"),
         m(Comments, {
           mdl,
           comments: data.comments,

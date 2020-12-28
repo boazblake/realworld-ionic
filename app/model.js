@@ -1,6 +1,8 @@
 import Routes from "./routes"
 
 const model = {
+  menus: ["settings", "options"],
+  menu: { title: "", side: "", menuId: "", contentId: "", contents: null },
   Routes,
   state: {
     isLoading: false,

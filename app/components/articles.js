@@ -28,7 +28,7 @@ const ArticlePreview = ({ attrs: { mdl, article } }) => {
         { button: true },
         m("ion-grid", [
           m(
-            "ion-row",
+            "ion-row.ion-justify-content-between.ion-align-items-end",
             m(
               "ion-col",
               m(
@@ -50,7 +50,7 @@ const ArticlePreview = ({ attrs: { mdl, article } }) => {
               )
             )
           ),
-          m("ion-row", [
+          m("ion-row.ion-justify-content-between.ion-align-items-end", [
             m(
               m.route.Link,
               {
