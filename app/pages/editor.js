@@ -22,8 +22,10 @@ const formatTagsToList = over(
 
 const formatTagsToString = over(lensPath(["article", "tagList"]), join(","))
 
-export const submitArticleTask = (http) => (mdl) => (article) =>
-  http.postTask(mdl)("articles")({ article })
+export const submitArticleTask = (http) => (mdl) => (article) => (isEditing) =>
+  isEditing
+    ? http.putTask(mdl)(`articles/${mdl.slug}`)({ article })
+    : http.postTask(mdl)("articles")({ article })
 
 const Editor = ({ attrs: { mdl } }) => {
   let data = {
@@ -33,6 +35,7 @@ const Editor = ({ attrs: { mdl } }) => {
     tagList: "",
   }
   const state = {
+    isEditing: false,
     disabled: false,
     errors: null,
     status: "loading",
@@ -50,6 +53,7 @@ const Editor = ({ attrs: { mdl } }) => {
     }
 
     if (mdl.slug !== "/editor") {
+      state.isEditing = true
       loadArticleTask(Http)(mdl)(mdl.slug).fork(onError, onSuccess)
     } else {
       state.status == "success"
@@ -66,7 +70,7 @@ const Editor = ({ attrs: { mdl } }) => {
       state.disabled = false
     }
 
-    submitArticleTask(Http)(mdl)(formatTagsToList(data)).fork(
+    submitArticleTask(Http)(mdl)(formatTagsToList(data))(state.isEditing).fork(
       onError,
       onSuccess
     )

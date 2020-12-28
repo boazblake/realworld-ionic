@@ -1843,9 +1843,13 @@ var formatTagsToString = (0, _ramda.over)((0, _ramda.lensPath)(["article", "tagL
 var submitArticleTask = function submitArticleTask(http) {
   return function (mdl) {
     return function (article) {
-      return http.postTask(mdl)("articles")({
-        article: article
-      });
+      return function (isEditing) {
+        return isEditing ? http.putTask(mdl)("articles/".concat(mdl.slug))({
+          article: article
+        }) : http.postTask(mdl)("articles")({
+          article: article
+        });
+      };
     };
   };
 };
@@ -1861,6 +1865,7 @@ var Editor = function Editor(_ref) {
     tagList: ""
   };
   var state = {
+    isEditing: false,
     disabled: false,
     errors: null,
     status: "loading"
@@ -1880,6 +1885,7 @@ var Editor = function Editor(_ref) {
     };
 
     if (mdl.slug !== "/editor") {
+      state.isEditing = true;
       loadArticleTask(_Http["default"])(mdl)(mdl.slug).fork(onError, onSuccess);
     } else {
       state.status == "success";
@@ -1900,7 +1906,7 @@ var Editor = function Editor(_ref) {
       state.disabled = false;
     };
 
-    submitArticleTask(_Http["default"])(mdl)(formatTagsToList(data)).fork(onError, onSuccess);
+    submitArticleTask(_Http["default"])(mdl)(formatTagsToList(data))(state.isEditing).fork(onError, onSuccess);
   };
 
   return {
@@ -2408,30 +2414,36 @@ var Profile = function Profile(_ref) {
     },
     view: function view(_ref6) {
       var mdl = _ref6.attrs.mdl;
-      return m(".profile-page", state.pageStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading ...")]), state.pageStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && [m(".user-info", m(".container", m(".row", m(".col-xs-12.col-md-10.offset-md-1", [m("img.user-img", {
+      return m(".profile-page", state.pageStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading ...")]), state.pageStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && [m(".user-info", m("ion-grid", m("ion-row", m("ion-col", m("img.user-img", {
         src: (0, _Utils.sanitizeImg)(data.profile.image)
-      }), m("h4", data.profile.username), m("p", data.profile.bio), data.profile.username !== mdl.user.username ? m("button.btn.btn-sm.btn-outline-secondary.action-btn", {
+      }), m("ion-text", m("h4", data.profile.username)), m("ion-text", m("p", data.profile.bio)), data.profile.username !== mdl.user.username ? m("ion-chip", {
         onclick: function onclick(e) {
-          toggleAuthorFollow({
+          return toggleAuthorFollow({
             author: {
               username: data.profile.username,
               following: data.profile.following
             }
           });
         }
-      }, [data.profile.following ? [m("i.ion-minus-round"), " Unfollow ".concat(data.profile.username, " ")] : [m("i.ion-plus-round"), " Follow ".concat(data.profile.username, " ")]]) : m("button.btn.btn-sm.btn-outline-secondary.action-btn", {
+      }, m("ion-icon", {
+        name: data.profile.following ? "people-circle-outline" : "people-outline"
+      }), m("ion-label", "".concat(data.profile.username))) : m("ion-chip", {
         onclick: function onclick(e) {
           return m.route.set("/settings/".concat(data.profile.username));
         }
-      }, [m("i.ion-gear-a.p-5"), "Edit Profile Settings"])])))), m(".container", m(".row", m(".col-xs-12.col-md-10.offset-md-1", [m(".articles-toggle", m("ul.nav.nav-pills.outline-active", [m("li.nav-item", m("a.nav-link ".concat(!state.showFaveArticles && "active"), {
+      }, m("ion-icon", {
+        name: "settings"
+      }), m("ion-label", "Edit Profile Settings")))))), m("ion-grid", m("ion-row", m("ion-col", [m("ion-list", m("ion-button", {
+        color: !state.showFaveArticles ? "secondary" : "primary",
         onclick: function onclick(e) {
           return selectFeed(false);
         }
-      }, "My Articles")), m("li.nav-item", m("a.nav-link ".concat(state.showFaveArticles && "active"), {
+      }, "My Articles"), m("ion-button", {
+        color: state.showFaveArticles ? "secondary" : "primary",
         onclick: function onclick(e) {
           return selectFeed(true);
         }
-      }, "Favorited Articles"))])), state.feedStatus == "loading" && "Loading Articles...", state.feedStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.feedStatus == "success" && [state.showFaveArticles ? m(_components.Articles, {
+      }, "Favorited Articles")), state.feedStatus == "loading" && "Loading Articles...", state.feedStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.feedStatus == "success" && [state.showFaveArticles ? m(_components.Articles, {
         mdl: mdl,
         data: data.authorFavoriteArticles
       }) : m(_components.Articles, {
@@ -2617,49 +2629,59 @@ var User = function User(_ref) {
   return {
     view: function view(_ref3) {
       var mdl = _ref3.attrs.mdl;
-      return m(".settings-page", m(".container.page", m(".row", m(".col-md-6.offset-md-3.col-xs-12", [m("h1.text-xs-center", "Your Settings"), m("form", m("fieldset", [m("fieldset.form-group", m("input.form-control.form-control-lg", {
+      return m("form", m("ion-text", m("h1", "Your Settings")), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "URL of profile picture"), m("ion-input", {
         type: "text",
         placeholder: "URL of profile picture",
         onchange: function onchange(e) {
           return data.image = e.target.value;
         },
         value: data.image
-      })), m("fieldset.form-group", m("input.form-control.form-control-lg", {
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Your Name"), m("ion-input", {
         type: "text",
         placeholder: "Your Name",
         onchange: function onchange(e) {
           return data.username = e.target.value;
         },
         value: data.username
-      })), m("fieldset.form-group", m("textarea.form-control.form-control-lg", {
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Short bio about you"), m("ion-textarea", {
         placeholder: "Short bio about you",
         onchange: function onchange(e) {
           return data.bio = e.target.value;
         },
         value: data.bio
-      })), m("fieldset.form-group", m("fieldset.form-group", m("input.form-control.form-control-lg", {
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Email"), m("ion-input", {
         type: "text",
         placeholder: "Email",
         onchange: function onchange(e) {
           return data.email = e.target.value;
         },
         value: data.email
-      }))), m("fieldset.form-group", m("fieldset.form-group", m("input.form-control.form-control-lg", {
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Password"), m("ion-input", {
         type: "password",
         placeholder: "Password",
         onchange: function onchange(e) {
           return data.password = e.target.value;
         },
         value: data.password
-      }))), m("button.btn.btn-lg.btn-primary.pull-xs-right", {
+      })), m("ion-button", {
         onclick: function onclick(e) {
           return submit(mdl, data);
         }
-      }, " Update Settings "), m("button.btn.btn-outline-danger.pull-xs-right", {
+      }, " Update Settings "), m("ion-button", {
         onclick: function onclick(e) {
           return logout(mdl, data);
         }
-      }, "Or click here to logout.")]))]))));
+      }, "Or click here to logout."));
     }
   };
 };

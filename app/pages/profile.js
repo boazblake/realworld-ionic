@@ -125,79 +125,70 @@ const Profile = ({ attrs: { mdl } }) => {
           m(
             ".user-info",
             m(
-              ".container",
+              "ion-grid",
               m(
-                ".row",
-                m(".col-xs-12.col-md-10.offset-md-1", [
+                "ion-row",
+                m(
+                  "ion-col",
                   m("img.user-img", { src: sanitizeImg(data.profile.image) }),
-                  m("h4", data.profile.username),
-                  m("p", data.profile.bio),
+                  m("ion-text", m("h4", data.profile.username)),
+                  m("ion-text", m("p", data.profile.bio)),
+
                   data.profile.username !== mdl.user.username
                     ? m(
-                        "button.btn.btn-sm.btn-outline-secondary.action-btn",
+                        "ion-chip",
                         {
-                          onclick: (e) => {
+                          onclick: (e) =>
                             toggleAuthorFollow({
                               author: {
                                 username: data.profile.username,
                                 following: data.profile.following,
                               },
-                            })
-                          },
+                            }),
                         },
-                        [
-                          data.profile.following
-                            ? [
-                                m("i.ion-minus-round"),
-                                ` Unfollow ${data.profile.username} `,
-                              ]
-                            : [
-                                m("i.ion-plus-round"),
-                                ` Follow ${data.profile.username} `,
-                              ],
-                        ]
+                        m("ion-icon", {
+                          name: data.profile.following
+                            ? "people-circle-outline"
+                            : "people-outline",
+                        }),
+                        m("ion-label", `${data.profile.username}`)
                       )
                     : m(
-                        "button.btn.btn-sm.btn-outline-secondary.action-btn",
+                        "ion-chip",
                         {
                           onclick: (e) =>
                             m.route.set(`/settings/${data.profile.username}`),
                         },
-                        [m("i.ion-gear-a.p-5"), `Edit Profile Settings`]
-                      ),
-                ])
+                        m("ion-icon", { name: "settings" }),
+                        m("ion-label", "Edit Profile Settings")
+                      )
+                )
               )
             )
           ),
           m(
-            ".container",
+            "ion-grid",
             m(
-              ".row",
-              m(".col-xs-12.col-md-10.offset-md-1", [
+              "ion-row",
+              m("ion-col", [
                 m(
-                  ".articles-toggle",
-                  m("ul.nav.nav-pills.outline-active", [
-                    m(
-                      "li.nav-item",
-                      m(
-                        `a.nav-link ${!state.showFaveArticles && "active"}`,
-                        {
-                          onclick: (e) => selectFeed(false),
-                        },
-                        "My Articles"
-                      )
-                    ),
-                    m(
-                      "li.nav-item",
-                      m(
-                        `a.nav-link ${state.showFaveArticles && "active"}`,
-                        {
-                          onclick: (e) => selectFeed(true),
-                        },
-                        "Favorited Articles"
-                      )
-                    ),
-                  ])
+                  "ion-list",
+                  m(
+                    "ion-button",
+                    {
+                      color: !state.showFaveArticles ? "secondary" : "primary",
+                      onclick: (e) => selectFeed(false),
+                    },
+                    "My Articles"
+                  ),
+                  m(
+                    "ion-button",
+                    {
+                      color: state.showFaveArticles ? "secondary" : "primary",
+                      onclick: (e) => selectFeed(true),
+                    },
+                    "Favorited Articles"
+                  )
                 ),
                 state.feedStatus == "loading" && "Loading Articles...",
                 state.feedStatus == "error" &&
