@@ -1,6 +1,9 @@
 export const Loader = () => {
   return {
-    view: ({ children }) =>
-      m(".container", m(".banner", m(".container", children))),
+    view: ({ attrs: { name, duration } }) =>
+      m("ion-spinner.spinner", {
+        duration: duration || 2000,
+        name: name || "crescent",
+      }),
   }
 }

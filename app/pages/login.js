@@ -1,5 +1,6 @@
 import Http from "Http"
 import { errorViewModel } from "Utils"
+import { FormErrors } from "components"
 
 export const loginTask = (http) => (mdl) => (user) =>
   http.postTask(mdl)("users/login")({ user })
@@ -35,22 +36,7 @@ const Login = () => {
       m("form", [
         m("ion-text", m("h1", "Login")),
 
-        state.errors &&
-          state.errors.map(({ key, errors }) =>
-            m(
-              ".error-messages",
-              m(
-                "ion-list",
-                m("ion-label", { color: "danger" }, `${key}`),
-                m(
-                  "ion-list",
-                  errors.map((error) =>
-                    m("ion-item", { color: "danger" }, error)
-                  )
-                )
-              )
-            )
-          ),
+        state.errors && m(FormErrors, { mdl, errors: state.errors }),
 
         m("ion-input", {
           type: "text",

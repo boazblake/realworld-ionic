@@ -1,11 +1,26 @@
 import Http from "Http"
-import { errorViewModel } from "Utils"
-import { compose, lensProp, over, split, trim, uniq } from "ramda"
+import { log, errorViewModel } from "Utils"
+import { FormErrors, Loader } from "components"
+import {
+  compose,
+  join,
+  lensPath,
+  lensProp,
+  over,
+  split,
+  trim,
+  uniq,
+} from "ramda"
 
 export const loadArticleTask = (http) => (mdl) => (slug) =>
-  http.getTask(mdl)(`articles/${slug}`)
+  http.getTask(mdl)(`articles/${slug}`).map(formatTagsToString)
 
-const formatTags = over(lensProp("tagList"), compose(uniq, split(" "), trim))
+const formatTagsToList = over(
+  lensProp("tagList"),
+  compose(uniq, split(","), trim)
+)
+
+const formatTagsToString = over(lensPath(["article", "tagList"]), join(","))
 
 export const submitArticleTask = (http) => (mdl) => (article) =>
   http.postTask(mdl)("articles")({ article })
@@ -19,20 +34,30 @@ const Editor = ({ attrs: { mdl } }) => {
   }
   const state = {
     disabled: false,
+    errors: null,
+    status: "loading",
   }
 
   const initEditor = (mdl) => {
     state.disabled = false
-    const onSuccess = ({ article }) => (data = article)
+    const onSuccess = ({ article }) => {
+      data = article
+      state.status = "success"
+    }
 
-    const onError = (errors) => (state.errors = errorViewModel(errors))
+    const onError = (errors) => {
+      state.errors = errorViewModel(errors)
+    }
 
     if (mdl.slug !== "/editor") {
       loadArticleTask(Http)(mdl)(mdl.slug).fork(onError, onSuccess)
+    } else {
+      state.status == "success"
     }
   }
 
   const submitData = (data) => {
+    log("data")([data, formatTagsToList(data)])
     state.disabled = true
     const onSuccess = ({ article: { slug } }) => m.route.set(`/article/${slug}`)
 
@@ -41,85 +66,79 @@ const Editor = ({ attrs: { mdl } }) => {
       state.disabled = false
     }
 
-    submitArticleTask(Http)(mdl)(data).fork(onError, onSuccess)
+    submitArticleTask(Http)(mdl)(formatTagsToList(data)).fork(
+      onError,
+      onSuccess
+    )
   }
 
   return {
     oninit: ({ attrs: { mdl } }) => initEditor(mdl),
     view: () =>
       m(
-        ".editor-page",
-        m(
-          ".container.page",
+        "form",
+        state.status == "loading" && m(Loader, { mdl }),
+        state.status == "error" && "Error!",
+        state.status == "success" && [
+          state.errors && m(FormErrors, { mdl, errors: state.errors }),
           m(
-            ".row",
+            "ion-item",
+            m("ion-label", { position: "stacked" }, "Article Title"),
+            m("ion-input", {
+              type: "text",
+              disabled: state.disabled,
+              placeholder: "Article Title",
+              onchange: (e) => (data.title = e.target.value),
+              value: data.title,
+            })
+          ),
+          m(
+            "ion-item",
             m(
-              ".col-md-10.offset-md-1.col-xs-12",
-              m("form", [
-                state.errors &&
-                  state.errors.map((e) =>
-                    m(
-                      ".error-messages",
-                      m(
-                        "ul",
-                        `${e.key}`,
-                        e.values.map((error) => m("li", error))
-                      )
-                    )
-                  ),
-                m(
-                  "fieldset.form-group",
-                  m("input.form-control.form-control-lg", {
-                    type: "text",
-                    disabled: state.disabled,
-                    placeholder: "Article Title",
-                    onchange: (e) => (data.title = e.target.value),
-                    value: data.title,
-                  })
-                ),
-
-                m(
-                  "fieldset.form-group",
-                  m("input.form-control.form-control-lg", {
-                    type: "text",
-                    disabled: state.disabled,
-                    placeholder: "What's this article about?",
-                    onchange: (e) => (data.description = e.target.value),
-                    value: data.description,
-                  })
-                ),
-
-                m(
-                  "fieldset.form-group",
-                  m("textarea.form-control.form-control-lg", {
-                    rows: 8,
-                    placeholder: "Write your article (in markdown)",
-                    disabled: state.disabled,
-                    onchange: (e) => (data.body = e.target.value),
-                    value: data.body,
-                  })
-                ),
-
-                m(
-                  "fieldset.form-group",
-                  m("input.form-control.form-control-lg", {
-                    type: "text",
-                    disabled: state.disabled,
-                    placeholder: "Enter tags",
-                    onchange: (e) => (data.tagList = e.target.value),
-                    value: data.tagList,
-                  })
-                ),
-
-                m(
-                  "button.btn-lg.pull-xs-right.btn-primary",
-                  { onclick: (e) => submitData(data) },
-                  " Publish Article "
-                ),
-              ])
-            )
-          )
-        )
+              "ion-label",
+              { position: "stacked" },
+              "What's this article about?"
+            ),
+            m("ion-input", {
+              type: "text",
+              disabled: state.disabled,
+              placeholder: "What's this article about?",
+              onchange: (e) => (data.description = e.target.value),
+              value: data.description,
+            })
+          ),
+          m(
+            "ion-item",
+            m(
+              "ion-label",
+              { position: "stacked" },
+              "Write your article (in markdown)"
+            ),
+            m("ion-textarea", {
+              rows: 8,
+              placeholder: "Write your article (in markdown)",
+              disabled: state.disabled,
+              onchange: (e) => (data.body = e.target.value),
+              value: data.body,
+            })
+          ),
+          m(
+            "ion-item",
+            m("ion-label", { position: "stacked" }, "Enter tags"),
+            m("ion-input", {
+              type: "text",
+              disabled: state.disabled,
+              placeholder: "Enter tags",
+              onchange: (e) => (data.tagList = e.target.value),
+              value: data.tagList,
+            })
+          ),
+          m(
+            "ion-button",
+            { onclick: (e) => submitData(data) },
+            "Publish Article"
+          ),
+        ]
       ),
   }
 }

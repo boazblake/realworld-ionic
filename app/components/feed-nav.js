@@ -37,7 +37,6 @@ export const FeedNav = ({ attrs: { fetchData } }) => {
                     color:
                       data.tags.current == "feed" ? "primary" : "secondary",
                     onclick: (e) => {
-                      console.log("data.tags.current", e.target.id, e)
                       data.tags.current = e.target.id
                       fetchData(mdl)
                     },

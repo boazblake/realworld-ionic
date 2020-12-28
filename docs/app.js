@@ -557,7 +557,7 @@ var formatComment = function formatComment(_ref) {
 var getCommentsTask = function getCommentsTask(http) {
   return function (mdl) {
     return function (slug) {
-      return http.getTask(mdl)("articles/".concat(slug, "/comments")).map((0, _ramda.prop)("comments")).map((0, _ramda.map)(formatComment)).map((0, _Utils.log)("??"));
+      return http.getTask(mdl)("articles/".concat(slug, "/comments")).map((0, _ramda.prop)("comments")).map((0, _ramda.map)(formatComment));
     };
   };
 };
@@ -753,7 +753,6 @@ var FeedNav = function FeedNav(_ref) {
         id: "feed",
         color: data.tags.current == "feed" ? "primary" : "secondary",
         onclick: function onclick(e) {
-          console.log("data.tags.current", e.target.id, e);
           data.tags.current = e.target.id;
           fetchData(mdl);
         }
@@ -938,6 +937,36 @@ var FollowFavorite = function FollowFavorite(_ref) {
 exports.FollowFavorite = FollowFavorite;
 });
 
+;require.register("components/form-errors.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.FormErrors = void 0;
+
+var FormErrors = function FormErrors() {
+  return {
+    view: function view(_ref) {
+      var errors = _ref.attrs.errors;
+      return errors.map(function (_ref2) {
+        var key = _ref2.key,
+            errors = _ref2.errors;
+        return m(".error-messages", m("ion-list", m("ion-label", {
+          color: "danger"
+        }, "".concat(key)), m("ion-list", errors.map(function (error) {
+          return m("ion-item", {
+            color: "danger"
+          }, error);
+        }))));
+      });
+    }
+  };
+};
+
+exports.FormErrors = FormErrors;
+});
+
 ;require.register("components/index.js", function(exports, require, module) {
 "use strict";
 
@@ -1100,6 +1129,19 @@ Object.keys(_toaster).forEach(function (key) {
     }
   });
 });
+
+var _formErrors = require("./form-errors");
+
+Object.keys(_formErrors).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _formErrors[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _formErrors[key];
+    }
+  });
+});
 });
 
 ;require.register("components/loader.js", function(exports, require, module) {
@@ -1113,8 +1155,13 @@ exports.Loader = void 0;
 var Loader = function Loader() {
   return {
     view: function view(_ref) {
-      var children = _ref.children;
-      return m(".container", m(".banner", m(".container", children)));
+      var _ref$attrs = _ref.attrs,
+          name = _ref$attrs.name,
+          duration = _ref$attrs.duration;
+      return m("ion-spinner.spinner", {
+        duration: duration || 2000,
+        name: name || "crescent"
+      });
     }
   };
 };
@@ -1743,7 +1790,9 @@ var Article = function Article() {
     },
     view: function view(_ref3) {
       var mdl = _ref3.attrs.mdl;
-      return [state.status == "loading" && m(_components.Banner, [m("h1.logo-font", "Loading ...")]), state.status == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.status == "success" && [m("ion-text", m("h1", data.article.title)), m("ion-text", m.trust((0, _marked["default"])(data.article.body))), m(_components.FollowFavorite, {
+      return [state.status == "loading" && m(_components.Banner, [m("h1.logo-font", "Loading ...")]), state.status == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.status == "success" && [m("ion-text", m("h1", data.article.title)), m("ion-text", m.trust((0, _marked["default"])(data.article.body))), data.article.tagList.map(function (tag) {
+        return m("ion-chip", tag);
+      }), m(_components.FollowFavorite, {
         mdl: mdl,
         data: data.article
       }), m(_components.Comments, {
@@ -1773,6 +1822,8 @@ var _Http = _interopRequireDefault(require("Http"));
 
 var _Utils = require("Utils");
 
+var _components = require("components");
+
 var _ramda = require("ramda");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -1780,13 +1831,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 var loadArticleTask = function loadArticleTask(http) {
   return function (mdl) {
     return function (slug) {
-      return http.getTask(mdl)("articles/".concat(slug));
+      return http.getTask(mdl)("articles/".concat(slug)).map(formatTagsToString);
     };
   };
 };
 
 exports.loadArticleTask = loadArticleTask;
-var formatTags = (0, _ramda.over)((0, _ramda.lensProp)("tagList"), (0, _ramda.compose)(_ramda.uniq, (0, _ramda.split)(" "), _ramda.trim));
+var formatTagsToList = (0, _ramda.over)((0, _ramda.lensProp)("tagList"), (0, _ramda.compose)(_ramda.uniq, (0, _ramda.split)(","), _ramda.trim));
+var formatTagsToString = (0, _ramda.over)((0, _ramda.lensPath)(["article", "tagList"]), (0, _ramda.join)(","));
 
 var submitArticleTask = function submitArticleTask(http) {
   return function (mdl) {
@@ -1809,7 +1861,9 @@ var Editor = function Editor(_ref) {
     tagList: ""
   };
   var state = {
-    disabled: false
+    disabled: false,
+    errors: null,
+    status: "loading"
   };
 
   var initEditor = function initEditor(mdl) {
@@ -1817,19 +1871,23 @@ var Editor = function Editor(_ref) {
 
     var onSuccess = function onSuccess(_ref2) {
       var article = _ref2.article;
-      return data = article;
+      data = article;
+      state.status = "success";
     };
 
     var onError = function onError(errors) {
-      return state.errors = (0, _Utils.errorViewModel)(errors);
+      state.errors = (0, _Utils.errorViewModel)(errors);
     };
 
     if (mdl.slug !== "/editor") {
       loadArticleTask(_Http["default"])(mdl)(mdl.slug).fork(onError, onSuccess);
+    } else {
+      state.status == "success";
     }
   };
 
   var submitData = function submitData(data) {
+    (0, _Utils.log)("data")([data, formatTagsToList(data)]);
     state.disabled = true;
 
     var onSuccess = function onSuccess(_ref3) {
@@ -1842,7 +1900,7 @@ var Editor = function Editor(_ref) {
       state.disabled = false;
     };
 
-    submitArticleTask(_Http["default"])(mdl)(data).fork(onError, onSuccess);
+    submitArticleTask(_Http["default"])(mdl)(formatTagsToList(data)).fork(onError, onSuccess);
   };
 
   return {
@@ -1851,11 +1909,14 @@ var Editor = function Editor(_ref) {
       return initEditor(mdl);
     },
     view: function view() {
-      return m(".editor-page", m(".container.page", m(".row", m(".col-md-10.offset-md-1.col-xs-12", m("form", [state.errors && state.errors.map(function (e) {
-        return m(".error-messages", m("ul", "".concat(e.key), e.values.map(function (error) {
-          return m("li", error);
-        })));
-      }), m("fieldset.form-group", m("input.form-control.form-control-lg", {
+      return m("form", state.status == "loading" && m(_components.Loader, {
+        mdl: mdl
+      }), state.status == "error" && "Error!", state.status == "success" && [state.errors && m(_components.FormErrors, {
+        mdl: mdl,
+        errors: state.errors
+      }), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Article Title"), m("ion-input", {
         type: "text",
         disabled: state.disabled,
         placeholder: "Article Title",
@@ -1863,7 +1924,9 @@ var Editor = function Editor(_ref) {
           return data.title = e.target.value;
         },
         value: data.title
-      })), m("fieldset.form-group", m("input.form-control.form-control-lg", {
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "What's this article about?"), m("ion-input", {
         type: "text",
         disabled: state.disabled,
         placeholder: "What's this article about?",
@@ -1871,7 +1934,9 @@ var Editor = function Editor(_ref) {
           return data.description = e.target.value;
         },
         value: data.description
-      })), m("fieldset.form-group", m("textarea.form-control.form-control-lg", {
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Write your article (in markdown)"), m("ion-textarea", {
         rows: 8,
         placeholder: "Write your article (in markdown)",
         disabled: state.disabled,
@@ -1879,7 +1944,9 @@ var Editor = function Editor(_ref) {
           return data.body = e.target.value;
         },
         value: data.body
-      })), m("fieldset.form-group", m("input.form-control.form-control-lg", {
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Enter tags"), m("ion-input", {
         type: "text",
         disabled: state.disabled,
         placeholder: "Enter tags",
@@ -1887,11 +1954,11 @@ var Editor = function Editor(_ref) {
           return data.tagList = e.target.value;
         },
         value: data.tagList
-      })), m("button.btn-lg.pull-xs-right.btn-primary", {
+      })), m("ion-button", {
         onclick: function onclick(e) {
           return submitData(data);
         }
-      }, " Publish Article ")])))));
+      }, "Publish Article")]);
     }
   };
 };
@@ -2066,6 +2133,8 @@ var _Http = _interopRequireDefault(require("Http"));
 
 var _Utils = require("Utils");
 
+var _components = require("components");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var loginTask = function loginTask(http) {
@@ -2114,16 +2183,9 @@ var Login = function Login() {
   return {
     view: function view(_ref2) {
       var mdl = _ref2.attrs.mdl;
-      return m("form", [m("ion-text", m("h1", "Login")), state.errors && state.errors.map(function (_ref3) {
-        var key = _ref3.key,
-            errors = _ref3.errors;
-        return m(".error-messages", m("ion-list", m("ion-label", {
-          color: "danger"
-        }, "".concat(key)), m("ion-list", errors.map(function (error) {
-          return m("ion-item", {
-            color: "danger"
-          }, error);
-        }))));
+      return m("form", [m("ion-text", m("h1", "Login")), state.errors && m(_components.FormErrors, {
+        mdl: mdl,
+        errors: state.errors
       }), m("ion-input", {
         type: "text",
         disabled: state.disabled,
@@ -2403,6 +2465,8 @@ var _Http = _interopRequireDefault(require("Http"));
 
 var _Utils = require("Utils");
 
+var _components = require("components");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var registerTask = function registerTask(http) {
@@ -2453,16 +2517,9 @@ var Register = function Register() {
   return {
     view: function view(_ref2) {
       var mdl = _ref2.attrs.mdl;
-      return m("form", [m("ion-text", m("h1", "Sign Up")), state.errors && state.errors.map(function (_ref3) {
-        var key = _ref3.key,
-            errors = _ref3.errors;
-        return m(".error-messages", m("ion-list", m("ion-label", {
-          color: "danger"
-        }, "".concat(key)), m("ion-list", errors.map(function (error) {
-          return m("ion-item", {
-            color: "danger"
-          }, error);
-        }))));
+      return m("form", [m("ion-text", m("h1", "Sign Up")), state.errors && m(_components.FormErrors, {
+        mdl: mdl,
+        errors: state.errors
       }), m("ion-input", {
         type: "text",
         disabled: state.disabled,

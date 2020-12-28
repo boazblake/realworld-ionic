@@ -19,7 +19,6 @@ const getCommentsTask = (http) => (mdl) => (slug) =>
     .getTask(mdl)(`articles/${slug}/comments`)
     .map(prop("comments"))
     .map(map(formatComment))
-    .map(log("??"))
 
 const deleteCommentTask = (http) => (mdl) => (slug) => (id) =>
   http.deleteTask(mdl)(`articles/${slug}/comments/${id}`)
