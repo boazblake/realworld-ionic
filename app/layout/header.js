@@ -7,31 +7,39 @@ const Header = () => {
         "ion-header",
         m(
           "ion-toolbar",
-          m(
-            "ion-buttons",
-            { slot: "start" },
-            m.route.get() !== "/home" &&
-              m("ion-back-button", {
-                slot: "start",
-                onclick: () => history.back(),
-                defaultHref: "/",
-              }),
-            mdl.state.isLoggedIn()
-              ? m(MenuButton, { side: "left", mdl, name: "settings" })
-              : [
-                  m(
-                    "ion-item",
-                    m(m.route.Link, { href: "/register" }, "Sign up")
-                  ),
-                  m("ion-item", m(m.route.Link, { href: "/login" }, "Login")),
-                ],
-            m(m.route.Link, { href: "#" }, "Home")
-          ),
-          m(
-            "ion-buttons",
-            { slot: "end" },
-            m(MenuButton, { side: "right", mdl, name: "options" })
-          )
+          mdl.state.isLoggedIn()
+            ? [
+                m.route.get() !== "/home" &&
+                  m("ion-buttons", { slot: "start" }, [
+                    m("ion-back-button", {
+                      slot: "start",
+                      onclick: (e) => {
+                        e.preventDefault()
+                        history.back()
+                      },
+                      defaultHref: "/",
+                    }),
+                    m(m.route.Link, { href: "#" }, "Home"),
+                  ]),
+                m(
+                  "ion-buttons",
+                  { slot: "end" },
+                  m(MenuButton, {
+                    side: "start",
+                    mdl,
+                    name: "options",
+                    label: "Options",
+                  })
+                ),
+              ]
+            : m(
+                "ion-item",
+                { slot: "primary", onclick: (e) => m.route.set("/home") },
+                [
+                  m("ion-text", m("h1", "conduit")),
+                  m("ion-text", m("p", "A place to share your knowledge.")),
+                ]
+              )
         )
       ),
   }

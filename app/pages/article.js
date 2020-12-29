@@ -1,5 +1,5 @@
 import Http from "Http"
-import { Banner, FollowFavorite, Comments } from "components"
+import { Loader, FollowFavorite, Comments } from "components"
 import md from "marked"
 
 const getArticleTask = (http) => (mdl) => (slug) =>
@@ -33,10 +33,14 @@ const Article = () => {
     oninit: ({ attrs: { mdl } }) => loadData(mdl),
     view: ({ attrs: { mdl } }) => [
       state.status == "loading" &&
-        m(Banner, [m("h1.logo-font", "Loading ...")]),
+        m(Loader, m("ion-text", m("h1", "Loading ..."))),
 
       state.status == "error" &&
-        m(Banner, [m("h1.logo-font", `Error Loading Data: ${state.error}`)]),
+        m(
+          "ion-text",
+          { color: "danger" },
+          m("h1", `Error Loading Data: ${state.error}`)
+        ),
 
       state.status == "success" && [
         m("ion-text", m("h1", data.article.title)),

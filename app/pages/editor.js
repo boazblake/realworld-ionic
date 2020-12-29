@@ -44,6 +44,7 @@ const Editor = ({ attrs: { mdl } }) => {
   const initEditor = (mdl) => {
     state.disabled = false
     const onSuccess = ({ article }) => {
+      console.log("?")
       data = article
       state.status = "success"
     }
@@ -51,12 +52,11 @@ const Editor = ({ attrs: { mdl } }) => {
     const onError = (errors) => {
       state.errors = errorViewModel(errors)
     }
-
     if (mdl.slug !== "/editor") {
       state.isEditing = true
       loadArticleTask(Http)(mdl)(mdl.slug).fork(onError, onSuccess)
     } else {
-      state.status == "success"
+      state.status = "success"
     }
   }
 
@@ -91,7 +91,7 @@ const Editor = ({ attrs: { mdl } }) => {
             m("ion-input", {
               type: "text",
               disabled: state.disabled,
-              placeholder: "Article Title",
+              // placeholder: "Article Title",
               onchange: (e) => (data.title = e.target.value),
               value: data.title,
             })
@@ -106,7 +106,7 @@ const Editor = ({ attrs: { mdl } }) => {
             m("ion-input", {
               type: "text",
               disabled: state.disabled,
-              placeholder: "What's this article about?",
+              // placeholder: "What's this article about?",
               onchange: (e) => (data.description = e.target.value),
               value: data.description,
             })
@@ -120,7 +120,7 @@ const Editor = ({ attrs: { mdl } }) => {
             ),
             m("ion-textarea", {
               rows: 8,
-              placeholder: "Write your article (in markdown)",
+              // placeholder: "Write your article (in markdown)",
               disabled: state.disabled,
               onchange: (e) => (data.body = e.target.value),
               value: data.body,
@@ -132,7 +132,7 @@ const Editor = ({ attrs: { mdl } }) => {
             m("ion-input", {
               type: "text",
               disabled: state.disabled,
-              placeholder: "Enter tags",
+              // placeholder: "Enter tags",
               onchange: (e) => (data.tagList = e.target.value),
               value: data.tagList,
             })

@@ -229,8 +229,8 @@ var parseHttpSuccess = function parseHttpSuccess(mdl) {
 exports.parseHttpSuccess = parseHttpSuccess;
 
 var getUserToken = function getUserToken() {
-  return sessionStorage.getItem("token") ? {
-    authorization: sessionStorage.getItem("token")
+  return localStorage.getItem("token") ? {
+    authorization: localStorage.getItem("token")
   } : "";
 };
 
@@ -342,22 +342,22 @@ exports["default"] = void 0;
 
 var toRouter = function toRouter(mdl) {
   return function (Router, route) {
-    var matcher = function matcher() {
-      return route.url.includes(":slug") ? mdl.state.isLoggedIn() ? function (_ref) {
-        var slug = _ref.slug;
-        mdl.slug = slug;
-      } : function () {
-        return m.route.set("/login");
-      } : function (_, b) {
-        mdl.slug = b;
-      };
+    var matcher = route.url.includes(":slug") ? mdl.state.isLoggedIn() ? function (_ref) {
+      var slug = _ref.slug;
+      mdl.slug = slug;
+    } : function () {
+      return m.route.set("/login");
+    } : function (_, b) {
+      mdl.slug = b;
+    };
+
+    var renderer = function renderer() {
+      return route.config.isAuth ? mdl.state.isLoggedIn() ? route.component(mdl) : m.route.set("/login") : route.component(mdl);
     };
 
     Router[route.url] = {
-      onmatch: matcher(),
-      render: function render() {
-        return route.component(mdl);
-      }
+      onmatch: matcher,
+      render: renderer
     };
     return Router;
   };
@@ -477,26 +477,6 @@ var Articles = function Articles() {
 };
 
 exports.Articles = Articles;
-});
-
-;require.register("components/banner.js", function(exports, require, module) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Banner = void 0;
-
-var Banner = function Banner() {
-  return {
-    view: function view(_ref) {
-      var children = _ref.children;
-      return m(".banner", m(".container", children));
-    }
-  };
-};
-
-exports.Banner = Banner;
 });
 
 ;require.register("components/card.js", function(exports, require, module) {
@@ -721,6 +701,25 @@ var Comments = function Comments(_ref5) {
 };
 
 exports.Comments = Comments;
+});
+
+;require.register("components/component.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Component = void 0;
+
+var Component = function Component() {
+  return {
+    view: function view() {
+      return m("");
+    }
+  };
+};
+
+exports.Component = Component;
 });
 
 ;require.register("components/feed-nav.js", function(exports, require, module) {
@@ -974,19 +973,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _banner = require("./banner");
-
-Object.keys(_banner).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _banner[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _banner[key];
-    }
-  });
-});
-
 var _loader = require("./loader");
 
 Object.keys(_loader).forEach(function (key) {
@@ -1181,16 +1167,10 @@ var _core = require("@ionic/core");
 
 var MenuButton = function MenuButton() {
   var toggleMenu = function toggleMenu(mdl, side) {
-    _core.menuController.enable(true, side);
-
-    mdl.menu ? mdl.menu = side : mdl.menu = null;
-    console.log("toggleMenu", side, _core.menuController);
-
-    _core.menuController // .open(side)
-    .toggle(side).then(function (s) {
-      return console.log("s", s);
+    _core.menuController.enable(true, side).then(_core.menuController.open(side)).then(function (s) {
+      return console.log("s", s, mdl.menu ? mdl.menu = side : mdl.menu = null);
     }, function (e) {
-      return console.log("e", e);
+      return console.log("erro", e);
     });
   };
 
@@ -1199,17 +1179,15 @@ var MenuButton = function MenuButton() {
       var _ref$attrs = _ref.attrs,
           mdl = _ref$attrs.mdl,
           name = _ref$attrs.name,
-          side = _ref$attrs.side;
+          side = _ref$attrs.side,
+          label = _ref$attrs.label;
       return m("ion-menu-toggle", {
-        oncreate: function oncreate(_ref2) {
-          var dom = _ref2.dom;
-        },
-        onclick: function onclick(e) {
+        onclick: function onclick() {
           return toggleMenu(mdl, side);
         }
-      }, m("ion-button", m("ion-icon", {
+      }, m("ion-button", {}, m("ion-icon", {
         name: name
-      })));
+      }), label));
     }
   };
 };
@@ -1218,32 +1196,37 @@ exports.MenuButton = MenuButton;
 
 var Menu = function Menu() {
   return {
-    oncreate: function oncreate(_ref3) {
-      var dom = _ref3.dom;
-
-      _core.menuController.enable(dom).then(function (s) {
-        return console.log("doms", s);
-      }, function (e) {
-        return console.log("dome", e);
-      });
-    },
-    view: function view(_ref4) {
-      var _ref4$attrs = _ref4.attrs,
-          title = _ref4$attrs.title,
-          visible = _ref4$attrs.visible,
-          side = _ref4$attrs.side,
-          menuId = _ref4$attrs.menuId,
-          contentId = _ref4$attrs.contentId,
-          contents = _ref4$attrs.contents;
-      return m("ion-menu", {
-        side: side,
+    view: function view(_ref2) {
+      var _ref2$attrs = _ref2.attrs,
+          title = _ref2$attrs.title,
+          visible = _ref2$attrs.visible,
+          side = _ref2$attrs.side,
+          menuId = _ref2$attrs.menuId,
+          contentId = _ref2$attrs.contentId,
+          contents = _ref2$attrs.contents;
+      console.log("wtf", {
+        title: title,
         visible: visible,
-        id: menuId,
+        side: side,
         menuId: menuId,
+        contentId: contentId,
+        contents: contents
+      });
+      return m("ion-menu[type='push']", {
+        // onionWillOpen: (e) => {
+        //   console.log("onionWillOpen", e.target)
+        // },
+        // onionDidOpen: (e) => {
+        //   console.log("onionDidOpen", e)
+        // },
+        // onionWillClose: (e) => {
+        //   console.log("onionwillClose", e)
+        // },
+        // onionDidClose: (e) => {
+        //   console.log("ionDidClose", e)
+        // },
         contentId: contentId
-      }, [m("ion-header", m("ion-toolbar[translucent]", m("ion-title", title))), m("ion-content", {
-        id: menuId
-      }, contents)]);
+      }, [m("ion-header", m("ion-toolbar[translucent]", m("ion-title", title))), m("ion-content", contents)]);
     }
   };
 };
@@ -1303,19 +1286,23 @@ exports.Paginator = Paginator;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.RightSideBar = exports.LeftSideBar = exports.SettingsMenu = exports.OptionsMenu = void 0;
+exports.SideBar = exports.StartSideBar = exports.AuthMenu = exports.OptionsMenu = void 0;
 
 var _menu = require("./menu");
+
+var _Utils = require("Utils");
 
 var _core = require("@ionic/core");
 
 var OptionsMenu = function OptionsMenu() {
   return {
     view: function view(_ref) {
-      var mdl = _ref.attrs.mdl;
+      var _ref$attrs = _ref.attrs,
+          mdl = _ref$attrs.mdl,
+          side = _ref$attrs.side;
       return m("ion-list", [m("ion-item", m(m.route.Link, {
         onclick: function onclick(e) {
-          return _core.menuController.toggle("settings");
+          return _core.menuController.toggle(side);
         },
         href: "/profile/".concat(mdl.user.username)
       }, mdl.user.username))]);
@@ -1325,73 +1312,121 @@ var OptionsMenu = function OptionsMenu() {
 
 exports.OptionsMenu = OptionsMenu;
 
-var SettingsMenu = function SettingsMenu() {
-  var test = function test() {
-    _core.menuController.getMenus().then(function (s) {
-      return console.log("s", s);
-    }, function (e) {
-      return console.log("e", e);
-    });
-  };
+var test = function test(item) {
+  _core.menuController.enable(item).then(_core.menuController.isEnabled(item)).then(function (s) {
+    return console.log("s", s);
+  }, function (e) {
+    return console.log("e", e);
+  });
+};
 
+var SettingsMenu = function SettingsMenu() {
   return {
     view: function view(_ref2) {
-      var mdl = _ref2.attrs.mdl;
+      var _ref2$attrs = _ref2.attrs,
+          mdl = _ref2$attrs.mdl,
+          side = _ref2$attrs.side;
+      return m("ion-list", [m("ion-item", m("ion-button", {
+        onclick: function onclick() {
+          return test();
+        }
+      }, "test")), m("ion-item", m(m.route.Link, {
+        onclick: function onclick(e) {
+          return _core.menuController.toggle(side);
+        },
+        href: "/profile/".concat(mdl.user.username)
+      }, m("ion-avatar", m("ion-img", {
+        src: (0, _Utils.sanitizeImg)(mdl.user.image)
+      })), m("ion-label", "".concat(mdl.user.username, " Profile Page"))))]);
+    }
+  };
+};
+
+var AuthMenu = function AuthMenu() {
+  return {
+    view: function view(_ref3) {
+      var _ref3$attrs = _ref3.attrs,
+          mdl = _ref3$attrs.mdl,
+          side = _ref3$attrs.side;
       return m("ion-list", [m("ion-item", m("ion-button", {
         onclick: test
       }, "test")), m("ion-item", m(m.route.Link, {
         onclick: function onclick(e) {
-          return _core.menuController.toggle("settings");
+          return _core.menuController.toggle(side);
         },
-        href: "/settings/".concat(mdl.user.username)
-      }, [m("i.ion-gear-a.p-5"), "Settings"]))]);
+        href: "/register"
+      }, m("ion-label", "register"))),, m("ion-item", m(m.route.Link, {
+        onclick: function onclick(e) {
+          return _core.menuController.toggle(side);
+        },
+        href: "/login"
+      }, m("ion-label", "Login")))]);
     }
   };
 };
 
-exports.SettingsMenu = SettingsMenu;
+exports.AuthMenu = AuthMenu;
 
-var LeftSideBar = function LeftSideBar() {
+var StartSideBar = function StartSideBar() {
+  var side = "start";
   return {
-    view: function view(_ref3) {
-      var mdl = _ref3.attrs.mdl;
-      return m(_menu.Menu, {
-        mdl: mdl,
-        // visibile: mdl.menu == "settings",
-        title: "Settings",
-        side: "start",
-        menuId: "settings",
-        contentId: "layout",
-        contents: m(SettingsMenu, {
-          mdl: mdl
-        })
-      });
-    }
-  };
-};
-
-exports.LeftSideBar = LeftSideBar;
-
-var RightSideBar = function RightSideBar() {
-  return {
+    // oncreate: (dom) => {
+    //   test("start")
+    // },
     view: function view(_ref4) {
       var mdl = _ref4.attrs.mdl;
-      return m(_menu.Menu, {
+      console.log(side, mdl);
+      return mdl.state.isLoggedIn() ? m(_menu.Menu, {
         mdl: mdl,
-        // visibile: mdl.menu == "options",
-        title: "Options",
-        side: "end",
-        menuId: "options",
-        contentId: "layout",
-        contents: m(OptionsMenu, {
-          mdl: mdl
+        side: side,
+        title: "Settings",
+        menuId: "settings",
+        contentId: "settings",
+        contents: m(SettingsMenu, {
+          mdl: mdl,
+          side: side
+        })
+      }) : m(_menu.Menu, {
+        mdl: mdl,
+        side: side,
+        title: "Login | Register",
+        menuId: "auth",
+        contentId: "auth",
+        contents: m(AuthMenu, {
+          mdl: mdl,
+          side: side
         })
       });
     }
   };
 };
 
-exports.RightSideBar = RightSideBar;
+exports.StartSideBar = StartSideBar;
+
+var SideBar = function SideBar() {
+  return {
+    oncreate: function oncreate(dom) {
+      test("end");
+    },
+    view: function view(_ref5) {
+      var mdl = _ref5.attrs.mdl;
+      return m(_menu.Menu, {
+        mdl: mdl,
+        visibile: true,
+        title: "Options",
+        side: "start",
+        menuId: "options",
+        contentId: "layout",
+        contents: m(SettingsMenu, {
+          mdl: mdl,
+          side: "start"
+        })
+      });
+    }
+  };
+};
+
+exports.SideBar = SideBar;
 });
 
 ;require.register("components/taglist.js", function(exports, require, module) {
@@ -1508,27 +1543,29 @@ var getProfile = function getProfile(w) {
   return "desktop";
 };
 
+var model = (0, _model["default"])();
+
 var checkWidth = function checkWidth(winW) {
   var w = window.innerWidth;
 
   if (winW !== w) {
     winW = w;
-    var lastProfile = _model["default"].settings.profile;
-    _model["default"].settings.profile = getProfile(w);
-    if (lastProfile != _model["default"].settings.profile) m.redraw();
+    var lastProfile = model.settings.profile;
+    model.settings.profile = getProfile(w);
+    if (lastProfile != model.settings.profile) m.redraw();
   }
 
   return requestAnimationFrame(checkWidth);
 };
 
-_model["default"].settings.profile = getProfile(winW);
+model.settings.profile = getProfile(winW);
 checkWidth(winW);
 
-if (sessionStorage.getItem("user")) {
-  _model["default"].user = JSON.parse(sessionStorage.getItem("user"));
+if (localStorage.getItem("user")) {
+  model.user = JSON.parse(localStorage.getItem("user"));
 }
 
-m.route(root, "/home", (0, _app["default"])(_model["default"]));
+m.route(root, "/home", (0, _app["default"])(model));
 });
 
 ;require.register("initialize.js", function(exports, require, module) {
@@ -1582,31 +1619,30 @@ var Header = function Header() {
   return {
     view: function view(_ref) {
       var mdl = _ref.attrs.mdl;
-      return m("ion-header", m("ion-toolbar", m("ion-buttons", {
+      return m("ion-header", m("ion-toolbar", mdl.state.isLoggedIn() ? [m.route.get() !== "/home" && m("ion-buttons", {
         slot: "start"
-      }, m.route.get() !== "/home" && m("ion-back-button", {
+      }, [m("ion-back-button", {
         slot: "start",
-        onclick: function onclick() {
-          return history.back();
+        onclick: function onclick(e) {
+          e.preventDefault();
+          history.back();
         },
         defaultHref: "/"
-      }), mdl.state.isLoggedIn() ? m(_components.MenuButton, {
-        side: "left",
-        mdl: mdl,
-        name: "settings"
-      }) : [m("ion-item", m(m.route.Link, {
-        href: "/register"
-      }, "Sign up")), m("ion-item", m(m.route.Link, {
-        href: "/login"
-      }, "Login"))], m(m.route.Link, {
+      }), m(m.route.Link, {
         href: "#"
-      }, "Home")), m("ion-buttons", {
+      }, "Home")]), m("ion-buttons", {
         slot: "end"
       }, m(_components.MenuButton, {
-        side: "right",
+        side: "start",
         mdl: mdl,
-        name: "options"
-      }))));
+        name: "options",
+        label: "Options"
+      }))] : m("ion-item", {
+        slot: "primary",
+        onclick: function onclick(e) {
+          return m.route.set("/home");
+        }
+      }, [m("ion-text", m("h1", "conduit")), m("ion-text", m("p", "A place to share your knowledge."))])));
     }
   };
 };
@@ -1638,14 +1674,12 @@ var Layout = function Layout() {
           mdl = _ref.attrs.mdl;
       return m("ion-app", m(_header["default"], {
         mdl: mdl
-      }), m(_components.LeftSideBar, {
+      }), m(_components.SideBar, {
         mdl: mdl
-      }), m("ion-content", {
+      }), m("ion-content.ion-page", {
         id: "layout",
         contentId: "layout"
       }, children), mdl.toast.msg && m(_components.Toaster, {
-        mdl: mdl
-      }), m(_components.RightSideBar, {
         mdl: mdl
       }), m(_footer["default"], {
         mdl: mdl
@@ -1699,37 +1733,40 @@ var _routes = _interopRequireDefault(require("./routes"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var model = {
-  menus: ["settings", "options"],
-  menu: {
-    title: "",
-    side: "",
-    menuId: "",
-    contentId: "",
-    contents: null
-  },
-  Routes: _routes["default"],
-  state: {
-    isLoading: false,
-    loadingProgress: {
-      max: 0,
-      value: 0
+var BaseModel = function BaseModel() {
+  return {
+    menus: ["settings", "options"],
+    menu: {
+      title: "",
+      side: "",
+      menuId: "",
+      contentId: "",
+      contents: null
     },
-    isLoggedIn: function isLoggedIn() {
-      return sessionStorage.getItem("token");
+    Routes: _routes["default"],
+    state: {
+      isLoading: false,
+      loadingProgress: {
+        max: 0,
+        value: 0
+      },
+      isLoggedIn: function isLoggedIn() {
+        return localStorage.getItem("token");
+      }
+    },
+    settings: {},
+    page: "",
+    user: {},
+    toast: {
+      show: false,
+      duration: 2000,
+      status: null,
+      msg: null
     }
-  },
-  settings: {},
-  page: "",
-  user: {},
-  toast: {
-    show: false,
-    duration: 2000,
-    status: null,
-    msg: null
-  }
+  };
 };
-var _default = model;
+
+var _default = BaseModel;
 exports["default"] = _default;
 });
 
@@ -1790,7 +1827,9 @@ var Article = function Article() {
     },
     view: function view(_ref3) {
       var mdl = _ref3.attrs.mdl;
-      return [state.status == "loading" && m(_components.Banner, [m("h1.logo-font", "Loading ...")]), state.status == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.status == "success" && [m("ion-text", m("h1", data.article.title)), m("ion-text", m.trust((0, _marked["default"])(data.article.body))), data.article.tagList.map(function (tag) {
+      return [state.status == "loading" && m(_components.Loader, m("ion-text", m("h1", "Loading ..."))), state.status == "error" && m("ion-text", {
+        color: "danger"
+      }, m("h1", "Error Loading Data: ".concat(state.error))), state.status == "success" && [m("ion-text", m("h1", data.article.title)), m("ion-text", m.trust((0, _marked["default"])(data.article.body))), data.article.tagList.map(function (tag) {
         return m("ion-chip", tag);
       }), m(_components.FollowFavorite, {
         mdl: mdl,
@@ -1876,6 +1915,7 @@ var Editor = function Editor(_ref) {
 
     var onSuccess = function onSuccess(_ref2) {
       var article = _ref2.article;
+      console.log("?");
       data = article;
       state.status = "success";
     };
@@ -1888,7 +1928,7 @@ var Editor = function Editor(_ref) {
       state.isEditing = true;
       loadArticleTask(_Http["default"])(mdl)(mdl.slug).fork(onError, onSuccess);
     } else {
-      state.status == "success";
+      state.status = "success";
     }
   };
 
@@ -1925,7 +1965,7 @@ var Editor = function Editor(_ref) {
       }, "Article Title"), m("ion-input", {
         type: "text",
         disabled: state.disabled,
-        placeholder: "Article Title",
+        // placeholder: "Article Title",
         onchange: function onchange(e) {
           return data.title = e.target.value;
         },
@@ -1935,7 +1975,7 @@ var Editor = function Editor(_ref) {
       }, "What's this article about?"), m("ion-input", {
         type: "text",
         disabled: state.disabled,
-        placeholder: "What's this article about?",
+        // placeholder: "What's this article about?",
         onchange: function onchange(e) {
           return data.description = e.target.value;
         },
@@ -1944,7 +1984,7 @@ var Editor = function Editor(_ref) {
         position: "stacked"
       }, "Write your article (in markdown)"), m("ion-textarea", {
         rows: 8,
-        placeholder: "Write your article (in markdown)",
+        // placeholder: "Write your article (in markdown)",
         disabled: state.disabled,
         onchange: function onchange(e) {
           return data.body = e.target.value;
@@ -1955,7 +1995,7 @@ var Editor = function Editor(_ref) {
       }, "Enter tags"), m("ion-input", {
         type: "text",
         disabled: state.disabled,
-        placeholder: "Enter tags",
+        // placeholder: "Enter tags",
         onchange: function onchange(e) {
           return data.tagList = e.target.value;
         },
@@ -2089,14 +2129,14 @@ var Home = function Home() {
     },
     view: function view(_ref4) {
       var mdl = _ref4.attrs.mdl;
-      return m("ion-content", {
-        id: "home",
-        contentId: "home"
-      }, [!mdl.state.isLoggedIn() && m(_components.Banner, [m("h1.logo-font", "conduit"), m("p", "A place to share your knowledge.")]), state.pageStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading Data")]), state.pageStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && [m(_components.FeedNav, {
+      return [m("ion-content", {
+        id: "profile",
+        contentId: "profile"
+      }, [!mdl.state.isLoggedIn() && state.pageStatus == "loading" || state.feedStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading Data")]), state.pageStatus == "error" && m(Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && [m(_components.FeedNav, {
         fetchData: loadArticles,
         mdl: mdl,
         data: data
-      }), state.feedStatus == "loading" && m("ion-text", "Loading Articles ..."), state.feedStatus == "success" && state.total ? [m(_components.Articles, {
+      }), state.feedStatus == "success" && state.total && [m(_components.Articles, {
         mdl: mdl,
         data: data
       }), m(_components.Paginator, {
@@ -2106,7 +2146,7 @@ var Home = function Home() {
           state.offset = offset;
           loadArticles(mdl);
         }
-      })] : m("ion-text", "No articles are here... yet."), mdl.state.isLoggedIn() && m("ion-fab", {
+      })], state.feedStatus == "success" && !state.total && m("ion-text", "No articles are here... yet."), mdl.state.isLoggedIn() && m("ion-fab", {
         vertical: "bottom",
         horizontal: "end",
         slot: "fixed"
@@ -2118,7 +2158,7 @@ var Home = function Home() {
       }))])), m(_components.TagList, {
         mdl: mdl,
         data: data
-      })]]);
+      })]])];
     }
   };
 };
@@ -2171,8 +2211,8 @@ var Login = function Login() {
 
     var onSuccess = function onSuccess(_ref) {
       var user = _ref.user;
-      sessionStorage.setItem("token", "Token ".concat(user.token));
-      sessionStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", "Token ".concat(user.token));
+      localStorage.setItem("user", JSON.stringify(user));
       mdl.user = user;
       state.disabled = false;
       m.route.set("/home");
@@ -2189,7 +2229,7 @@ var Login = function Login() {
   return {
     view: function view(_ref2) {
       var mdl = _ref2.attrs.mdl;
-      return m("form", [m("ion-text", m("h1", "Login")), state.errors && m(_components.FormErrors, {
+      return m("ion-content", m("form", [m("ion-text", m("h1", "Login")), state.errors && m(_components.FormErrors, {
         mdl: mdl,
         errors: state.errors
       }), m("ion-input", {
@@ -2220,7 +2260,7 @@ var Login = function Login() {
         }
       }, "Login"), m("ion-link", m(m.route.Link, {
         href: "/register"
-      }, m("ion-label", "Need an Account?")))]);
+      }, m("ion-label", "Need an Account?")))]));
     }
   };
 };
@@ -2414,7 +2454,10 @@ var Profile = function Profile(_ref) {
     },
     view: function view(_ref6) {
       var mdl = _ref6.attrs.mdl;
-      return m(".profile-page", state.pageStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading ...")]), state.pageStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && [m(".user-info", m("ion-grid", m("ion-row", m("ion-col", m("img.user-img", {
+      return m("ion-content", {
+        id: "profile",
+        contentId: "profile"
+      }, state.pageStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading ...")]), state.pageStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && [m("ion-grid", m("ion-row", m("ion-col", m("ion-img", {
         src: (0, _Utils.sanitizeImg)(data.profile.image)
       }), m("ion-text", m("h4", data.profile.username)), m("ion-text", m("p", data.profile.bio)), data.profile.username !== mdl.user.username ? m("ion-chip", {
         onclick: function onclick(e) {
@@ -2433,13 +2476,13 @@ var Profile = function Profile(_ref) {
         }
       }, m("ion-icon", {
         name: "settings"
-      }), m("ion-label", "Edit Profile Settings")))))), m("ion-grid", m("ion-row", m("ion-col", [m("ion-list", m("ion-button", {
-        color: !state.showFaveArticles ? "secondary" : "primary",
+      }), m("ion-label", "Edit Profile Settings"))))), m("ion-list", m("ion-button", {
+        color: !state.showFaveArticles ? "primary" : "secondary",
         onclick: function onclick(e) {
           return selectFeed(false);
         }
-      }, "My Articles"), m("ion-button", {
-        color: state.showFaveArticles ? "secondary" : "primary",
+      }, "Written Articles"), m("ion-button", {
+        color: state.showFaveArticles ? "primary" : "secondary",
         onclick: function onclick(e) {
           return selectFeed(true);
         }
@@ -2456,7 +2499,7 @@ var Profile = function Profile(_ref) {
           state.offset = offset;
           loadData(mdl);
         }
-      })]])))]);
+      })]]);
     }
   };
 };
@@ -2510,8 +2553,8 @@ var Register = function Register() {
     var onSuccess = function onSuccess(_ref) {
       var user = _ref.user;
       mdl.user = user;
-      sessionStorage.setItem("token", "Token ".concat(user.token));
-      sessionStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", "Token ".concat(user.token));
+      localStorage.setItem("user", JSON.stringify(user));
       state.disabled = false;
       m.route.set("/home");
       console.log("success", user);
@@ -2583,10 +2626,13 @@ var _Http = _interopRequireDefault(require("Http"));
 
 var _Utils = require("Utils");
 
+var _model = _interopRequireDefault(require("../model"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var logout = function logout() {
-  sessionStorage.clear();
+var logout = function logout(mdl) {
+  localStorage.clear();
+  mdl = (0, _model["default"])();
   m.route.set("/home");
 };
 
@@ -2616,7 +2662,7 @@ var User = function User(_ref) {
   var submit = function submit(mdl, data) {
     var onSuccess = function onSuccess(_ref2) {
       var user = _ref2.user;
-      sessionStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(user));
       mdl.user = user;
       console.log(mdl.user);
       m.route.set("/home");
@@ -2718,6 +2764,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 var Routes = [{
   url: "/home",
+  config: {
+    isAuth: false
+  },
   component: function component(mdl) {
     return m(_index["default"], {
       mdl: mdl
@@ -2727,6 +2776,9 @@ var Routes = [{
   }
 }, {
   url: "/editor",
+  config: {
+    isAuth: true
+  },
   component: function component(mdl) {
     return m(_index["default"], {
       mdl: mdl
@@ -2737,6 +2789,9 @@ var Routes = [{
   }
 }, {
   url: "/editor/:slug",
+  config: {
+    isAuth: true
+  },
   component: function component(mdl) {
     return m(_index["default"], {
       mdl: mdl
@@ -2746,6 +2801,9 @@ var Routes = [{
   }
 }, {
   url: "/article/:slug",
+  config: {
+    isAuth: true
+  },
   component: function component(mdl) {
     return m(_index["default"], {
       mdl: mdl
@@ -2755,6 +2813,9 @@ var Routes = [{
   }
 }, {
   url: "/profile/:slug",
+  config: {
+    isAuth: true
+  },
   component: function component(mdl) {
     return m(_index["default"], {
       mdl: mdl
@@ -2765,6 +2826,9 @@ var Routes = [{
   }
 }, {
   url: "/settings/:slug",
+  config: {
+    isAuth: true
+  },
   component: function component(mdl) {
     return m(_index["default"], {
       mdl: mdl
@@ -2775,6 +2839,9 @@ var Routes = [{
   }
 }, {
   url: "/login",
+  config: {
+    isAuth: false
+  },
   component: function component(mdl) {
     return m(_index["default"], {
       mdl: mdl
@@ -2784,6 +2851,9 @@ var Routes = [{
   }
 }, {
   url: "/register",
+  config: {
+    isAuth: false
+  },
   component: function component(mdl) {
     return m(_index["default"], {
       mdl: mdl

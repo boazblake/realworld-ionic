@@ -1,5 +1,5 @@
 import App from "./app.js"
-import model from "./model.js"
+import BaseModel from "./model.js"
 
 const root = document.body
 let winW = window.innerWidth
@@ -32,6 +32,8 @@ const getProfile = (w) => {
   return "desktop"
 }
 
+const model = BaseModel()
+
 const checkWidth = (winW) => {
   const w = window.innerWidth
   if (winW !== w) {
@@ -47,8 +49,8 @@ model.settings.profile = getProfile(winW)
 
 checkWidth(winW)
 
-if (sessionStorage.getItem("user")) {
-  model.user = JSON.parse(sessionStorage.getItem("user"))
+if (localStorage.getItem("user")) {
+  model.user = JSON.parse(localStorage.getItem("user"))
 }
 
 m.route(root, "/home", App(model))

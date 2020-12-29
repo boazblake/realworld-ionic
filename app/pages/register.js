@@ -19,8 +19,8 @@ const Register = () => {
     state.disabled = true
     const onSuccess = ({ user }) => {
       mdl.user = user
-      sessionStorage.setItem("token", `Token ${user.token}`)
-      sessionStorage.setItem("user", JSON.stringify(user))
+      localStorage.setItem("token", `Token ${user.token}`)
+      localStorage.setItem("user", JSON.stringify(user))
       state.disabled = false
       m.route.set("/home")
       console.log("success", user)

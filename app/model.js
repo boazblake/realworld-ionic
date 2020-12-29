@@ -1,13 +1,13 @@
 import Routes from "./routes"
 
-const model = {
+const BaseModel = () => ({
   menus: ["settings", "options"],
   menu: { title: "", side: "", menuId: "", contentId: "", contents: null },
   Routes,
   state: {
     isLoading: false,
     loadingProgress: { max: 0, value: 0 },
-    isLoggedIn: () => sessionStorage.getItem("token"),
+    isLoggedIn: () => localStorage.getItem("token"),
   },
   settings: {},
   page: "",
@@ -18,6 +18,6 @@ const model = {
     status: null,
     msg: null,
   },
-}
+})
 
-export default model
+export default BaseModel

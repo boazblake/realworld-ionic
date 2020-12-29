@@ -44,8 +44,8 @@ export const parseHttpSuccess = (mdl) => (res) => (data) => {
 }
 
 const getUserToken = () =>
-  sessionStorage.getItem("token")
-    ? { authorization: sessionStorage.getItem("token") }
+  localStorage.getItem("token")
+    ? { authorization: localStorage.getItem("token") }
     : ""
 
 const call = (_headers) => (method) => (mdl) => (url) => (body) => {

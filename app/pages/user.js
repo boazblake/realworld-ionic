@@ -1,8 +1,10 @@
 import Http from "Http"
 import { log } from "Utils"
+import BaseModel from "../model"
 
-const logout = () => {
-  sessionStorage.clear()
+const logout = (mdl) => {
+  localStorage.clear()
+  mdl = BaseModel()
   m.route.set("/home")
 }
 
@@ -18,7 +20,7 @@ const User = ({
   let data = { image, username, password, bio, email }
   const submit = (mdl, data) => {
     const onSuccess = ({ user }) => {
-      sessionStorage.setItem("user", JSON.stringify(user))
+      localStorage.setItem("user", JSON.stringify(user))
       mdl.user = user
       console.log(mdl.user)
       m.route.set("/home")
