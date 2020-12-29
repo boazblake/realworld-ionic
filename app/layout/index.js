@@ -6,14 +6,10 @@ const Layout = () => {
   return {
     view: ({ children, attrs: { mdl } }) =>
       m(
-        "ion-app",
+        "ion-app.ion-page",
         m(Header, { mdl }),
         m(SideBar, { mdl }),
-        m(
-          "ion-content.ion-page",
-          { id: "layout", contentId: "layout" },
-          children
-        ),
+        m("ion-content", { id: "layout", contentId: "layout" }, children),
         mdl.toast.msg && m(Toaster, { mdl }),
         m(Footer, { mdl })
       ),
