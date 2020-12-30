@@ -10,7 +10,8 @@ const Header = () => {
           mdl.state.isLoggedIn()
             ? [
                 m.route.get() !== "/home" &&
-                  m("ion-buttons", { slot: "start" }, [
+                  m(
+                    "ion-buttons",
                     m("ion-back-button", {
                       slot: "start",
                       onclick: (e) => {
@@ -19,8 +20,11 @@ const Header = () => {
                       },
                       defaultHref: "/",
                     }),
-                    m(m.route.Link, { href: "#" }, "Home"),
-                  ]),
+                    m(
+                      "ion-title.ion-align-center",
+                      m(m.route.Link, { href: "#" }, "Home")
+                    )
+                  ),
                 m(
                   "ion-buttons",
                   { slot: "end" },
