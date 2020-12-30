@@ -6,7 +6,6 @@ const logout = (mdl) => {
   localStorage.clear()
   mdl = BaseModel()
   m.redraw()
-  // console.log("LOGOUT", mdl, mdl.state.isLoggedIn())
   m.route.set("/home")
 }
 

@@ -1,1 +1,2964 @@
-!function(){"use strict";var e="undefined"==typeof global?self:global;if("function"!=typeof e.require){var t={},n={},r={},o={}.hasOwnProperty,i=/^\.\.?(\/|$)/,u=function(e,t){for(var n,r=[],o=(i.test(t)?e+"/"+t:t).split("/"),u=0,a=o.length;u<a;u++)".."===(n=o[u])?r.pop():"."!==n&&""!==n&&r.push(n);return r.join("/")},a=function(e){return e.split("/").slice(0,-1).join("/")},s=function(t,r){var o,i={id:t,exports:{},hot:m&&m.createHot(t)};return n[t]=i,r(i.exports,(o=t,function(t){var n=u(a(o),t);return e.require(n,o)}),i),i.exports},c=function(e){var t=r[e];return t&&e!==t?c(t):e},l=function(e,r){null==r&&(r="/");var i=c(e);if(o.call(n,i))return n[i].exports;if(o.call(t,i))return s(i,t[i]);throw new Error("Cannot find module '"+e+"' from '"+r+"'")};l.alias=function(e,t){r[t]=e};var f=/\.[^.\/]+$/,d=/\/index(\.[^\/]+)?$/;l.register=l.define=function(e,i){if(e&&"object"==typeof e)for(var u in e)o.call(e,u)&&l.register(u,e[u]);else t[e]=i,delete n[e],function(e){if(f.test(e)){var t=e.replace(f,"");o.call(r,t)&&r[t].replace(f,"")!==t+"/index"||(r[t]=e)}if(d.test(e)){var n=e.replace(d,"");o.call(r,n)||(r[n]=e)}}(e)},l.list=function(){var e=[];for(var n in t)o.call(t,n)&&e.push(n);return e};var m=e._hmr&&new e._hmr((function(e,t){return c(u(a(e),t))}),l,t,n);l._cache=n,l.hmr=m&&m.wrap,l.brunch=!0,e.require=l}}(),function(){"undefined"==typeof window||window;require.register("Http.js",(function(e,t,n){"use strict";function r(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),n.push.apply(n,r)}return n}function o(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?r(Object(n),!0).forEach((function(t){i(e,t,n[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):r(Object(n)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))}))}return e}function i(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}Object.defineProperty(e,"__esModule",{value:!0}),e.default=e.parseHttpSuccess=e.parseHttpError=void 0;function u(){return!1}var a=function(e){return{config:function(t){t.onprogress=function(e){return function(t){t.lengthComputable&&(e.state.loadingProgress.max=t.total,e.state.loadingProgress.value=t.loaded,m.redraw())}}(e),t.onload=u,t.onloadstart=function(e){return function(t){return e.state.isLoading=!0,!1}}(e),t.onloadend=function(e){return function(t){return e.state.isLoading=!1,e.state.loadingProgress.max=0,e.state.loadingProgress.value=0,!1}}(e)}}},s=function(e){return function(t){return function(n){return e.state.isLoading=!1,t(n.response.errors)}}};e.parseHttpError=s;var c=function(e){return function(t){return function(n){return e.state.isLoading=!1,t(n)}}};e.parseHttpSuccess=c;var l=function(){return localStorage.getItem("token")?{authorization:localStorage.getItem("token")}:""},f=function(e){return function(t){return function(n){return function(r){return function(i){return!["POST","PUT","DELETE"].includes(t)||n.state.isLoggedIn("http-call")||["/login","/register"].includes(n.slug)?(n.state.isLoading=!0,new Task((function(u,l){return m.request(o({method:t,url:"https://conduit.productionready.io/api/"+r,headers:o({"content-type":"application/json"},e),body:i,withCredentials:!1},a(n))).then(c(n)(l),s(n)(u))}))):Task.rejected(m.route.set("/register"))}}}}},d={getTask:function(e){return function(t){return f(l())("GET")(e)(t)(null)}},deleteTask:function(e){return function(t){return f(l())("DELETE")(e)(t)(null)}},postTask:function(e){return function(t){return function(n){return f(l())("POST")(e)(t)(n)}}},putTask:function(e){return function(t){return function(n){return f(l())("PUT")(e)(t)(n)}}}};e.default=d})),require.register("Utils.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.errorViewModel=e.sanitizeImg=e.log=void 0;e.log=function(e){return function(t){return console.log(e,t),t}};e.sanitizeImg=function(e){return e&&e.match(/\.(jpeg|jpg|gif|png|svg)$/)?function(e){return e.match(/(https)./)?e:e.replace("http","https")}(e):"https://static.productionready.io/images/smiley-cyrus.jpg"};e.errorViewModel=function(e){return Object.keys(e).map((function(t){return{key:t.toUpperCase(),errors:e[t]}}))}})),require.register("app.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var r=function(e){return e.Routes.reduce(function(e){return function(t,n){var r=n.url.includes(":slug")?e.state.isLoggedIn("MATCHER")?function(t){var n=t.slug;e.slug=n}:function(){return m.route.set("/login")}:function(t,n){e.slug=n};return t[n.url]={onmatch:r,render:function(){return n.config.isAuth?e.state.isLoggedIn("RENDERER")?n.component(e):m.route.set("/login"):n.component(e)}},t}}(e),{})};e.default=r})),require.register("components/articles.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Articles=void 0;var r,o=(r=t("Http"))&&r.__esModule?r:{default:r},i=t("Utils");var u=function(e){return"articles/".concat(e,"/favorite")},a=function(e){return function(t){return function(n){return e.postTask(t)(u(n))()}}},s=function(e){return function(t){return function(n){return e.deleteTask(t)(u(n))}}},c=function(e){var t=e.attrs,n=t.mdl,r=t.article;return{view:function(){return m("ion-item",{button:!0},m("ion-grid",[m("ion-row.ion-justify-content-between.ion-align-items-end",m("ion-col",m(m.route.Link,{class:"preview-link",href:"/article/".concat(r.slug)},m("ion-text",m("h1",r.title)),m("ion-text",m("p",r.description))))),m("ion-row",m("ion-col",m("ion-list",{side:"end"},r.tagList.map((function(e){return m("ion-chip",e)}))))),m("ion-row.ion-justify-content-between.ion-align-items-end",[m(m.route.Link,{href:"/profile/".concat(r.author.username),options:{replace:!0}},m("ion-avatar",{slot:"start"},m("img",{src:(0,i.sanitizeImg)(r.author.image)}))),m("ion-label",m("ion-text",m("h2",r.author.username)),m("p",r.createdAt)),m("ion-chip",{onclick:function(e){return t=r.favorited,u=r.slug,c=(0,i.log)("toggleArticleLike err-art"),void(t?s:a)(o.default)(n)(u).fork(c,(function(e){var t=e.article,n=t.favorited,o=t.favoritesCount;r.favorited=n,r.favoritesCount=o}));var t,u,c}},[m("ion-icon",{name:r.favorited?"heart-dislike-outline":"heart-outline"}),m("ion-text",r.favoritesCount)])])]))}}};e.Articles=function(){return{view:function(e){var t=e.attrs,n=t.mdl,r=t.data;return r.articles.length?m("ion-list",{button:!0},r.articles.map((function(e){return m(c,{mdl:n,data:r,article:e})}))):m("p","No articles are here... yet.")}}}})),require.register("components/card.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Card=void 0;var r={view:function(e){var t=e.attrs,n=t.options,r=t.header,o=t.content,i=t.footer;return m("ion-card",n,m("ion-card-header",{translucent:!0},r),m("ion-card-content",o),m("ion-card-footer",i))}};e.Card=r})),require.register("components/comments.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Comments=void 0;var r=a(t("Http")),o=t("Utils"),i=t("ramda"),u=a(t("dayjs"));function a(e){return e&&e.__esModule?e:{default:e}}var s=(0,i.over)((0,i.lensProp)("body"),i.trim),c=function(e){var t=e.author,n=e.body,r=e.id,o=e.createdAt;return{author:t,body:n,id:r,date:(0,u.default)().format("MM/DD/YYYY HH:mm",o)}},l=function(e){return function(t){return function(n){return e.getTask(t)("articles/".concat(n,"/comments")).map((0,i.prop)("comments")).map((0,i.map)(c))}}},f=function(e){var t=e.attrs,n=t.mdl,i=t.reload,u={body:""},a={errors:[],disabled:!1},c=function(e){a.errors=(0,o.errorViewModel)(e),console.log("Error with form ",a),a.disabled=!1},l=function(){u.body="",a.errors=[],a.disabled=!1,i()},f=function(e){return(t=r.default,function(e){return function(n){return t.postTask(e)("articles/".concat(e.slug,"/comments"))({comment:n})}})(n)(s(e)).fork(c,l);var t};return{oninit:function(){return u.body=""},view:function(e){var t=e.attrs.mdl;return[m("ion-grid",m("ion-row.ion-justify-content-between.ion-align-items-end",m("ion-col",m("ion-textarea",{rows:3,placeholder:"Write a comment ...",onchange:function(e){return u.body=e.target.value},disabled:a.disabled,value:u.body}))),m("ion-row.ion-justify-content-between.ion-align-items-end",m("ion-col",m("ion-avatar",m("img",{src:(0,o.sanitizeImg)(t.user.image)}))),m("ion-col",m("ion-button",{onclick:function(e){a.disabled=!0,f(u)}}," Post Comment ")))),a.errors.map((function(e){return e.values.map((function(t){return m("p.error-messages","".concat(e.key," ").concat(t))}))}))]}}},d=function(){return{view:function(e){var t=e.attrs,n=t.mdl,r=t.comment,i=r.author,u=i.image,a=i.username,s=r.body,c=r.date,l=r.id,f=t.deleteComment;return m("ion-item",m("ion-grid",m("ion-text",s),m("ion-row.ion-justify-content-between.ion-align-items-end",m(m.route.Link,{href:"/profile/".concat(a),class:"comment-author m-5"},m("ion-avatar",m("img",{src:(0,o.sanitizeImg)(u)})),m("ion-text",a)),m("ion-text",c),a==n.user.username&&m("ion-icon",{name:"trash-outline",onclick:function(e){return f(l)}}))))}}};e.Comments=function(e){var t=e.attrs.mdl,n={comments:[]},i=function(e){var t=(0,o.log)("error with comments");l(r.default)(e)(e.slug).fork(t,(function(e){return n.comments=e}))},u=function(e){var i,u=(0,o.log)("error with comments");(i=r.default,function(e){return function(t){return function(n){return i.deleteTask(e)("articles/".concat(t,"/comments/").concat(n))}}})(t)(t.slug)(e).chain((function(e){return l(r.default)(t)(t.slug)})).fork(u,(function(e){return n.comments=e}))};return{oninit:function(e){var t=e.attrs.mdl;return i(t)},view:function(e){var t=e.attrs.mdl;return m("item-list",m(f,{mdl:t,reload:function(){return i(t)}}),n.comments.map((function(e){return m(d,{mdl:t,comment:e,deleteComment:function(e){return u(e)}})})))}}}})),require.register("components/component.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Component=void 0;e.Component=function(){return{view:function(){return m("")}}}})),require.register("components/dark-mode-toggle.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.DarkModeToggle=void 0;e.DarkModeToggle=function(){return{view:function(e){var t=e.attrs.mdl;return m("ion-item",t.state.darkmode&&m("ion-label",m("ion-icon",{name:"sunny-outline"})),m("ion-toggle",{onclick:function(e){t.state.darkmode=!t.state.darkmode,document.body.classList.toggle("dark"),window.matchMedia("(prefers-color-scheme: dark)")}}),!t.state.darkmode&&m("ion-label",m("ion-icon",{name:"moon-outline"})))}}}})),require.register("components/feed-nav.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.FeedNav=void 0;e.FeedNav=function(e){var t=e.attrs.fetchData;return{view:function(e){var n=e.attrs,r=n.mdl,o=n.data;return[m("ion-toolbar",m("ion-row",m("ion-col",m("ion-button",{fill:"solid",expand:"full",id:"",color:""==o.tags.current?"primary":"secondary",onclick:function(e){o.tags.current=e.target.id,t(r)}},"Global Feed")),r.state.isLoggedIn("feed-nav")&&m("ion-col",m("ion-button",{fill:"solid",expand:"full",id:"feed",color:"feed"==o.tags.current?"primary":"secondary",onclick:function(e){o.tags.current=e.target.id,t(r)}},"Your Feed"))),m("ion-row",m("ion-col",o.tags.selected.map((function(e){return m("ion-button",{fill:"solid",size:"small",color:o.tags.current==e?"primary":"secondary",id:e,onclick:function(n){o.tags.current=e,t(r)}},m("ion-text","# ".concat(e)))})))))]}}}})),require.register("components/follow-favorite.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.FollowFavorite=void 0;var r,o=(r=t("Http"))&&r.__esModule?r:{default:r},i=t("Utils");var u=function(e){return"articles/".concat(e,"/favorite")},a=function(e){return"profiles/".concat(e,"/follow")},s=function(e){return function(t){return e.postTask(t)(u(t.slug))()}},c=function(e){return function(t){return e.deleteTask(t)(u(t.slug))}},l=function(e){return function(t){return function(n){return e.postTask(t)(a(n))()}}},f=function(e){return function(t){return function(n){return e.deleteTask(t)(a(n))}}};e.FollowFavorite=function(e){var t=e.attrs,n=t.mdl,r=t.data,u=function(e){var t=e.favorited,u=(0,i.log)("toggleArticleLike err-art");(t?c:s)(o.default)(n).fork(u,(function(e){var t=e.article,n=t.favorited,o=t.favoritesCount;r.favorited=n,r.favoritesCount=o}))},a=function(e){var t=e.author,u=t.username,a=t.following,s=(0,i.log)("toggleAuthorFollow, err-auth");(a?f:l)(o.default)(n)(u).fork(s,(function(e){var t=e.profile.following;return r.author.following=t}))},d=function(e){var t,r=(0,i.log)("deleteArticle, err-auth");(t=o.default,function(e){return t.deleteTask(e)((n=e.slug,"articles/".concat(n)));var n})(n).fork(r,(function(e){console.log(e),m.route.set("/home")}))};return{view:function(e){var t=e.attrs,n=t.mdl,o=t.data,s=o.author,c=s.username,l=s.image,f=s.following,g=o.favoritesCount,p=o.favorited,v=o.slug;return m("ion-grid",m("ion-row",[m(m.route.Link,{href:"profile/".concat(c)},m("ion-chip",m("ion-avatar",m("ion-img",{src:(0,i.sanitizeImg)(l)})),m("ion-text",c))),n.user.username==c?[m(m.route.Link,{class:"btn btn-sm btn-outline-secondary",href:"/editor/".concat(v),selector:"button"},[m("ion-icon",{name:"edit"}),"Edit Article"]),m("ion-button",{onclick:function(e){return d()}},[m("ion-icon",{name:"trash-outline"}),"Delete Article "])]:[m("ion-chip",{onclick:function(e){return a(r)}},[m("ion-icon",{name:f?"people-circle-outline":"people-outline"}),m("ion-label","".concat(c))]),m("ion-chip",{onclick:function(e){return u(r)}},[m("ion-icon",{name:p?"heart-dislike-outline":"heart-outline"}),m("ion-label",g)])]]))}}}})),require.register("components/form-errors.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.FormErrors=void 0;e.FormErrors=function(){return{view:function(e){return e.attrs.errors.map((function(e){var t=e.key,n=e.errors;return m(".error-messages",m("ion-list",m("ion-label",{color:"danger"},"".concat(t)),m("ion-list",n.map((function(e){return m("ion-item",{color:"danger"},e)})))))}))}}}})),require.register("components/index.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var r=t("./loader");Object.keys(r).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===r[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return r[t]}}))}));var o=t("./paginator");Object.keys(o).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===o[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return o[t]}}))}));var i=t("./articles");Object.keys(i).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===i[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return i[t]}}))}));var u=t("./follow-favorite");Object.keys(u).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===u[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return u[t]}}))}));var a=t("./comments");Object.keys(a).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===a[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return a[t]}}))}));var s=t("./feed-nav");Object.keys(s).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===s[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return s[t]}}))}));var c=t("./taglist");Object.keys(c).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===c[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return c[t]}}))}));var l=t("./card");Object.keys(l).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===l[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return l[t]}}))}));var f=t("./menu");Object.keys(f).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===f[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return f[t]}}))}));var d=t("./sidebars");Object.keys(d).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===d[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return d[t]}}))}));var m=t("./toaster");Object.keys(m).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===m[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return m[t]}}))}));var g=t("./form-errors");Object.keys(g).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===g[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return g[t]}}))}));var p=t("./profile-link");Object.keys(p).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===p[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return p[t]}}))}));var v=t("./dark-mode-toggle");Object.keys(v).forEach((function(t){"default"!==t&&"__esModule"!==t&&(t in e&&e[t]===v[t]||Object.defineProperty(e,t,{enumerable:!0,get:function(){return v[t]}}))}))})),require.register("components/loader.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Loader=void 0;e.Loader=function(){return{view:function(e){var t=e.attrs,n=t.name,r=t.duration;return m("ion-spinner.spinner",{duration:r||2e3,name:n||"crescent"})}}}})),require.register("components/menu.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Menu=e.MenuToggle=void 0;var r=t("@ionic/core");e.MenuToggle=function(e){var t=e.attrs,n=(t.mdl,t.side),o=t.contents,i=(t.eHandler,t.sHandler,function(){r.menuController.enable(!0,n).then(r.menuController.toggle(n)).then((function(e){return console.log("?menutoggle s",e)}),(function(e){return console.log("menutoggle e",e)}))});return{view:function(){return m("ion-menu-toggle",{onclick:function(){return i}},o)}}};e.Menu=function(){return{view:function(e){var t=e.attrs,n=t.header,r=t.title,o=t.contentId,i=t.contents;return m("ion-menu[type='push']",{contentId:o},[n&&n,r&&m("ion-header",m("ion-toolbar",m("ion-title",r))),m("ion-content",i)])}}}})),require.register("components/paginator.js",(function(e,t,n){"use strict";function r(e){return function(e){if(Array.isArray(e))return o(e)}(e)||function(e){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e))return Array.from(e)}(e)||function(e,t){if(!e)return;if("string"==typeof e)return o(e,t);var n=Object.prototype.toString.call(e).slice(8,-1);"Object"===n&&e.constructor&&(n=e.constructor.name);if("Map"===n||"Set"===n)return Array.from(e);if("Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return o(e,t)}(e)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function o(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,r=new Array(t);n<t;n++)r[n]=e[n];return r}Object.defineProperty(e,"__esModule",{value:!0}),e.Paginator=void 0;e.Paginator=function(){return{view:function(e){var t=e.attrs,n=t.state,o=t.fetchDataFor,i=Math.ceil(n.total/n.limit)+1,u=n.offset/n.limit+1,a=r(Array(i).keys()).slice(1);return n.total>n.limit&&a.map((function(e,t){return m("ion-chip",{color:e==u&&"primary",onclick:function(e){return o(t*n.limit)}},e)}))}}}})),require.register("components/profile-link.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.ProfileLink=void 0;var r=t("Utils"),o=t("components");e.ProfileLink=function(){return{view:function(e){var t=e.attrs.mdl;return m(o.MenuToggle,{side:"start",contents:m("ion-grid",{onclick:function(e){return function(e){return m.route.set("/profile/".concat(e.user.username))}(t)}},m("a",m("ion-row.ion-justify-content-evenly.ion-align-items-end",m("ion-avatar",m("ion-img",{src:(0,r.sanitizeImg)(t.user.image)})),m("ion-text",m("h1","".concat(t.user.username))))))})}}}})),require.register("components/sidebars.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.SideBar=void 0;var r,o=t("./menu"),i=t("components"),u=(r=t("../model"))&&r.__esModule?r:{default:r};var a=function(){return{view:function(e){var t=e.attrs,n=t.mdl;t.side;return m("ion-list",[m("ion-item",m(i.MenuToggle,{mdl:n,side:"start",contents:m("ion-button",{color:"danger",onclick:function(){return localStorage.clear(),(0,u.default)(),m.redraw(),void m.route.set("/home")}},"logout")}),m(i.MenuToggle,{mdl:n,side:"start",contents:m("ion-button",{color:"warning",onclick:function(e){return m.route.set("/settings/".concat(n.user.username))}},m("ion-icon",{name:"settings"}),"Edit")}),m(i.DarkModeToggle,{mdl:n})),m("ion-item",m(i.TagList,{mdl:n}))])}}};e.SideBar=function(){return{view:function(e){var t=e.attrs.mdl;return m(o.Menu,{mdl:t,visibile:!0,side:"start",menuId:"options",contentId:"layout",header:m("ion-header",m(i.ProfileLink,{mdl:t})),contents:m(a,{mdl:t,side:"start"})})}}}})),require.register("components/taglist.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.TagList=void 0;var r,o=(r=t("Http"))&&r.__esModule?r:{default:r},i=t("ramda");e.TagList=function(e){var t,n=e.attrs.mdl;return(t=o.default,function(e){return t.getTask(e)("tags")})(n).fork((function(e){}),(function(e){var t=e.tags;n.data.tags.tagList=t})),{view:function(e){e.attrs.data;var t=function(e){return n.data.tags.selected.includes(e)?"primary":"secondary"};return[m("ion-text","Popular Tags"),m("ion-list",n.data.tags.tagList.filter((function(e){return!n.data.tags.selected.includes(e)})).map((function(e){return m("ion-chip",{color:t(e),onclick:function(t){return function(e,t){return n.data.tags.selected=(0,i.uniq)(n.data.tags.selected.concat([t]))}(0,e)}},e)})))]}}}})),require.register("components/toaster.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Toaster=void 0;var r=t("@ionic/core");e.Toaster=function(){return{view:function(e){var t=e.attrs.mdl;return m("ion-toast",{oncreate:function(e){var n=e.dom;r.toastController.create({component:n,message:t.toast.msg,duration:t.toast.duration||2e3,showCloseButton:!0,animated:!0,color:t.toast.status?"success":"danger"}).then((function(e){return e.present()}))}})}}}})),require.register("index.js",(function(e,t,n){"use strict";var r=i(t("./app.js")),o=i(t("./model.js"));function i(e){return e&&e.__esModule?e:{default:e}}var u=document.body,a=window.innerWidth;n.hot&&n.hot.accept(),"serviceWorker"in navigator&&window.addEventListener("load",(function(){navigator.serviceWorker.register("./service-worker.js").then((function(e){console.log("⚙️ SW registered: ",e)})).catch((function(e){console.log("🧟 SW registration failed: ",e)}))}));var s=function(e){return e<668?"phone":e<920?"tablet":"desktop"},c=(0,o.default)();c.settings.profile=s(a),function e(t){var n=window.innerWidth;if(t!==n){t=n;var r=c.settings.profile;c.settings.profile=s(n),r!=c.settings.profile&&m.redraw()}return requestAnimationFrame(e)}(a),localStorage.getItem("user")&&(c.user=JSON.parse(localStorage.getItem("user"))),m.route(u,"/home",(0,r.default)(c))})),require.register("initialize.js",(function(e,t,n){"use strict";document.addEventListener("DOMContentLoaded",(function(){t("./index.js")}))})),require.register("layout/footer.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var r=function(){return{view:function(){return m("ion-footer",m("div",{class:"container"},[m("a",{class:"logo-font",href:"https://github.com/gothinkster/realworld"},"conduit"),m("span",{class:"attribution"},[" An interactive learning project from ",m("a",{href:"https://thinkster.io"},"Thinkster"),". Code ",m.trust("&amp;")," design licensed under MIT. "])]))}}};e.default=r})),require.register("layout/header.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var r=t("components"),o=function(){return{view:function(e){var t=e.attrs.mdl;return m("ion-header",m("ion-toolbar",t.state.isLoggedIn("header")?["/home"!==m.route.get()&&m("ion-buttons",m("ion-back-button",{slot:"start",onclick:function(e){e.preventDefault(),history.back()},defaultHref:"/"}),m("ion-title.ion-align-center",m(m.route.Link,{href:"#"},"Home"))),m("ion-buttons",{slot:"end"},m(r.MenuToggle,{side:"start",mdl:t,eHandler:function(){return""},sHandler:function(){return""},contents:m("ion-button",m("ion-icon",{name:"options"}))}))]:m("ion-item",{slot:"primary",onclick:function(e){return m.route.set("/home")}},[m("ion-text",m("h1","conduit")),m("ion-text",m("p","A place to share your knowledge."))])))}}};e.default=o})),require.register("layout/index.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var r=i(t("./header.js")),o=(i(t("./footer.js")),t("components"));function i(e){return e&&e.__esModule?e:{default:e}}var u=function(){return{view:function(e){var t=e.children,n=e.attrs.mdl;return m("ion-app",m(r.default,{mdl:n}),m(o.SideBar,{mdl:n}),m("ion-content",{id:"layout",contentId:"layout"},t),n.toast.msg&&m(o.Toaster,{mdl:n}))}}};e.default=u})),require.register("layout/info.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var r=function(){return{view:function(){return m("footer",m("div",{class:"container"},[m("a",{class:"logo-font",href:"https://github.com/gothinkster/realworld"},"conduit"),m("span",{class:"attribution"},[" An interactive learning project from ",m("a",{href:"https://thinkster.io"},"Thinkster"),". Code ",m.trust("&amp;")," design licensed under MIT. "])]))}}};e.default=r})),require.register("model.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var r=o(t("./routes"));o(t("mithril-stream"));function o(e){return e&&e.__esModule?e:{default:e}}var i=function(){return{menus:["settings","options"],menu:{title:"",side:"",menuId:"",contentId:"",contents:null},Routes:r.default,state:{darkmode:!1,isLoading:!1,loadingProgress:{max:0,value:0},isLoggedIn:function(e){return!!localStorage.getItem("token")}},settings:{},page:"",user:{},toast:{show:!1,duration:2e3,status:null,msg:null},data:{tags:{tagList:[],selected:[],current:""},articles:{}}}};e.default=i})),require.register("pages/article.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var r=u(t("Http")),o=t("components"),i=u(t("marked"));function u(e){return e&&e.__esModule?e:{default:e}}var a=function(){var e={},t={status:"loading",error:null},n=function(n){var r=n.article,o=n.comments;e.article=r,e.comments=o,t.status="success"},u=function(e){console.log("error",e),t.error=e,t.status="error"},a=function(e){var o;t.status="loading",(o=r.default,function(e){return function(t){return o.getTask(e)("articles/".concat(t))}})(e)(e.slug).fork(u,n)};return{oninit:function(e){var t=e.attrs.mdl;return a(t)},view:function(n){var r=n.attrs.mdl;return["loading"==t.status&&m(o.Loader,m("ion-text",m("h1","Loading ..."))),"error"==t.status&&m("ion-text",{color:"danger"},m("h1","Error Loading Data: ".concat(t.error))),"success"==t.status&&[m("ion-text",m("h1",e.article.title)),m("ion-text",m.trust((0,i.default)(e.article.body))),e.article.tagList.map((function(e){return m("ion-chip",e)})),m(o.FollowFavorite,{mdl:r,data:e.article}),m(o.Comments,{mdl:r,comments:e.comments,reloadArticle:function(){return a(r)}})]]}}};e.default=a})),require.register("pages/editor.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=e.submitArticleTask=e.loadArticleTask=void 0;var r,o=(r=t("Http"))&&r.__esModule?r:{default:r},i=t("Utils"),u=t("components"),a=t("ramda");var s=function(e){return function(t){return function(n){return e.getTask(t)("articles/".concat(n)).map(l)}}};e.loadArticleTask=s;var c=(0,a.over)((0,a.lensProp)("tagList"),(0,a.compose)(a.uniq,(0,a.split)(","),a.trim)),l=(0,a.over)((0,a.lensPath)(["article","tagList"]),(0,a.join)(",")),f=function(e){return function(t){return function(n){return function(r){return r?e.putTask(t)("articles/".concat(t.slug))({article:n}):e.postTask(t)("articles")({article:n})}}}};e.submitArticleTask=f;var d=function(e){var t=e.attrs.mdl,n={description:"",title:"",body:"",tagList:""},r={isEditing:!1,disabled:!1,errors:null,status:"loading"};return{oninit:function(e){return function(e){r.disabled=!1;"/editor"!==e.slug?(r.isEditing=!0,s(o.default)(e)(e.slug).fork((function(e){r.errors=(0,i.errorViewModel)(e)}),(function(e){var t=e.article;console.log("?"),n=t,r.status="success"}))):r.status="success"}(e.attrs.mdl)},view:function(){return m("form","loading"==r.status&&m(u.Loader,{mdl:t}),"error"==r.status&&"Error!","success"==r.status&&[r.errors&&m(u.FormErrors,{mdl:t,errors:r.errors}),m("ion-item",m("ion-label",{position:"stacked"},"Article Title"),m("ion-input",{type:"text",disabled:r.disabled,onchange:function(e){return n.title=e.target.value},value:n.title})),m("ion-item",m("ion-label",{position:"stacked"},"What's this article about?"),m("ion-input",{type:"text",disabled:r.disabled,onchange:function(e){return n.description=e.target.value},value:n.description})),m("ion-item",m("ion-label",{position:"stacked"},"Write your article (in markdown)"),m("ion-textarea",{rows:8,disabled:r.disabled,onchange:function(e){return n.body=e.target.value},value:n.body})),m("ion-item",m("ion-label",{position:"stacked"},"Enter tags"),m("ion-input",{type:"text",disabled:r.disabled,onchange:function(e){return n.tagList=e.target.value},value:n.tagList})),m("ion-button",{onclick:function(e){return function(e){(0,i.log)("data")([e,c(e)]),r.disabled=!0;f(o.default)(t)(c(e))(r.isEditing).fork((function(e){r.errors=(0,i.errorViewModel)(e),r.disabled=!1}),(function(e){var t=e.article.slug;return m.route.set("/article/".concat(t))}))}(n)}},"Publish Article")])}}};e.default=d})),require.register("pages/home.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var r,o=(r=t("Http"))&&r.__esModule?r:{default:r},i=t("components");var u=function(e){return function(t){return function(n){return function(r){return"feed"==r.tags.current?e.getTask(t)("articles/feed?limit=20&offset=".concat(n.offset)):e.getTask(t)("articles?limit=20&offset=".concat(n.offset,"&tag=").concat(r.tags.current))}}}},a=function(){var e={feedStatus:"loading",pageStatus:"loading",limit:20,offset:0,total:0,error:null},t=function(t){e.feedStatus="loading",u(o.default)(t)(e)(t.data).fork((function(t){console.log("error",t),e.error=t,e.feedStatus="error"}),(function(n){var r=n.articles,o=n.articlesCount;t.data.articles=r,e.total=o,e.feedStatus="success"}))};return{oninit:function(t){return function(t){e.pageStatus="loading",u(o.default)(t)(e)(t.data).fork((function(t){console.log("error",t),e.error=t,e.pageStatus="error"}),(function(n){var r=n.articles,o=n.articlesCount;t.data.articles=r,e.total=o,e.pageStatus="success",e.feedStatus="success"}))}(t.attrs.mdl)},view:function(n){var r=n.attrs.mdl;return[m("ion-content",{scroll:!1,id:"profile",contentId:"profile"},[!r.state.isLoggedIn("home")&&"loading"==e.pageStatus||"loading"==e.feedStatus&&m(i.Loader,[m("h1.logo-font","Loading Data")]),"error"==e.pageStatus&&m("ion-text",{color:"earning"},m("h1","Error Loading Data: ".concat(e.error))),"success"==e.pageStatus&&[m("ion-list-header",m(i.FeedNav,{fetchData:t,mdl:r,data:r.data})),"success"==e.feedStatus&&e.total&&[m("ion-scroll",m(i.Articles,{mdl:r,data:r.data})),m(i.Paginator,{mdl:r,state:e,fetchDataFor:function(n){e.offset=n,t(r)}})],"success"==e.feedStatus&&!e.total&&m("ion-text","No articles are here... yet."),r.state.isLoggedIn("home")&&m("ion-fab",{style:{padding:"0 50px 40px 0"},vertical:"bottom",horizontal:"end",slot:"fixed"},m(m.route.Link,{class:"nav-link",href:"/editor"},[m("ion-fab-button",m("ion-icon",{name:"add-circle"}))]))]])]}}};e.default=a})),require.register("pages/login.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=e.loginTask=void 0;var r,o=(r=t("Http"))&&r.__esModule?r:{default:r},i=t("Utils"),u=t("components");var a=function(e){return function(t){return function(n){return e.postTask(t)("users/login")({user:n})}}};e.loginTask=a;var s=function(){var e={errors:null,disabled:!1},t={email:"",password:""};return{view:function(n){var r=n.attrs.mdl;return m("form",[m("ion-text",m("h1","Login")),e.errors&&m(u.FormErrors,{mdl:r,errors:e.errors}),m("ion-input",{type:"text",disabled:e.disabled,placeholder:"email",onchange:function(e){return t.email=e.target.value},value:t.email,onblur:function(t){return e.isSubmitted&&validate}}),m("ion-input",{type:"password",disabled:e.disabled,placeholder:"password",onchange:function(e){return t.password=e.target.value},value:t.password,onblur:function(t){return e.isSubmitted&&validate}}),m("ion-button",{onclick:function(n){return function(n,r){r.preventDefault(),e.disabled=!0;a(o.default)(n)(t).fork((function(t){e.disabled=!1,e.errors=(0,i.errorViewModel)(t)}),(function(t){var r=t.user;localStorage.setItem("token","Token ".concat(r.token)),localStorage.setItem("user",JSON.stringify(r)),n.user=r,e.disabled=!1,m.route.set("/home")}))}(r,n)}},"Login"),m("ion-link",m(m.route.Link,{href:"/register"},m("ion-label","Need an Account?")))])}}};e.default=s})),require.register("pages/profile.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=e.loadInitDataTask=e.loadDataTask=void 0;var r,o=(r=t("Http"))&&r.__esModule?r:{default:r},i=t("Utils"),u=t("components");function a(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),n.push.apply(n,r)}return n}function s(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?a(Object(n),!0).forEach((function(t){c(e,t,n[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):a(Object(n)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))}))}return e}function c(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}var l=function(e){return"profiles/".concat(e,"/follow")},f=function(e){return function(t){return function(n){return e.postTask(t)(l(n))()}}},d=function(e){return function(t){return function(n){return e.deleteTask(t)(l(n))}}},g=function(e){return function(t){return function(n){return function(r){return e.getTask(t)("articles?limit=".concat(n.limit,"&offset=").concat(n.offset,"&author=").concat(r))}}}},p=function(e){return function(t){return function(n){return n.showFaveArticles?function(e){return function(t){return function(n){return function(r){return e.getTask(t)("articles?limit=".concat(n.limit,"&offset=").concat(n.offset,"&favorited=").concat(r))}}}}(e)(t)(n)(t.slug):g(e)(t)(n)(t.slug)}}};e.loadDataTask=p;var v=function(e){return function(t){return function(n){return Task.of((function(e){return function(t){return s(s({},e),{},{authorArticles:t})}})).ap(function(e){return function(t){return function(n){return e.getTask(t)("profiles/".concat(n))}}}(e)(t)(t.slug)).ap(g(e)(t)(n)(t.slug))}}};e.loadInitDataTask=v;var b=function(e){var t=e.attrs.mdl,n={authorArticles:{articles:[],articlesCount:0},authorFavoriteArticles:{articles:[],articlesCount:0}},r={pageStatus:"loading",feedStatus:"loading",showFaveArticles:!1,limit:5,offset:0,total:0,error:null},a=function(e){r.feedStatus="loading",p(o.default)(e)(r).fork((function(e){console.log("error",e),r.error=e,r.feedStatus="error"}),(function(e){r.showFaveArticles?n.authorFavoriteArticles=e:n.authorArticles=e,r.total=r.showFaveArticles?n.authorFavoriteArticles.articlesCount:n.authorArticles.articlesCount,r.feedStatus="success"}))},s=function(e){r.showFaveArticles=e,r.offset=0,a(t)},c=function(e){var r=e.author,u=r.username,a=r.following,s=(0,i.log)("toggleAuthorFollow, err-auth");(a?d:f)(o.default)(t)(u).fork(s,(function(e){var t=e.profile.following;return n.profile.following=t}))};return{oninit:function(e){return function(e){r.pageStatus="loading",v(o.default)(e)(r).fork((function(e){console.log("error",e),r.error=e,r.pageStatus="error",m.route.set("/home")}),(function(e){var t=e.authorArticles,o=e.profile;n.authorArticles=t,n.profile=o,r.pageStatus="success",r.feedStatus="success",r.total=n.authorArticles.articlesCount}))}(e.attrs.mdl)},view:function(e){var t=e.attrs.mdl;return["loading"==r.pageStatus&&m(u.Loader,[m("h1.logo-font","Loading ...")]),"error"==r.pageStatus&&m(u.Banner,[m("h1.logo-font","Error Loading Data: ".concat(r.error))]),"success"==r.pageStatus&&[m("ion-grid",m("ion-row",m("ion-col",m("ion-img",{src:(0,i.sanitizeImg)(n.profile.image)}),m("ion-text",m("h4",n.profile.username)),m("ion-text",m("p",n.profile.bio)),n.profile.username!==t.user.username?m("ion-chip",{onclick:function(e){return c({author:{username:n.profile.username,following:n.profile.following}})}},m("ion-icon",{name:n.profile.following?"people-circle-outline":"people-outline"}),m("ion-label","".concat(n.profile.username))):m("ion-chip",{onclick:function(e){return m.route.set("/settings/".concat(n.profile.username))}},m("ion-icon",{name:"settings"}),m("ion-label","Edit Profile Settings"))))),m("ion-list",m("ion-button",{color:r.showFaveArticles?"secondary":"primary",onclick:function(e){return s(!1)}},"Written Articles"),m("ion-button",{color:r.showFaveArticles?"primary":"secondary",onclick:function(e){return s(!0)}},"Favorited Articles")),"loading"==r.feedStatus&&"Loading Articles...","error"==r.feedStatus&&m("ion-text",{color:"warning"},[m("h1","Error Loading Data: ".concat(r.error))]),"success"==r.feedStatus&&[r.showFaveArticles?m(u.Articles,{mdl:t,data:n.authorFavoriteArticles}):m(u.Articles,{mdl:t,data:n.authorArticles}),m(u.Paginator,{mdl:t,state:r,fetchDataFor:function(e){r.offset=e,a(t)}})]]]}}};e.default=b})),require.register("pages/register.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var r,o=(r=t("Http"))&&r.__esModule?r:{default:r},i=t("Utils"),u=t("components");var a=function(){var e={errors:null,disabled:!1},t={username:"",email:"",password:""};return{view:function(n){var r=n.attrs.mdl;return m("form",[m("ion-text",m("h1","Sign Up")),e.errors&&m(u.FormErrors,{mdl:r,errors:e.errors}),m("ion-input",{type:"text",disabled:e.disabled,placeholder:"Your Name",onchange:function(e){return t.username=e.target.value},value:t.username}),m("ion-input",{type:"text",disabled:e.disabled,placeholder:"email",onchange:function(e){return t.email=e.target.value},value:t.email}),m("ion-input",{type:"password",disabled:e.disabled,placeholder:"password",onchange:function(e){return t.password=e.target.value},value:t.password}),m("ion-button",{onclick:function(n){return function(n,r){r.preventDefault(),console.log(n),e.disabled=!0;var u;e.isSubmitted=!0,(u=o.default,function(e){return function(t){return u.postTask(e)("users")({user:t})}})(n)(t).fork((function(t){e.disabled=!1,e.errors=(0,i.errorViewModel)(t)}),(function(t){var r=t.user;n.user=r,localStorage.setItem("token","Token ".concat(r.token)),localStorage.setItem("user",JSON.stringify(r)),e.disabled=!1,m.route.set("/home"),console.log("success",r)}))}(r,n)}},"Sign Up"),m("ion-link",m(m.route.Link,{href:"/login"},m("ion-label","Have an account?")))])}}};e.default=a})),require.register("pages/user.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var r,o=(r=t("Http"))&&r.__esModule?r:{default:r},i=t("Utils");var u=function(e){var t=e.attrs.mdl.user,n={image:t.image,username:t.username,password:t.password,bio:t.bio,email:t.email};return{view:function(e){var t=e.attrs.mdl;return m("form",m("ion-text",m("h1","Your Settings")),m("ion-item",m("ion-label",{position:"stacked"},"URL of profile picture"),m("ion-input",{type:"text",placeholder:"URL of profile picture",onchange:function(e){return n.image=e.target.value},value:n.image})),m("ion-item",m("ion-label",{position:"stacked"},"Your Name"),m("ion-input",{type:"text",placeholder:"Your Name",onchange:function(e){return n.username=e.target.value},value:n.username})),m("ion-item",m("ion-label",{position:"stacked"},"Short bio about you"),m("ion-textarea",{placeholder:"Short bio about you",onchange:function(e){return n.bio=e.target.value},value:n.bio})),m("ion-item",m("ion-label",{position:"stacked"},"Email"),m("ion-input",{type:"text",placeholder:"Email",onchange:function(e){return n.email=e.target.value},value:n.email})),m("ion-item",m("ion-label",{position:"stacked"},"Password"),m("ion-input",{type:"password",placeholder:"Password",onchange:function(e){return n.password=e.target.value},value:n.password})),m("ion-button",{onclick:function(e){return function(e,t){var n,r=(0,i.log)("error");(n=o.default,function(e){return function(t){return n.putTask(e)("user")(t)}})(e)(t).fork(r,(function(t){var n=t.user;localStorage.setItem("user",JSON.stringify(n)),e.user=n,console.log(e.user),m.route.set("/home")}))}(t,n)}}," Update Settings "))}}};e.default=u})),require.register("routes.js",(function(e,t,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0;var r=f(t("./layout/index")),o=f(t("./pages/home")),i=f(t("./pages/article")),u=f(t("./pages/profile")),a=f(t("./pages/register")),s=f(t("./pages/login")),c=f(t("./pages/user")),l=f(t("./pages/editor"));function f(e){return e&&e.__esModule?e:{default:e}}var d=[{url:"/home",config:{isAuth:!1},component:function(e){return m(r.default,{mdl:e},m(o.default,{mdl:e}))}},{url:"/editor",config:{isAuth:!0},component:function(e){return m(r.default,{mdl:e},m(l.default,{mdl:e,key:e.slug}))}},{url:"/editor/:slug",config:{isAuth:!0},component:function(e){return m(r.default,{mdl:e},m(l.default,{mdl:e}))}},{url:"/article/:slug",config:{isAuth:!0},component:function(e){return m(r.default,{mdl:e},m(i.default,{mdl:e}))}},{url:"/profile/:slug",config:{isAuth:!0},component:function(e){return m(r.default,{mdl:e},m(u.default,{mdl:e,key:e.slug}))}},{url:"/settings/:slug",config:{isAuth:!0},component:function(e){return m(r.default,{mdl:e},m(c.default,{mdl:e,key:e.slug}))}},{url:"/login",config:{isAuth:!1},component:function(e){return m(r.default,{mdl:e},m(s.default,{mdl:e}))}},{url:"/register",config:{isAuth:!1},component:function(e){return m(r.default,{mdl:e},m(a.default,{mdl:e}))}}];e.default=d})),require.alias("process/browser.js","process"),require("process"),require.register("___globals___",(function(e,t,n){window.m=t("mithril"),window.Task=t("data.task")}))}(),require("___globals___");
+(function() {
+  'use strict';
+
+  var globals = typeof global === 'undefined' ? self : global;
+  if (typeof globals.require === 'function') return;
+
+  var modules = {};
+  var cache = {};
+  var aliases = {};
+  var has = {}.hasOwnProperty;
+
+  var expRe = /^\.\.?(\/|$)/;
+  var expand = function(root, name) {
+    var results = [], part;
+    var parts = (expRe.test(name) ? root + '/' + name : name).split('/');
+    for (var i = 0, length = parts.length; i < length; i++) {
+      part = parts[i];
+      if (part === '..') {
+        results.pop();
+      } else if (part !== '.' && part !== '') {
+        results.push(part);
+      }
+    }
+    return results.join('/');
+  };
+
+  var dirname = function(path) {
+    return path.split('/').slice(0, -1).join('/');
+  };
+
+  var localRequire = function(path) {
+    return function expanded(name) {
+      var absolute = expand(dirname(path), name);
+      return globals.require(absolute, path);
+    };
+  };
+
+  var initModule = function(name, definition) {
+    var hot = hmr && hmr.createHot(name);
+    var module = {id: name, exports: {}, hot: hot};
+    cache[name] = module;
+    definition(module.exports, localRequire(name), module);
+    return module.exports;
+  };
+
+  var expandAlias = function(name) {
+    var val = aliases[name];
+    return (val && name !== val) ? expandAlias(val) : name;
+  };
+
+  var _resolve = function(name, dep) {
+    return expandAlias(expand(dirname(name), dep));
+  };
+
+  var require = function(name, loaderPath) {
+    if (loaderPath == null) loaderPath = '/';
+    var path = expandAlias(name);
+
+    if (has.call(cache, path)) return cache[path].exports;
+    if (has.call(modules, path)) return initModule(path, modules[path]);
+
+    throw new Error("Cannot find module '" + name + "' from '" + loaderPath + "'");
+  };
+
+  require.alias = function(from, to) {
+    aliases[to] = from;
+  };
+
+  var extRe = /\.[^.\/]+$/;
+  var indexRe = /\/index(\.[^\/]+)?$/;
+  var addExtensions = function(bundle) {
+    if (extRe.test(bundle)) {
+      var alias = bundle.replace(extRe, '');
+      if (!has.call(aliases, alias) || aliases[alias].replace(extRe, '') === alias + '/index') {
+        aliases[alias] = bundle;
+      }
+    }
+
+    if (indexRe.test(bundle)) {
+      var iAlias = bundle.replace(indexRe, '');
+      if (!has.call(aliases, iAlias)) {
+        aliases[iAlias] = bundle;
+      }
+    }
+  };
+
+  require.register = require.define = function(bundle, fn) {
+    if (bundle && typeof bundle === 'object') {
+      for (var key in bundle) {
+        if (has.call(bundle, key)) {
+          require.register(key, bundle[key]);
+        }
+      }
+    } else {
+      modules[bundle] = fn;
+      delete cache[bundle];
+      addExtensions(bundle);
+    }
+  };
+
+  require.list = function() {
+    var list = [];
+    for (var item in modules) {
+      if (has.call(modules, item)) {
+        list.push(item);
+      }
+    }
+    return list;
+  };
+
+  var hmr = globals._hmr && new globals._hmr(_resolve, require, modules, cache);
+  require._cache = cache;
+  require.hmr = hmr && hmr.wrap;
+  require.brunch = true;
+  globals.require = require;
+})();
+
+(function() {
+var global = typeof window === 'undefined' ? this : window;
+var process;
+var __makeRelativeRequire = function(require, mappings, pref) {
+  var none = {};
+  var tryReq = function(name, pref) {
+    var val;
+    try {
+      val = require(pref + '/node_modules/' + name);
+      return val;
+    } catch (e) {
+      if (e.toString().indexOf('Cannot find module') === -1) {
+        throw e;
+      }
+
+      if (pref.indexOf('node_modules') !== -1) {
+        var s = pref.split('/');
+        var i = s.lastIndexOf('node_modules');
+        var newPref = s.slice(0, i).join('/');
+        return tryReq(name, newPref);
+      }
+    }
+    return none;
+  };
+  return function(name) {
+    if (name in mappings) name = mappings[name];
+    if (!name) return;
+    if (name[0] !== '.' && pref) {
+      var val = tryReq(name, pref);
+      if (val !== none) return val;
+    }
+    return require(name);
+  }
+};
+require.register("Http.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = exports.parseHttpSuccess = exports.parseHttpError = void 0;
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var api = "https://conduit.productionready.io/api/";
+
+var onProgress = function onProgress(mdl) {
+  return function (e) {
+    if (e.lengthComputable) {
+      mdl.state.loadingProgress.max = e.total;
+      mdl.state.loadingProgress.value = e.loaded;
+      m.redraw();
+    }
+  };
+};
+
+function onLoad() {
+  return false;
+}
+
+var onLoadStart = function onLoadStart(mdl) {
+  return function (e) {
+    mdl.state.isLoading = true;
+    return false;
+  };
+};
+
+var onLoadEnd = function onLoadEnd(mdl) {
+  return function (e) {
+    mdl.state.isLoading = false;
+    mdl.state.loadingProgress.max = 0;
+    mdl.state.loadingProgress.value = 0;
+    return false;
+  };
+};
+
+var xhrProgress = function xhrProgress(mdl) {
+  return {
+    config: function config(xhr) {
+      xhr.onprogress = onProgress(mdl);
+      xhr.onload = onLoad;
+      xhr.onloadstart = onLoadStart(mdl);
+      xhr.onloadend = onLoadEnd(mdl);
+    }
+  };
+};
+
+var parseHttpError = function parseHttpError(mdl) {
+  return function (rej) {
+    return function (e) {
+      mdl.state.isLoading = false;
+      return rej(e.response.errors);
+    };
+  };
+};
+
+exports.parseHttpError = parseHttpError;
+
+var parseHttpSuccess = function parseHttpSuccess(mdl) {
+  return function (res) {
+    return function (data) {
+      mdl.state.isLoading = false;
+      return res(data);
+    };
+  };
+};
+
+exports.parseHttpSuccess = parseHttpSuccess;
+
+var getUserToken = function getUserToken() {
+  return localStorage.getItem("token") ? {
+    authorization: localStorage.getItem("token")
+  } : "";
+};
+
+var call = function call(_headers) {
+  return function (method) {
+    return function (mdl) {
+      return function (url) {
+        return function (body) {
+          if (["POST", "PUT", "DELETE"].includes(method) && !mdl.state.isLoggedIn("http-call")) {
+            if (!["/login", "/register"].includes(mdl.slug)) {
+              return Task.rejected(m.route.set("/register"));
+            }
+          }
+
+          mdl.state.isLoading = true;
+          return new Task(function (rej, res) {
+            return m.request(_objectSpread({
+              method: method,
+              url: api + url,
+              headers: _objectSpread({
+                "content-type": "application/json"
+              }, _headers),
+              body: body,
+              withCredentials: false
+            }, xhrProgress(mdl))).then(parseHttpSuccess(mdl)(res), parseHttpError(mdl)(rej));
+          });
+        };
+      };
+    };
+  };
+};
+
+var Http = {
+  getTask: function getTask(mdl) {
+    return function (url) {
+      return call(getUserToken())("GET")(mdl)(url)(null);
+    };
+  },
+  deleteTask: function deleteTask(mdl) {
+    return function (url) {
+      return call(getUserToken())("DELETE")(mdl)(url)(null);
+    };
+  },
+  postTask: function postTask(mdl) {
+    return function (url) {
+      return function (data) {
+        return call(getUserToken())("POST")(mdl)(url)(data);
+      };
+    };
+  },
+  putTask: function putTask(mdl) {
+    return function (url) {
+      return function (data) {
+        return call(getUserToken())("PUT")(mdl)(url)(data);
+      };
+    };
+  }
+};
+var _default = Http;
+exports["default"] = _default;
+});
+
+;require.register("Utils.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.errorViewModel = exports.sanitizeImg = exports.log = void 0;
+
+var log = function log(m) {
+  return function (v) {
+    console.log(m, v);
+    return v;
+  };
+};
+
+exports.log = log;
+
+var secureImg = function secureImg(url) {
+  return url.match(/(https)./) ? url : url.replace("http", "https");
+};
+
+var sanitizeImg = function sanitizeImg(url) {
+  return url && url.match(/\.(jpeg|jpg|gif|png|svg)$/) ? secureImg(url) : "https://static.productionready.io/images/smiley-cyrus.jpg";
+};
+
+exports.sanitizeImg = sanitizeImg;
+
+var errorViewModel = function errorViewModel(err) {
+  return Object.keys(err).map(function (k) {
+    return {
+      key: k.toUpperCase(),
+      errors: err[k]
+    };
+  });
+};
+
+exports.errorViewModel = errorViewModel;
+});
+
+;require.register("app.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var toRouter = function toRouter(mdl) {
+  return function (Router, route) {
+    var matcher = // mdl.state.isLoggedIn("MATCHER")
+    route.url.includes(":slug") ? function (_ref) {
+      var slug = _ref.slug;
+      mdl.slug = slug;
+    } : function (_, b) {
+      mdl.slug = b; // console.log(
+      //   "login",
+      //   mdl,
+      //   mdl.state.isLoggedIn("MATCHER - slug"),
+      //   localStorage.getItem("token")
+      // )
+    }; // : () => m.route.set("/login")
+
+    var renderer = function renderer() {
+      // console.log(
+      //   "renderer",
+      //   mdl,
+      //   mdl.state.isLoggedIn("RENDERER "),
+      //   localStorage.getItem("token")
+      // )
+      return route.config.isAuth ? mdl.state.isLoggedIn("RENDERER") ? route.component(mdl) : m.route.set("/login") : route.component(mdl);
+    };
+
+    Router[route.url] = {
+      onmatch: matcher,
+      render: renderer
+    }; // console.log("stringRouter", JSON.stringify(Router, null, 4))
+
+    return Router;
+  };
+};
+
+var App = function App(mdl) {
+  return mdl.Routes.reduce(toRouter(mdl), {});
+};
+
+var _default = App;
+exports["default"] = _default;
+});
+
+;require.register("components/articles.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Articles = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var favoriteArticleUrl = function favoriteArticleUrl(slug) {
+  return "articles/".concat(slug, "/favorite");
+};
+
+var favoriteArticleTask = function favoriteArticleTask(http) {
+  return function (mdl) {
+    return function (slug) {
+      return http.postTask(mdl)(favoriteArticleUrl(slug))();
+    };
+  };
+};
+
+var unFavoriteArticleTask = function unFavoriteArticleTask(http) {
+  return function (mdl) {
+    return function (slug) {
+      return http.deleteTask(mdl)(favoriteArticleUrl(slug));
+    };
+  };
+};
+
+var ArticlePreview = function ArticlePreview(_ref) {
+  var _ref$attrs = _ref.attrs,
+      mdl = _ref$attrs.mdl,
+      article = _ref$attrs.article;
+  var data = article;
+
+  var toggleArticleLike = function toggleArticleLike(favorited, slug) {
+    var onError = (0, _Utils.log)("toggleArticleLike err-art");
+
+    var onSuccess = function onSuccess(_ref2) {
+      var _ref2$article = _ref2.article,
+          favorited = _ref2$article.favorited,
+          favoritesCount = _ref2$article.favoritesCount;
+      data.favorited = favorited;
+      data.favoritesCount = favoritesCount;
+    };
+
+    var toggle = favorited ? unFavoriteArticleTask : favoriteArticleTask;
+    toggle(_Http["default"])(mdl)(slug).fork(onError, onSuccess);
+  };
+
+  return {
+    view: function view() {
+      return m("ion-item", {
+        button: true
+      }, m("ion-grid", [m("ion-row.ion-justify-content-between.ion-align-items-end", m("ion-col", m(m.route.Link, {
+        "class": "preview-link",
+        href: "/article/".concat(data.slug)
+      }, m("ion-text", m("h1", data.title)), m("ion-text", m("p", data.description))))), m("ion-row", m("ion-col", m("ion-list", {
+        side: "end"
+      }, data.tagList.map(function (tag) {
+        return m("ion-chip", tag);
+      })))), m("ion-row.ion-justify-content-between.ion-align-items-end", [m(m.route.Link, {
+        href: "/profile/".concat(data.author.username),
+        options: {
+          replace: true
+        }
+      }, m("ion-avatar", {
+        slot: "start"
+      }, m("img", {
+        src: (0, _Utils.sanitizeImg)(data.author.image)
+      }))), m("ion-label", m("ion-text", m("h2", data.author.username)), m("p", data.createdAt)), m("ion-chip", {
+        onclick: function onclick(e) {
+          return toggleArticleLike(data.favorited, data.slug);
+        }
+      }, [m("ion-icon", {
+        name: data.favorited ? "heart-dislike-outline" : "heart-outline"
+      }), m("ion-text", data.favoritesCount)])])]));
+    }
+  };
+};
+
+var Articles = function Articles() {
+  return {
+    view: function view(_ref3) {
+      var _ref3$attrs = _ref3.attrs,
+          mdl = _ref3$attrs.mdl,
+          data = _ref3$attrs.data;
+      return data.articles.length ? m("ion-list", {
+        button: true
+      }, data.articles.map(function (article) {
+        return m(ArticlePreview, {
+          mdl: mdl,
+          data: data,
+          article: article
+        });
+      })) : m("p", "No articles are here... yet.");
+    }
+  };
+};
+
+exports.Articles = Articles;
+});
+
+;require.register("components/card.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Card = void 0;
+var Card = {
+  view: function view(_ref) {
+    var _ref$attrs = _ref.attrs,
+        options = _ref$attrs.options,
+        header = _ref$attrs.header,
+        content = _ref$attrs.content,
+        footer = _ref$attrs.footer;
+    return m("ion-card", options, m("ion-card-header", {
+      translucent: true
+    }, header), m("ion-card-content", content), m("ion-card-footer", footer));
+  }
+};
+exports.Card = Card;
+});
+
+;require.register("components/comments.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Comments = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+var _ramda = require("ramda");
+
+var _dayjs = _interopRequireDefault(require("dayjs"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var trimBody = (0, _ramda.over)((0, _ramda.lensProp)("body"), _ramda.trim);
+
+var formatComment = function formatComment(_ref) {
+  var author = _ref.author,
+      body = _ref.body,
+      id = _ref.id,
+      createdAt = _ref.createdAt;
+  return {
+    author: author,
+    body: body,
+    id: id,
+    date: (0, _dayjs["default"])().format("MM/DD/YYYY HH:mm", createdAt)
+  };
+};
+
+var getCommentsTask = function getCommentsTask(http) {
+  return function (mdl) {
+    return function (slug) {
+      return http.getTask(mdl)("articles/".concat(slug, "/comments")).map((0, _ramda.prop)("comments")).map((0, _ramda.map)(formatComment));
+    };
+  };
+};
+
+var deleteCommentTask = function deleteCommentTask(http) {
+  return function (mdl) {
+    return function (slug) {
+      return function (id) {
+        return http.deleteTask(mdl)("articles/".concat(slug, "/comments/").concat(id));
+      };
+    };
+  };
+};
+
+var submitTask = function submitTask(http) {
+  return function (mdl) {
+    return function (comment) {
+      return http.postTask(mdl)("articles/".concat(mdl.slug, "/comments"))({
+        comment: comment
+      });
+    };
+  };
+};
+
+var CommentForm = function CommentForm(_ref2) {
+  var _ref2$attrs = _ref2.attrs,
+      mdl = _ref2$attrs.mdl,
+      reload = _ref2$attrs.reload;
+  var comment = {
+    body: ""
+  };
+  var state = {
+    errors: [],
+    disabled: false
+  };
+
+  var onError = function onError(errors) {
+    state.errors = (0, _Utils.errorViewModel)(errors);
+    console.log("Error with form ", state);
+    state.disabled = false;
+  };
+
+  var onSuccess = function onSuccess() {
+    comment.body = "";
+    state.errors = [];
+    state.disabled = false;
+    reload();
+  };
+
+  var submit = function submit(comment) {
+    return submitTask(_Http["default"])(mdl)(trimBody(comment)).fork(onError, onSuccess);
+  };
+
+  return {
+    oninit: function oninit() {
+      return comment.body = "";
+    },
+    view: function view(_ref3) {
+      var mdl = _ref3.attrs.mdl;
+      return [m("ion-grid", m("ion-row.ion-justify-content-between.ion-align-items-end", m("ion-col", m("ion-textarea", {
+        rows: 3,
+        placeholder: "Write a comment ...",
+        onchange: function onchange(e) {
+          return comment.body = e.target.value;
+        },
+        disabled: state.disabled,
+        value: comment.body
+      }))), m("ion-row.ion-justify-content-between.ion-align-items-end", m("ion-col", m("ion-avatar", m("img", {
+        src: (0, _Utils.sanitizeImg)(mdl.user.image)
+      }))), m("ion-col", m("ion-button", {
+        onclick: function onclick(e) {
+          state.disabled = true;
+          submit(comment);
+        }
+      }, " Post Comment ")))), state.errors.map(function (e) {
+        return e.values.map(function (err) {
+          return m("p.error-messages", "".concat(e.key, " ").concat(err));
+        });
+      })];
+    }
+  };
+};
+
+var Comment = function Comment() {
+  return {
+    view: function view(_ref4) {
+      var _ref4$attrs = _ref4.attrs,
+          mdl = _ref4$attrs.mdl,
+          _ref4$attrs$comment = _ref4$attrs.comment,
+          _ref4$attrs$comment$a = _ref4$attrs$comment.author,
+          image = _ref4$attrs$comment$a.image,
+          username = _ref4$attrs$comment$a.username,
+          body = _ref4$attrs$comment.body,
+          date = _ref4$attrs$comment.date,
+          id = _ref4$attrs$comment.id,
+          deleteComment = _ref4$attrs.deleteComment;
+      return m("ion-item", m("ion-grid", ("ion-row.ion-justify-content-between.ion-align-items-end", m("ion-text", body)), m("ion-row.ion-justify-content-between.ion-align-items-end", m(m.route.Link, {
+        href: "/profile/".concat(username),
+        "class": "comment-author m-5"
+      }, m("ion-avatar", m("img", {
+        src: (0, _Utils.sanitizeImg)(image)
+      })), m("ion-text", username)), m("ion-text", date), username == mdl.user.username && m("ion-icon", {
+        name: "trash-outline",
+        onclick: function onclick(e) {
+          return deleteComment(id);
+        }
+      }))));
+    }
+  };
+};
+
+var Comments = function Comments(_ref5) {
+  var mdl = _ref5.attrs.mdl;
+  var data = {
+    comments: []
+  };
+
+  var loadComments = function loadComments(mdl) {
+    var onSuccess = function onSuccess(comments) {
+      return data.comments = comments;
+    };
+
+    var onError = (0, _Utils.log)("error with comments");
+    getCommentsTask(_Http["default"])(mdl)(mdl.slug).fork(onError, onSuccess);
+  };
+
+  var _deleteComment = function deleteComment(id) {
+    var onSuccess = function onSuccess(comments) {
+      return data.comments = comments;
+    };
+
+    var onError = (0, _Utils.log)("error with comments");
+    deleteCommentTask(_Http["default"])(mdl)(mdl.slug)(id).chain(function (x) {
+      return getCommentsTask(_Http["default"])(mdl)(mdl.slug);
+    }).fork(onError, onSuccess);
+  };
+
+  return {
+    oninit: function oninit(_ref6) {
+      var mdl = _ref6.attrs.mdl;
+      return loadComments(mdl);
+    },
+    view: function view(_ref7) {
+      var mdl = _ref7.attrs.mdl;
+      return m("item-list", m(CommentForm, {
+        mdl: mdl,
+        reload: function reload() {
+          return loadComments(mdl);
+        }
+      }), data.comments.map(function (c) {
+        return m(Comment, {
+          mdl: mdl,
+          comment: c,
+          deleteComment: function deleteComment(id) {
+            return _deleteComment(id);
+          }
+        });
+      }));
+    }
+  };
+};
+
+exports.Comments = Comments;
+});
+
+;require.register("components/component.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Component = void 0;
+
+var Component = function Component() {
+  return {
+    view: function view() {
+      return m("");
+    }
+  };
+};
+
+exports.Component = Component;
+});
+
+;require.register("components/dark-mode-toggle.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.DarkModeToggle = void 0;
+
+var DarkModeToggle = function DarkModeToggle() {
+  return {
+    view: function view(_ref) {
+      var mdl = _ref.attrs.mdl;
+      return m("ion-item", mdl.state.darkmode && m("ion-label", m("ion-icon", {
+        name: "sunny-outline"
+      })), m("ion-toggle", {
+        onclick: function onclick(e) {
+          mdl.state.darkmode = !mdl.state.darkmode;
+          document.body.classList.toggle("dark");
+          window.matchMedia("(prefers-color-scheme: dark)");
+        }
+      }), !mdl.state.darkmode && m("ion-label", m("ion-icon", {
+        name: "moon-outline"
+      })));
+    }
+  };
+};
+
+exports.DarkModeToggle = DarkModeToggle;
+});
+
+;require.register("components/feed-nav.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.FeedNav = void 0;
+
+var FeedNav = function FeedNav(_ref) {
+  var fetchData = _ref.attrs.fetchData;
+  return {
+    view: function view(_ref2) {
+      var _ref2$attrs = _ref2.attrs,
+          mdl = _ref2$attrs.mdl,
+          data = _ref2$attrs.data;
+      return [m("ion-toolbar", m("ion-row", m("ion-col", m("ion-button", {
+        fill: "solid",
+        expand: "full",
+        id: "",
+        color: data.tags.current == "" ? "primary" : "secondary",
+        onclick: function onclick(e) {
+          data.tags.current = e.target.id;
+          fetchData(mdl);
+        }
+      }, "Global Feed")), mdl.state.isLoggedIn("feed-nav") && m("ion-col", m("ion-button", {
+        fill: "solid",
+        expand: "full",
+        id: "feed",
+        color: data.tags.current == "feed" ? "primary" : "secondary",
+        onclick: function onclick(e) {
+          data.tags.current = e.target.id;
+          fetchData(mdl);
+        }
+      }, "Your Feed"))), m("ion-row", m("ion-col", data.tags.selected.map(function (tag) {
+        return m("ion-button", {
+          fill: "solid",
+          size: "small",
+          color: data.tags.current == tag ? "primary" : "secondary",
+          id: tag,
+          onclick: function onclick(e) {
+            data.tags.current = tag;
+            fetchData(mdl);
+          }
+        }, m("ion-text", "# ".concat(tag)) //Move this to user profile
+        // import { without } from "ramda"
+        // m("ion-icon", {
+        //   name: "close-circle-outline",
+        //   onclick: (e) =>
+        //     (data.tags.selected = without(tag, data.tags.selected)),
+        // })
+        );
+      }))))];
+    }
+  };
+};
+
+exports.FeedNav = FeedNav;
+});
+
+;require.register("components/follow-favorite.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.FollowFavorite = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var deleteArticleUrl = function deleteArticleUrl(slug) {
+  return "articles/".concat(slug);
+};
+
+var favoriteArticleUrl = function favoriteArticleUrl(slug) {
+  return "articles/".concat(slug, "/favorite");
+};
+
+var followAuthorUrl = function followAuthorUrl(author) {
+  return "profiles/".concat(author, "/follow");
+};
+
+var deleteArticleTask = function deleteArticleTask(http) {
+  return function (mdl) {
+    return http.deleteTask(mdl)(deleteArticleUrl(mdl.slug));
+  };
+};
+
+var favoriteArticleTask = function favoriteArticleTask(http) {
+  return function (mdl) {
+    return http.postTask(mdl)(favoriteArticleUrl(mdl.slug))();
+  };
+};
+
+var unFavoriteArticleTask = function unFavoriteArticleTask(http) {
+  return function (mdl) {
+    return http.deleteTask(mdl)(favoriteArticleUrl(mdl.slug));
+  };
+};
+
+var followAuthorTask = function followAuthorTask(http) {
+  return function (mdl) {
+    return function (author) {
+      return http.postTask(mdl)(followAuthorUrl(author))();
+    };
+  };
+};
+
+var unFollowAuthorTask = function unFollowAuthorTask(http) {
+  return function (mdl) {
+    return function (author) {
+      return http.deleteTask(mdl)(followAuthorUrl(author));
+    };
+  };
+};
+
+var FollowFavorite = function FollowFavorite(_ref) {
+  var _ref$attrs = _ref.attrs,
+      mdl = _ref$attrs.mdl,
+      data = _ref$attrs.data;
+
+  var toggleArticleLike = function toggleArticleLike(_ref2) {
+    var favorited = _ref2.favorited;
+    var onError = (0, _Utils.log)("toggleArticleLike err-art");
+
+    var onSuccess = function onSuccess(_ref3) {
+      var _ref3$article = _ref3.article,
+          favorited = _ref3$article.favorited,
+          favoritesCount = _ref3$article.favoritesCount;
+      data.favorited = favorited;
+      data.favoritesCount = favoritesCount;
+    };
+
+    var toggle = favorited ? unFavoriteArticleTask : favoriteArticleTask;
+    toggle(_Http["default"])(mdl).fork(onError, onSuccess);
+  };
+
+  var toggleAuthorFollow = function toggleAuthorFollow(_ref4) {
+    var _ref4$author = _ref4.author,
+        username = _ref4$author.username,
+        following = _ref4$author.following;
+    var onError = (0, _Utils.log)("toggleAuthorFollow, err-auth");
+
+    var onSuccess = function onSuccess(_ref5) {
+      var following = _ref5.profile.following;
+      return data.author.following = following;
+    };
+
+    var toggle = following ? unFollowAuthorTask : followAuthorTask;
+    toggle(_Http["default"])(mdl)(username).fork(onError, onSuccess);
+  };
+
+  var deleteArticle = function deleteArticle(slug) {
+    var onError = (0, _Utils.log)("deleteArticle, err-auth");
+
+    var onSuccess = function onSuccess(s) {
+      console.log(s);
+      m.route.set("/home");
+    };
+
+    deleteArticleTask(_Http["default"])(mdl).fork(onError, onSuccess);
+  };
+
+  return {
+    view: function view(_ref6) {
+      var _ref6$attrs = _ref6.attrs,
+          mdl = _ref6$attrs.mdl,
+          _ref6$attrs$data = _ref6$attrs.data,
+          _ref6$attrs$data$auth = _ref6$attrs$data.author,
+          username = _ref6$attrs$data$auth.username,
+          image = _ref6$attrs$data$auth.image,
+          following = _ref6$attrs$data$auth.following,
+          favoritesCount = _ref6$attrs$data.favoritesCount,
+          favorited = _ref6$attrs$data.favorited,
+          slug = _ref6$attrs$data.slug;
+      return m("ion-grid", m("ion-row", [m(m.route.Link, {
+        href: "profile/".concat(username)
+      }, m("ion-chip", m("ion-avatar", m("ion-img", {
+        src: (0, _Utils.sanitizeImg)(image)
+      })), m("ion-text", username))), mdl.user.username == username ? [m(m.route.Link, {
+        "class": "btn btn-sm btn-outline-secondary",
+        href: "/editor/".concat(slug),
+        selector: "button"
+      }, [m("ion-icon", {
+        name: "edit"
+      }), "Edit Article"]), m("ion-button", {
+        onclick: function onclick(e) {
+          return deleteArticle(slug);
+        }
+      }, [m("ion-icon", {
+        name: "trash-outline"
+      }), "Delete Article "])] : [m("ion-chip", {
+        onclick: function onclick(e) {
+          return toggleAuthorFollow(data);
+        }
+      }, [m("ion-icon", {
+        name: following ? "people-circle-outline" : "people-outline"
+      }), m("ion-label", "".concat(username))]), m("ion-chip", {
+        onclick: function onclick(e) {
+          return toggleArticleLike(data);
+        }
+      }, [m("ion-icon", {
+        name: favorited ? "heart-dislike-outline" : "heart-outline"
+      }), m("ion-label", favoritesCount)])]]));
+    }
+  };
+};
+
+exports.FollowFavorite = FollowFavorite;
+});
+
+;require.register("components/form-errors.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.FormErrors = void 0;
+
+var FormErrors = function FormErrors() {
+  return {
+    view: function view(_ref) {
+      var errors = _ref.attrs.errors;
+      return errors.map(function (_ref2) {
+        var key = _ref2.key,
+            errors = _ref2.errors;
+        return m(".error-messages", m("ion-list", m("ion-label", {
+          color: "danger"
+        }, "".concat(key)), m("ion-list", errors.map(function (error) {
+          return m("ion-item", {
+            color: "danger"
+          }, error);
+        }))));
+      });
+    }
+  };
+};
+
+exports.FormErrors = FormErrors;
+});
+
+;require.register("components/index.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _loader = require("./loader");
+
+Object.keys(_loader).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _loader[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _loader[key];
+    }
+  });
+});
+
+var _paginator = require("./paginator");
+
+Object.keys(_paginator).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _paginator[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _paginator[key];
+    }
+  });
+});
+
+var _articles = require("./articles");
+
+Object.keys(_articles).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _articles[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _articles[key];
+    }
+  });
+});
+
+var _followFavorite = require("./follow-favorite");
+
+Object.keys(_followFavorite).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _followFavorite[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _followFavorite[key];
+    }
+  });
+});
+
+var _comments = require("./comments");
+
+Object.keys(_comments).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _comments[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _comments[key];
+    }
+  });
+});
+
+var _feedNav = require("./feed-nav");
+
+Object.keys(_feedNav).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _feedNav[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _feedNav[key];
+    }
+  });
+});
+
+var _taglist = require("./taglist");
+
+Object.keys(_taglist).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _taglist[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _taglist[key];
+    }
+  });
+});
+
+var _card = require("./card");
+
+Object.keys(_card).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _card[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _card[key];
+    }
+  });
+});
+
+var _menu = require("./menu");
+
+Object.keys(_menu).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _menu[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _menu[key];
+    }
+  });
+});
+
+var _sidebars = require("./sidebars");
+
+Object.keys(_sidebars).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _sidebars[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _sidebars[key];
+    }
+  });
+});
+
+var _toaster = require("./toaster");
+
+Object.keys(_toaster).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _toaster[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _toaster[key];
+    }
+  });
+});
+
+var _formErrors = require("./form-errors");
+
+Object.keys(_formErrors).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _formErrors[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _formErrors[key];
+    }
+  });
+});
+
+var _profileLink = require("./profile-link");
+
+Object.keys(_profileLink).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _profileLink[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _profileLink[key];
+    }
+  });
+});
+
+var _darkModeToggle = require("./dark-mode-toggle");
+
+Object.keys(_darkModeToggle).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _darkModeToggle[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _darkModeToggle[key];
+    }
+  });
+});
+});
+
+;require.register("components/loader.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Loader = void 0;
+
+var Loader = function Loader() {
+  return {
+    view: function view(_ref) {
+      var _ref$attrs = _ref.attrs,
+          name = _ref$attrs.name,
+          duration = _ref$attrs.duration;
+      return m("ion-spinner.spinner", {
+        duration: duration || 2000,
+        name: name || "crescent"
+      });
+    }
+  };
+};
+
+exports.Loader = Loader;
+});
+
+;require.register("components/menu.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Menu = exports.MenuToggle = void 0;
+
+var _core = require("@ionic/core");
+
+var MenuToggle = function MenuToggle(_ref) {
+  var _ref$attrs = _ref.attrs,
+      mdl = _ref$attrs.mdl,
+      side = _ref$attrs.side,
+      contents = _ref$attrs.contents,
+      eHandler = _ref$attrs.eHandler,
+      sHandler = _ref$attrs.sHandler;
+
+  var toggleMenu = function toggleMenu() {
+    _core.menuController.enable(true, side).then(_core.menuController.toggle(side)).then(function (x) {
+      return console.log("?menutoggle s", x);
+    }, function (z) {
+      return console.log("menutoggle e", z);
+    }); // .then(sHandler(mdl), eHandler(mdl))
+
+  };
+
+  return {
+    view: function view() {
+      return m("ion-menu-toggle", {
+        onclick: function onclick() {
+          return toggleMenu;
+        }
+      }, contents);
+    }
+  };
+};
+
+exports.MenuToggle = MenuToggle;
+
+var Menu = function Menu() {
+  return {
+    view: function view(_ref2) {
+      var _ref2$attrs = _ref2.attrs,
+          header = _ref2$attrs.header,
+          title = _ref2$attrs.title,
+          contentId = _ref2$attrs.contentId,
+          contents = _ref2$attrs.contents;
+      // console.log("wtf", { title, visible, side, menuId, contentId, contents })
+      return m("ion-menu[type='push']", {
+        // onionWillOpen: (e) => {
+        //   console.log("onionWillOpen", e.target)
+        // },
+        // onionDidOpen: (e) => {
+        //   console.log("onionDidOpen", e)
+        // },
+        // onionWillClose: (e) => {
+        //   console.log("onionwillClose", e)
+        // },
+        // onionDidClose: (e) => {
+        //   console.log("ionDidClose", e)
+        // },
+        contentId: contentId
+      }, [header && header, title && m("ion-header", m("ion-toolbar", m("ion-title", title))), m("ion-content", contents)]);
+    }
+  };
+};
+
+exports.Menu = Menu;
+});
+
+;require.register("components/paginator.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Paginator = void 0;
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+var Paginator = function Paginator() {
+  return {
+    view: function view(_ref) {
+      var _ref$attrs = _ref.attrs,
+          state = _ref$attrs.state,
+          fetchDataFor = _ref$attrs.fetchDataFor;
+      var total = Math.ceil(state.total / state.limit) + 1;
+      var current = state.offset / state.limit + 1;
+
+      var range = _toConsumableArray(Array(total).keys()).slice(1);
+
+      return state.total > state.limit && range.map(function (page, idx) {
+        return m("ion-chip", {
+          color: page == current && "primary",
+          onclick: function onclick(e) {
+            return fetchDataFor(idx * state.limit);
+          }
+        }, page);
+      });
+    }
+  };
+};
+
+exports.Paginator = Paginator;
+});
+
+;require.register("components/profile-link.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ProfileLink = void 0;
+
+var _Utils = require("Utils");
+
+var _components = require("components");
+
+var ProfileLink = function ProfileLink() {
+  return {
+    view: function view(_ref) {
+      var mdl = _ref.attrs.mdl;
+      return m(_components.MenuToggle, {
+        side: "start",
+        contents: m("ion-grid", {
+          onclick: function onclick(e) {
+            return m.route.set("/profile/".concat(mdl.user.username));
+          }
+        }, m("a", m("ion-row.ion-justify-content-evenly.ion-align-items-end", m("ion-avatar", m("ion-img", {
+          src: (0, _Utils.sanitizeImg)(mdl.user.image)
+        })), m("ion-text", m("h1", "".concat(mdl.user.username))))))
+      });
+    }
+  };
+};
+
+exports.ProfileLink = ProfileLink;
+});
+
+;require.register("components/sidebars.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SideBar = void 0;
+
+var _menu = require("./menu");
+
+var _components = require("components");
+
+var _model = _interopRequireDefault(require("../model"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var logout = function logout(mdl) {
+  localStorage.clear();
+  mdl = (0, _model["default"])();
+  m.redraw();
+  m.route.set("/home");
+};
+
+var SettingsMenu = function SettingsMenu() {
+  return {
+    view: function view(_ref) {
+      var _ref$attrs = _ref.attrs,
+          mdl = _ref$attrs.mdl,
+          side = _ref$attrs.side;
+      return m("ion-list", [m("ion-item", m(_components.MenuToggle, {
+        mdl: mdl,
+        side: "start",
+        contents: m("ion-button", {
+          color: "danger",
+          onclick: function onclick() {
+            return logout();
+          }
+        }, "logout")
+      }), m(_components.MenuToggle, {
+        mdl: mdl,
+        side: "start",
+        contents: m("ion-button", {
+          color: "warning",
+          onclick: function onclick(e) {
+            return m.route.set("/settings/".concat(mdl.user.username));
+          }
+        }, m("ion-icon", {
+          name: "settings"
+        }), "Edit")
+      }), m(_components.DarkModeToggle, {
+        mdl: mdl
+      })), m("ion-item", m(_components.TagList, {
+        mdl: mdl
+      }))]);
+    }
+  };
+};
+
+var SideBar = function SideBar() {
+  return {
+    view: function view(_ref2) {
+      var mdl = _ref2.attrs.mdl;
+      return m(_menu.Menu, {
+        mdl: mdl,
+        visibile: true,
+        side: "start",
+        menuId: "options",
+        contentId: "layout",
+        header: m("ion-header", m(_components.ProfileLink, {
+          mdl: mdl
+        })),
+        contents: m(SettingsMenu, {
+          mdl: mdl,
+          side: "start"
+        })
+      });
+    }
+  };
+}; // export const OptionsMenu = () => {
+//   return {
+//     view: ({ attrs: { mdl, side } }) =>
+//       m("ion-list", [
+//         m(
+//           "ion-item",
+//           m(
+//             m.route.Link,
+//             {
+//               onclick: (e) =>
+//                 menuController
+//                   .close(side)
+//                   .then(
+//                     m.route.set(`/profile/${mdl.user.username}`),
+//                     m.route.set(`/profile/${mdl.user.username}`)
+//                   ),
+//               // href: `/profile/${mdl.user.username}`,
+//             },
+//             mdl.user.username
+//           )
+//         ),
+//       ]),
+//   }
+// }
+// const test = (item) => {
+//   menuController
+//     .enable(item)
+//     .then(menuController.isEnabled(item))
+//     .then(
+//       (s) => console.log("s", s),
+//       (e) => console.log("e", e)
+//     )
+// }
+// export const AuthMenu = () => {
+//   return {
+//     view: ({ attrs: { mdl, side } }) =>
+//       m("ion-list", [
+//         m("ion-item", m("ion-button", { onclick: test }, "test")),
+//         m(
+//           "ion-item",
+//           m(
+//             m.route.Link,
+//             {
+//               onclick: (e) => menuController.toggle(side),
+//               href: "/register",
+//             },
+//             m("ion-label", "register")
+//           )
+//         ),
+//         ,
+//         m(
+//           "ion-item",
+//           m(
+//             m.route.Link,
+//             {
+//               onclick: (e) => menuController.toggle(side),
+//               href: "/login",
+//             },
+//             m("ion-label", "Login")
+//           )
+//         ),
+//       ]),
+//   }
+// }
+// export const StartSideBar = () => {
+//   const side = "start"
+//   return {
+//     view: ({ attrs: { mdl } }) => {
+//       console.log(side, mdl)
+//       return mdl.state.isLoggedIn()
+//         ? m(Menu, {
+//             mdl,
+//             side,
+//             title: "Settings",
+//             menuId: "settings",
+//             contentId: "settings",
+//             contents: m(SettingsMenu, { mdl, side }),
+//           })
+//         : m(Menu, {
+//             mdl,
+//             side,
+//             title: "Login | Register",
+//             menuId: "auth",
+//             contentId: "auth",
+//             contents: m(AuthMenu, { mdl, side }),
+//           })
+//     },
+//   }
+// }
+
+
+exports.SideBar = SideBar;
+});
+
+;require.register("components/taglist.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.TagList = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _ramda = require("ramda");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var getTagsTask = function getTagsTask(http) {
+  return function (mdl) {
+    return http.getTask(mdl)("tags");
+  };
+};
+
+var TagList = function TagList(_ref) {
+  var mdl = _ref.attrs.mdl;
+
+  var selectTag = function selectTag(data, tag) {
+    return mdl.data.tags.selected = (0, _ramda.uniq)(mdl.data.tags.selected.concat([tag]));
+  };
+
+  var onError = function onError(e) {};
+
+  var onSuccess = function onSuccess(_ref2) {
+    var tags = _ref2.tags;
+    mdl.data.tags.tagList = tags;
+  };
+
+  getTagsTask(_Http["default"])(mdl).fork(onError, onSuccess);
+  return {
+    view: function view(_ref3) {
+      var data = _ref3.attrs.data;
+
+      var isSelected = function isSelected(tag) {
+        return mdl.data.tags.selected.includes(tag) ? "primary" : "secondary";
+      };
+
+      return [m("ion-text", "Popular Tags"), m("ion-list", mdl.data.tags.tagList.filter(function (tag) {
+        return !mdl.data.tags.selected.includes(tag);
+      }).map(function (tag) {
+        return m("ion-chip", {
+          color: isSelected(tag),
+          onclick: function onclick(e) {
+            return selectTag(data, tag);
+          }
+        }, tag);
+      }))];
+    }
+  };
+};
+
+exports.TagList = TagList;
+});
+
+;require.register("components/toaster.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Toaster = void 0;
+
+var _core = require("@ionic/core");
+
+var Toaster = function Toaster() {
+  return {
+    view: function view(_ref) {
+      var mdl = _ref.attrs.mdl;
+      return m("ion-toast", {
+        oncreate: function oncreate(_ref2) {
+          var dom = _ref2.dom;
+
+          _core.toastController.create({
+            component: dom,
+            message: mdl.toast.msg,
+            duration: mdl.toast.duration || 2000,
+            showCloseButton: true,
+            animated: true,
+            color: mdl.toast.status ? "success" : "danger"
+          }).then(function (toast) {
+            return toast.present();
+          });
+        }
+      });
+    }
+  };
+};
+
+exports.Toaster = Toaster;
+});
+
+;require.register("index.js", function(exports, require, module) {
+"use strict";
+
+var _app = _interopRequireDefault(require("./app.js"));
+
+var _model = _interopRequireDefault(require("./model.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var root = document.body;
+var winW = window.innerWidth;
+
+if (module.hot) {
+  module.hot.accept();
+}
+
+if ('development' !== "production") {
+  console.log("Looks like we are in development mode!");
+} else {
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("./service-worker.js").then(function (registration) {
+        console.log("⚙️ SW registered: ", registration);
+      })["catch"](function (registrationError) {
+        console.log("🧟 SW registration failed: ", registrationError);
+      });
+    });
+  }
+} // set display profiles
+
+
+var getProfile = function getProfile(w) {
+  if (w < 668) return "phone";
+  if (w < 920) return "tablet";
+  return "desktop";
+};
+
+var model = (0, _model["default"])();
+
+var checkWidth = function checkWidth(winW) {
+  var w = window.innerWidth;
+
+  if (winW !== w) {
+    winW = w;
+    var lastProfile = model.settings.profile;
+    model.settings.profile = getProfile(w);
+    if (lastProfile != model.settings.profile) m.redraw();
+  }
+
+  return requestAnimationFrame(checkWidth);
+};
+
+model.settings.profile = getProfile(winW);
+checkWidth(winW);
+
+if (localStorage.getItem("user")) {
+  model.user = JSON.parse(localStorage.getItem("user"));
+}
+
+m.route(root, "/home", (0, _app["default"])(model));
+});
+
+;require.register("initialize.js", function(exports, require, module) {
+"use strict";
+
+document.addEventListener("DOMContentLoaded", function () {
+  require("./index.js");
+});
+});
+
+;require.register("layout/header.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _components = require("components");
+
+var Header = function Header() {
+  return {
+    view: function view(_ref) {
+      var mdl = _ref.attrs.mdl;
+      return m("ion-header", m("ion-toolbar", mdl.state.isLoggedIn("header") ? [m.route.get() !== "/home" && m("ion-buttons", m("ion-back-button", {
+        slot: "start",
+        onclick: function onclick(e) {
+          e.preventDefault();
+          history.back();
+        },
+        defaultHref: "/"
+      }), m("ion-title.ion-align-center", m(m.route.Link, {
+        href: "#"
+      }, "Home"))), m("ion-buttons", {
+        slot: "end"
+      }, m(_components.MenuToggle, {
+        side: "start",
+        mdl: mdl,
+        eHandler: function eHandler() {
+          return "";
+        },
+        sHandler: function sHandler() {
+          return "";
+        },
+        contents: m("ion-button", m("ion-icon", {
+          name: "options"
+        }))
+      }))] : m("ion-item", {
+        slot: "primary",
+        onclick: function onclick(e) {
+          return m.route.set("/home");
+        }
+      }, [m("ion-text", m("h1", "conduit")), m("ion-text", m("p", "A place to share your knowledge."))])));
+    }
+  };
+};
+
+var _default = Header;
+exports["default"] = _default;
+});
+
+;require.register("layout/index.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _header = _interopRequireDefault(require("./header.js"));
+
+var _components = require("components");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var Layout = function Layout() {
+  return {
+    view: function view(_ref) {
+      var children = _ref.children,
+          mdl = _ref.attrs.mdl;
+      return m("ion-app", m(_header["default"], {
+        mdl: mdl
+      }), mdl.state.isLoggedIn() && m(_components.SideBar, {
+        mdl: mdl
+      }), m("ion-content", {
+        id: "layout",
+        contentId: "layout"
+      }, children), mdl.toast.msg && m(_components.Toaster, {
+        mdl: mdl
+      }));
+    }
+  };
+};
+
+var _default = Layout;
+exports["default"] = _default;
+});
+
+;require.register("layout/info.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var info = function info() {
+  return {
+    view: function view() {
+      return m("footer", m("div", {
+        "class": "container"
+      }, [m("a", {
+        "class": "logo-font",
+        href: "https://github.com/gothinkster/realworld"
+      }, "conduit"), m("span", {
+        "class": "attribution"
+      }, [" An interactive learning project from ", m("a", {
+        href: "https://thinkster.io"
+      }, "Thinkster"), ". Code ", m.trust("&amp;"), " design licensed under MIT. "])]));
+    }
+  };
+};
+
+var _default = info;
+exports["default"] = _default;
+});
+
+;require.register("model.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _routes = _interopRequireDefault(require("./routes"));
+
+var _mithrilStream = _interopRequireDefault(require("mithril-stream"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var BaseModel = function BaseModel() {
+  return {
+    menus: ["settings", "options"],
+    menu: {
+      title: "",
+      side: "",
+      menuId: "",
+      contentId: "",
+      contents: null
+    },
+    Routes: _routes["default"],
+    state: {
+      darkmode: false,
+      isLoading: false,
+      loadingProgress: {
+        max: 0,
+        value: 0
+      },
+      isLoggedIn: function isLoggedIn(from) {
+        return (// console.log(
+          //   "called is logged in",
+          //   from,
+          //   localStorage.getItem("token"),
+          //   !!localStorage.getItem("token")
+          // )
+          !!localStorage.getItem("token")
+        );
+      }
+    },
+    settings: {},
+    page: "",
+    user: {},
+    toast: {
+      show: false,
+      duration: 2000,
+      status: null,
+      msg: null
+    },
+    data: {
+      tags: {
+        tagList: [],
+        selected: [],
+        current: ""
+      },
+      articles: {}
+    }
+  };
+};
+
+var _default = BaseModel;
+exports["default"] = _default;
+});
+
+;require.register("pages/article.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _components = require("components");
+
+var _marked = _interopRequireDefault(require("marked"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var getArticleTask = function getArticleTask(http) {
+  return function (mdl) {
+    return function (slug) {
+      return http.getTask(mdl)("articles/".concat(slug));
+    };
+  };
+};
+
+var Article = function Article() {
+  var data = {};
+  var state = {
+    status: "loading",
+    error: null
+  };
+
+  var onSuccess = function onSuccess(_ref) {
+    var article = _ref.article,
+        comments = _ref.comments;
+    data.article = article;
+    data.comments = comments;
+    state.status = "success";
+  };
+
+  var onError = function onError(error) {
+    console.log("error", error);
+    state.error = error;
+    state.status = "error";
+  };
+
+  var loadData = function loadData(mdl) {
+    state.status = "loading";
+    getArticleTask(_Http["default"])(mdl)(mdl.slug).fork(onError, onSuccess);
+  };
+
+  return {
+    oninit: function oninit(_ref2) {
+      var mdl = _ref2.attrs.mdl;
+      return loadData(mdl);
+    },
+    view: function view(_ref3) {
+      var mdl = _ref3.attrs.mdl;
+      return [state.status == "loading" && m(_components.Loader, m("ion-text", m("h1", "Loading ..."))), state.status == "error" && m("ion-text", {
+        color: "danger"
+      }, m("h1", "Error Loading Data: ".concat(state.error))), state.status == "success" && [m("ion-text", m("h1", data.article.title)), m("ion-text", m.trust((0, _marked["default"])(data.article.body))), data.article.tagList.map(function (tag) {
+        return m("ion-chip", tag);
+      }), m(_components.FollowFavorite, {
+        mdl: mdl,
+        data: data.article
+      }), m(_components.Comments, {
+        mdl: mdl,
+        comments: data.comments,
+        reloadArticle: function reloadArticle() {
+          return loadData(mdl);
+        }
+      })]];
+    }
+  };
+};
+
+var _default = Article;
+exports["default"] = _default;
+});
+
+;require.register("pages/editor.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = exports.submitArticleTask = exports.loadArticleTask = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+var _components = require("components");
+
+var _ramda = require("ramda");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var loadArticleTask = function loadArticleTask(http) {
+  return function (mdl) {
+    return function (slug) {
+      return http.getTask(mdl)("articles/".concat(slug)).map(formatTagsToString);
+    };
+  };
+};
+
+exports.loadArticleTask = loadArticleTask;
+var formatTagsToList = (0, _ramda.over)((0, _ramda.lensProp)("tagList"), (0, _ramda.compose)(_ramda.uniq, (0, _ramda.split)(","), _ramda.trim));
+var formatTagsToString = (0, _ramda.over)((0, _ramda.lensPath)(["article", "tagList"]), (0, _ramda.join)(","));
+
+var submitArticleTask = function submitArticleTask(http) {
+  return function (mdl) {
+    return function (article) {
+      return function (isEditing) {
+        return isEditing ? http.putTask(mdl)("articles/".concat(mdl.slug))({
+          article: article
+        }) : http.postTask(mdl)("articles")({
+          article: article
+        });
+      };
+    };
+  };
+};
+
+exports.submitArticleTask = submitArticleTask;
+
+var Editor = function Editor(_ref) {
+  var mdl = _ref.attrs.mdl;
+  var data = {
+    description: "",
+    title: "",
+    body: "",
+    tagList: ""
+  };
+  var state = {
+    isEditing: false,
+    disabled: false,
+    errors: null,
+    status: "loading"
+  };
+
+  var initEditor = function initEditor(mdl) {
+    state.disabled = false;
+
+    var onSuccess = function onSuccess(_ref2) {
+      var article = _ref2.article;
+      console.log("?");
+      data = article;
+      state.status = "success";
+    };
+
+    var onError = function onError(errors) {
+      state.errors = (0, _Utils.errorViewModel)(errors);
+    };
+
+    if (mdl.slug !== "/editor") {
+      state.isEditing = true;
+      loadArticleTask(_Http["default"])(mdl)(mdl.slug).fork(onError, onSuccess);
+    } else {
+      state.status = "success";
+    }
+  };
+
+  var submitData = function submitData(data) {
+    (0, _Utils.log)("data")([data, formatTagsToList(data)]);
+    state.disabled = true;
+
+    var onSuccess = function onSuccess(_ref3) {
+      var slug = _ref3.article.slug;
+      return m.route.set("/article/".concat(slug));
+    };
+
+    var onError = function onError(errors) {
+      state.errors = (0, _Utils.errorViewModel)(errors);
+      state.disabled = false;
+    };
+
+    submitArticleTask(_Http["default"])(mdl)(formatTagsToList(data))(state.isEditing).fork(onError, onSuccess);
+  };
+
+  return {
+    oninit: function oninit(_ref4) {
+      var mdl = _ref4.attrs.mdl;
+      return initEditor(mdl);
+    },
+    view: function view() {
+      return m("form", state.status == "loading" && m(_components.Loader, {
+        mdl: mdl
+      }), state.status == "error" && "Error!", state.status == "success" && [state.errors && m(_components.FormErrors, {
+        mdl: mdl,
+        errors: state.errors
+      }), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Article Title"), m("ion-input", {
+        type: "text",
+        disabled: state.disabled,
+        // placeholder: "Article Title",
+        onchange: function onchange(e) {
+          return data.title = e.target.value;
+        },
+        value: data.title
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "What's this article about?"), m("ion-input", {
+        type: "text",
+        disabled: state.disabled,
+        // placeholder: "What's this article about?",
+        onchange: function onchange(e) {
+          return data.description = e.target.value;
+        },
+        value: data.description
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Write your article (in markdown)"), m("ion-textarea", {
+        rows: 8,
+        // placeholder: "Write your article (in markdown)",
+        disabled: state.disabled,
+        onchange: function onchange(e) {
+          return data.body = e.target.value;
+        },
+        value: data.body
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Enter tags"), m("ion-input", {
+        type: "text",
+        disabled: state.disabled,
+        // placeholder: "Enter tags",
+        onchange: function onchange(e) {
+          return data.tagList = e.target.value;
+        },
+        value: data.tagList
+      })), m("ion-button", {
+        onclick: function onclick(e) {
+          return submitData(data);
+        }
+      }, "Publish Article")]);
+    }
+  };
+};
+
+var _default = Editor;
+exports["default"] = _default;
+});
+
+;require.register("pages/home.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _components = require("components");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var getArticlesTask = function getArticlesTask(http) {
+  return function (mdl) {
+    return function (state) {
+      return function (data) {
+        return data.tags.current == "feed" ? http.getTask(mdl)("articles/feed?limit=20&offset=".concat(state.offset)) : http.getTask(mdl)("articles?limit=20&offset=".concat(state.offset, "&tag=").concat(data.tags.current));
+      };
+    };
+  };
+};
+
+var Home = function Home() {
+  var state = {
+    feedStatus: "loading",
+    pageStatus: "loading",
+    limit: 20,
+    offset: 0,
+    total: 0,
+    error: null
+  };
+
+  var loadInitData = function loadInitData(mdl) {
+    var onSuccess = function onSuccess(_ref) {
+      var articles = _ref.articles,
+          articlesCount = _ref.articlesCount;
+      mdl.data.articles = articles;
+      state.total = articlesCount;
+      state.pageStatus = "success";
+      state.feedStatus = "success";
+    };
+
+    var onError = function onError(error) {
+      console.log("error", error);
+      state.error = error;
+      state.pageStatus = "error";
+    };
+
+    state.pageStatus = "loading";
+    getArticlesTask(_Http["default"])(mdl)(state)(mdl.data).fork(onError, onSuccess);
+  };
+
+  var loadArticles = function loadArticles(mdl) {
+    var onSuccess = function onSuccess(_ref2) {
+      var articles = _ref2.articles,
+          articlesCount = _ref2.articlesCount;
+      mdl.data.articles = articles;
+      state.total = articlesCount;
+      state.feedStatus = "success";
+    };
+
+    var onError = function onError(error) {
+      console.log("error", error);
+      state.error = error;
+      state.feedStatus = "error";
+    };
+
+    state.feedStatus = "loading";
+    getArticlesTask(_Http["default"])(mdl)(state)(mdl.data).fork(onError, onSuccess);
+  };
+
+  return {
+    oninit: function oninit(_ref3) {
+      var mdl = _ref3.attrs.mdl;
+      return loadInitData(mdl);
+    },
+    view: function view(_ref4) {
+      var mdl = _ref4.attrs.mdl;
+      return [m("ion-content", {
+        scroll: false,
+        id: "profile",
+        contentId: "profile"
+      }, [!mdl.state.isLoggedIn("home") && state.pageStatus == "loading" || state.feedStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading Data")]), state.pageStatus == "error" && m("ion-text", {
+        color: "earning"
+      }, m("h1", "Error Loading Data: ".concat(state.error))), state.pageStatus == "success" && [m("ion-list-header", m(_components.FeedNav, {
+        fetchData: loadArticles,
+        mdl: mdl,
+        data: mdl.data
+      })), state.feedStatus == "success" && state.total && [m("ion-scroll", m(_components.Articles, {
+        mdl: mdl,
+        data: mdl.data
+      })), m(_components.Paginator, {
+        mdl: mdl,
+        state: state,
+        fetchDataFor: function fetchDataFor(offset) {
+          state.offset = offset;
+          loadArticles(mdl);
+        }
+      })], state.feedStatus == "success" && !state.total && m("ion-text", "No articles are here... yet."), mdl.state.isLoggedIn("home") && m("ion-fab", {
+        style: {
+          padding: "0 50px 40px 0"
+        },
+        vertical: "bottom",
+        horizontal: "end",
+        slot: "fixed"
+      }, m(m.route.Link, {
+        "class": "nav-link",
+        href: "/editor"
+      }, [m("ion-fab-button", m("ion-icon", {
+        name: "add-circle"
+      }))]))]])];
+    }
+  };
+};
+
+var _default = Home;
+exports["default"] = _default;
+});
+
+;require.register("pages/login.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = exports.loginTask = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+var _components = require("components");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var loginTask = function loginTask(http) {
+  return function (mdl) {
+    return function (user) {
+      return http.postTask(mdl)("users/login")({
+        user: user
+      });
+    };
+  };
+};
+
+exports.loginTask = loginTask;
+
+var Login = function Login() {
+  var state = {
+    errors: null,
+    disabled: false
+  };
+  var data = {
+    email: "",
+    password: ""
+  };
+
+  var onSubmit = function onSubmit(mdl, e) {
+    e.preventDefault();
+    state.disabled = true;
+
+    var onSuccess = function onSuccess(_ref) {
+      var user = _ref.user;
+      localStorage.setItem("token", "Token ".concat(user.token));
+      localStorage.setItem("user", JSON.stringify(user));
+      mdl.user = user;
+      state.disabled = false; // console.log(
+      //   "LOGGED IN",
+      //   localStorage.getItem("token"),
+      //   mdl.state.isLoggedIn("LOGGED IN"),
+      //   mdl
+      // )
+
+      m.route.set("/home");
+    };
+
+    var onError = function onError(errors) {
+      state.disabled = false;
+      state.errors = (0, _Utils.errorViewModel)(errors);
+    };
+
+    loginTask(_Http["default"])(mdl)(data).fork(onError, onSuccess);
+  };
+
+  return {
+    view: function view(_ref2) {
+      var mdl = _ref2.attrs.mdl;
+      return m("form", [m("ion-text", m("h1", "Login")), state.errors && m(_components.FormErrors, {
+        mdl: mdl,
+        errors: state.errors
+      }), m("ion-input", {
+        type: "text",
+        disabled: state.disabled,
+        placeholder: "email",
+        onchange: function onchange(e) {
+          return data.email = e.target.value;
+        },
+        value: data.email,
+        onblur: function onblur(e) {
+          return state.isSubmitted && validate;
+        }
+      }), m("ion-input", {
+        type: "password",
+        disabled: state.disabled,
+        placeholder: "password",
+        onchange: function onchange(e) {
+          return data.password = e.target.value;
+        },
+        value: data.password,
+        onblur: function onblur(e) {
+          return state.isSubmitted && validate;
+        }
+      }), m("ion-button", {
+        onclick: function onclick(e) {
+          return onSubmit(mdl, e);
+        }
+      }, "Login"), m("ion-link", m(m.route.Link, {
+        href: "/register"
+      }, m("ion-label", "Need an Account?")))]);
+    }
+  };
+};
+
+var _default = Login;
+exports["default"] = _default;
+});
+
+;require.register("pages/profile.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = exports.loadInitDataTask = exports.loadDataTask = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+var _components = require("components");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var followAuthorUrl = function followAuthorUrl(author) {
+  return "profiles/".concat(author, "/follow");
+};
+
+var followAuthorTask = function followAuthorTask(http) {
+  return function (mdl) {
+    return function (author) {
+      return http.postTask(mdl)(followAuthorUrl(author))();
+    };
+  };
+};
+
+var unFollowAuthorTask = function unFollowAuthorTask(http) {
+  return function (mdl) {
+    return function (author) {
+      return http.deleteTask(mdl)(followAuthorUrl(author));
+    };
+  };
+};
+
+var getProfileTask = function getProfileTask(http) {
+  return function (mdl) {
+    return function (username) {
+      return http.getTask(mdl)("profiles/".concat(username));
+    };
+  };
+};
+
+var getAuthorArticlesTask = function getAuthorArticlesTask(http) {
+  return function (mdl) {
+    return function (state) {
+      return function (username) {
+        return http.getTask(mdl)("articles?limit=".concat(state.limit, "&offset=").concat(state.offset, "&author=").concat(username));
+      };
+    };
+  };
+};
+
+var getAuthorFavoriteArticlesTask = function getAuthorFavoriteArticlesTask(http) {
+  return function (mdl) {
+    return function (state) {
+      return function (username) {
+        return http.getTask(mdl)("articles?limit=".concat(state.limit, "&offset=").concat(state.offset, "&favorited=").concat(username));
+      };
+    };
+  };
+};
+
+var loadDataTask = function loadDataTask(http) {
+  return function (mdl) {
+    return function (state) {
+      return state.showFaveArticles ? getAuthorFavoriteArticlesTask(http)(mdl)(state)(mdl.slug) : getAuthorArticlesTask(http)(mdl)(state)(mdl.slug);
+    };
+  };
+};
+
+exports.loadDataTask = loadDataTask;
+
+var loadInitDataTask = function loadInitDataTask(http) {
+  return function (mdl) {
+    return function (state) {
+      return Task.of(function (profile) {
+        return function (authorArticles) {
+          return _objectSpread(_objectSpread({}, profile), {}, {
+            authorArticles: authorArticles
+          });
+        };
+      }).ap(getProfileTask(http)(mdl)(mdl.slug)).ap(getAuthorArticlesTask(http)(mdl)(state)(mdl.slug));
+    };
+  };
+};
+
+exports.loadInitDataTask = loadInitDataTask;
+
+var Profile = function Profile(_ref) {
+  var mdl = _ref.attrs.mdl;
+  var data = {
+    authorArticles: {
+      articles: [],
+      articlesCount: 0
+    },
+    authorFavoriteArticles: {
+      articles: [],
+      articlesCount: 0
+    }
+  };
+  var state = {
+    pageStatus: "loading",
+    feedStatus: "loading",
+    showFaveArticles: false,
+    limit: 5,
+    offset: 0,
+    total: 0,
+    error: null
+  };
+
+  var loadData = function loadData(mdl) {
+    var onSuccess = function onSuccess(result) {
+      state.showFaveArticles ? data.authorFavoriteArticles = result : data.authorArticles = result;
+      state.total = state.showFaveArticles ? data.authorFavoriteArticles.articlesCount : data.authorArticles.articlesCount;
+      state.feedStatus = "success";
+    };
+
+    var onError = function onError(error) {
+      console.log("error", error);
+      state.error = error;
+      state.feedStatus = "error";
+    };
+
+    state.feedStatus = "loading";
+    loadDataTask(_Http["default"])(mdl)(state).fork(onError, onSuccess);
+  };
+
+  var loadInitData = function loadInitData(mdl) {
+    var onSuccess = function onSuccess(_ref2) {
+      var authorArticles = _ref2.authorArticles,
+          profile = _ref2.profile;
+      data.authorArticles = authorArticles;
+      data.profile = profile;
+      state.pageStatus = "success";
+      state.feedStatus = "success";
+      state.total = data.authorArticles.articlesCount;
+    };
+
+    var onError = function onError(error) {
+      console.log("error", error);
+      state.error = error;
+      state.pageStatus = "error";
+      m.route.set("/home");
+    };
+
+    state.pageStatus = "loading";
+    loadInitDataTask(_Http["default"])(mdl)(state).fork(onError, onSuccess);
+  };
+
+  var selectFeed = function selectFeed(toShowFaveArticles) {
+    state.showFaveArticles = toShowFaveArticles;
+    state.offset = 0;
+    loadData(mdl);
+  };
+
+  var toggleAuthorFollow = function toggleAuthorFollow(_ref3) {
+    var _ref3$author = _ref3.author,
+        username = _ref3$author.username,
+        following = _ref3$author.following;
+    var onError = (0, _Utils.log)("toggleAuthorFollow, err-auth");
+
+    var onSuccess = function onSuccess(_ref4) {
+      var following = _ref4.profile.following;
+      return data.profile.following = following;
+    };
+
+    var toggleTask = following ? unFollowAuthorTask : followAuthorTask;
+    toggleTask(_Http["default"])(mdl)(username).fork(onError, onSuccess);
+  };
+
+  return {
+    oninit: function oninit(_ref5) {
+      var mdl = _ref5.attrs.mdl;
+      return loadInitData(mdl);
+    },
+    view: function view(_ref6) {
+      var mdl = _ref6.attrs.mdl;
+      return [state.pageStatus == "loading" && m(_components.Loader, [m("h1.logo-font", "Loading ...")]), state.pageStatus == "error" && m(_components.Banner, [m("h1.logo-font", "Error Loading Data: ".concat(state.error))]), state.pageStatus == "success" && [m("ion-grid", m("ion-row", m("ion-col", m("ion-img", {
+        src: (0, _Utils.sanitizeImg)(data.profile.image)
+      }), m("ion-text", m("h4", data.profile.username)), m("ion-text", m("p", data.profile.bio)), data.profile.username !== mdl.user.username ? m("ion-chip", {
+        onclick: function onclick(e) {
+          return toggleAuthorFollow({
+            author: {
+              username: data.profile.username,
+              following: data.profile.following
+            }
+          });
+        }
+      }, m("ion-icon", {
+        name: data.profile.following ? "people-circle-outline" : "people-outline"
+      }), m("ion-label", "".concat(data.profile.username))) : m("ion-chip", {
+        onclick: function onclick(e) {
+          return m.route.set("/settings/".concat(data.profile.username));
+        }
+      }, m("ion-icon", {
+        name: "settings"
+      }), m("ion-label", "Edit Profile Settings"))))), m("ion-list", m("ion-button", {
+        color: !state.showFaveArticles ? "primary" : "secondary",
+        onclick: function onclick(e) {
+          return selectFeed(false);
+        }
+      }, "Written Articles"), m("ion-button", {
+        color: state.showFaveArticles ? "primary" : "secondary",
+        onclick: function onclick(e) {
+          return selectFeed(true);
+        }
+      }, "Favorited Articles")), state.feedStatus == "loading" && "Loading Articles...", state.feedStatus == "error" && m("ion-text", {
+        color: "warning"
+      }, [m("h1", "Error Loading Data: ".concat(state.error))]), state.feedStatus == "success" && [state.showFaveArticles ? m(_components.Articles, {
+        mdl: mdl,
+        data: data.authorFavoriteArticles
+      }) : m(_components.Articles, {
+        mdl: mdl,
+        data: data.authorArticles
+      }), m(_components.Paginator, {
+        mdl: mdl,
+        state: state,
+        fetchDataFor: function fetchDataFor(offset) {
+          state.offset = offset;
+          loadData(mdl);
+        }
+      })]]];
+    }
+  };
+};
+
+var _default = Profile;
+exports["default"] = _default;
+});
+
+;require.register("pages/register.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+var _components = require("components");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var registerTask = function registerTask(http) {
+  return function (mdl) {
+    return function (user) {
+      return http.postTask(mdl)("users")({
+        user: user
+      });
+    };
+  };
+};
+
+var Register = function Register() {
+  var state = {
+    errors: null,
+    disabled: false
+  };
+  var data = {
+    username: "",
+    email: "",
+    password: ""
+  };
+
+  var onSubmit = function onSubmit(mdl, e) {
+    e.preventDefault();
+    console.log(mdl);
+    state.disabled = true;
+
+    var onSuccess = function onSuccess(_ref) {
+      var user = _ref.user;
+      mdl.user = user;
+      localStorage.setItem("token", "Token ".concat(user.token));
+      localStorage.setItem("user", JSON.stringify(user));
+      state.disabled = false;
+      m.route.set("/home");
+      console.log("success", user);
+    };
+
+    var onError = function onError(errors) {
+      state.disabled = false;
+      state.errors = (0, _Utils.errorViewModel)(errors);
+    };
+
+    state.isSubmitted = true;
+    registerTask(_Http["default"])(mdl)(data).fork(onError, onSuccess);
+  };
+
+  return {
+    view: function view(_ref2) {
+      var mdl = _ref2.attrs.mdl;
+      return m("form", [m("ion-text", m("h1", "Sign Up")), state.errors && m(_components.FormErrors, {
+        mdl: mdl,
+        errors: state.errors
+      }), m("ion-input", {
+        type: "text",
+        disabled: state.disabled,
+        placeholder: "Your Name",
+        onchange: function onchange(e) {
+          return data.username = e.target.value;
+        },
+        value: data.username
+      }), m("ion-input", {
+        type: "text",
+        disabled: state.disabled,
+        placeholder: "email",
+        onchange: function onchange(e) {
+          return data.email = e.target.value;
+        },
+        value: data.email
+      }), m("ion-input", {
+        type: "password",
+        disabled: state.disabled,
+        placeholder: "password",
+        onchange: function onchange(e) {
+          return data.password = e.target.value;
+        },
+        value: data.password
+      }), m("ion-button", {
+        onclick: function onclick(e) {
+          return onSubmit(mdl, e);
+        }
+      }, "Sign Up"), m("ion-link", m(m.route.Link, {
+        href: "/login"
+      }, m("ion-label", "Have an account?")))]);
+    }
+  };
+};
+
+var _default = Register;
+exports["default"] = _default;
+});
+
+;require.register("pages/user.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _Http = _interopRequireDefault(require("Http"));
+
+var _Utils = require("Utils");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var submitTask = function submitTask(http) {
+  return function (mdl) {
+    return function (data) {
+      return http.putTask(mdl)("user")(data);
+    };
+  };
+};
+
+var submit = function submit(mdl, data) {
+  var onSuccess = function onSuccess(_ref) {
+    var user = _ref.user;
+    localStorage.setItem("user", JSON.stringify(user));
+    mdl.user = user;
+    console.log(mdl.user);
+    m.route.set("/home");
+  };
+
+  var onError = (0, _Utils.log)("error");
+  submitTask(_Http["default"])(mdl)(data).fork(onError, onSuccess);
+};
+
+var User = function User(_ref2) {
+  var _ref2$attrs$mdl$user = _ref2.attrs.mdl.user,
+      image = _ref2$attrs$mdl$user.image,
+      username = _ref2$attrs$mdl$user.username,
+      password = _ref2$attrs$mdl$user.password,
+      bio = _ref2$attrs$mdl$user.bio,
+      email = _ref2$attrs$mdl$user.email;
+  var data = {
+    image: image,
+    username: username,
+    password: password,
+    bio: bio,
+    email: email
+  };
+  return {
+    view: function view(_ref3) {
+      var mdl = _ref3.attrs.mdl;
+      return m("form", m("ion-text", m("h1", "Your Settings")), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "URL of profile picture"), m("ion-input", {
+        type: "text",
+        placeholder: "URL of profile picture",
+        onchange: function onchange(e) {
+          return data.image = e.target.value;
+        },
+        value: data.image
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Your Name"), m("ion-input", {
+        type: "text",
+        placeholder: "Your Name",
+        onchange: function onchange(e) {
+          return data.username = e.target.value;
+        },
+        value: data.username
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Short bio about you"), m("ion-textarea", {
+        placeholder: "Short bio about you",
+        onchange: function onchange(e) {
+          return data.bio = e.target.value;
+        },
+        value: data.bio
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Email"), m("ion-input", {
+        type: "text",
+        placeholder: "Email",
+        onchange: function onchange(e) {
+          return data.email = e.target.value;
+        },
+        value: data.email
+      })), m("ion-item", m("ion-label", {
+        position: "stacked"
+      }, "Password"), m("ion-input", {
+        type: "password",
+        placeholder: "Password",
+        onchange: function onchange(e) {
+          return data.password = e.target.value;
+        },
+        value: data.password
+      })), m("ion-button", {
+        onclick: function onclick(e) {
+          return submit(mdl, data);
+        }
+      }, " Update Settings "));
+    }
+  };
+};
+
+var _default = User;
+exports["default"] = _default;
+});
+
+;require.register("routes.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _index = _interopRequireDefault(require("./layout/index"));
+
+var _home = _interopRequireDefault(require("./pages/home"));
+
+var _article = _interopRequireDefault(require("./pages/article"));
+
+var _profile = _interopRequireDefault(require("./pages/profile"));
+
+var _register = _interopRequireDefault(require("./pages/register"));
+
+var _login = _interopRequireDefault(require("./pages/login"));
+
+var _user = _interopRequireDefault(require("./pages/user"));
+
+var _editor = _interopRequireDefault(require("./pages/editor"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var Routes = [{
+  url: "/home",
+  config: {
+    isAuth: false
+  },
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_home["default"], {
+      mdl: mdl
+    }));
+  }
+}, {
+  url: "/editor",
+  config: {
+    isAuth: true
+  },
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_editor["default"], {
+      mdl: mdl,
+      key: mdl.slug
+    }));
+  }
+}, {
+  url: "/editor/:slug",
+  config: {
+    isAuth: true
+  },
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_editor["default"], {
+      mdl: mdl
+    }));
+  }
+}, {
+  url: "/article/:slug",
+  config: {
+    isAuth: true
+  },
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_article["default"], {
+      mdl: mdl
+    }));
+  }
+}, {
+  url: "/profile/:slug",
+  config: {
+    isAuth: true
+  },
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_profile["default"], {
+      mdl: mdl,
+      key: mdl.slug
+    }));
+  }
+}, {
+  url: "/settings/:slug",
+  config: {
+    isAuth: true
+  },
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_user["default"], {
+      mdl: mdl,
+      key: mdl.slug
+    }));
+  }
+}, {
+  url: "/login",
+  config: {
+    isAuth: false
+  },
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_login["default"], {
+      mdl: mdl
+    }));
+  }
+}, {
+  url: "/register",
+  config: {
+    isAuth: false
+  },
+  component: function component(mdl) {
+    return m(_index["default"], {
+      mdl: mdl
+    }, m(_register["default"], {
+      mdl: mdl
+    }));
+  }
+}];
+var _default = Routes;
+exports["default"] = _default;
+});
+
+;require.alias("process/browser.js", "process");process = require('process');require.register("___globals___", function(exports, require, module) {
+  
+
+// Auto-loaded modules from config.npm.globals.
+window.m = require("mithril");
+window.Task = require("data.task");
+
+
+});})();require('___globals___');
+
+
+//# sourceMappingURL=app.js.map

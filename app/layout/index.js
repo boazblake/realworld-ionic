@@ -1,5 +1,4 @@
 import Header from "./header.js"
-import Footer from "./footer.js"
 import { Toaster, SideBar } from "components"
 
 const Layout = () => {
@@ -8,10 +7,9 @@ const Layout = () => {
       m(
         "ion-app",
         m(Header, { mdl }),
-        m(SideBar, { mdl }),
+        mdl.state.isLoggedIn() && m(SideBar, { mdl }),
         m("ion-content", { id: "layout", contentId: "layout" }, children),
         mdl.toast.msg && m(Toaster, { mdl })
-        // m(Footer, { mdl })
       ),
   }
 }

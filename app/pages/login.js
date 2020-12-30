@@ -23,7 +23,8 @@ const Login = () => {
       // console.log(
       //   "LOGGED IN",
       //   localStorage.getItem("token"),
-      //   mdl.state.isLoggedIn("LOGGED IN")
+      //   mdl.state.isLoggedIn("LOGGED IN"),
+      //   mdl
       // )
       m.route.set("/home")
     }
