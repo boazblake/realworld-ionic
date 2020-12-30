@@ -1,5 +1,5 @@
 import { Menu } from "./menu"
-import { ProfileLink, MenuToggle, TagList } from "components"
+import { ProfileLink, MenuToggle, TagList, DarkModeToggle } from "components"
 import BaseModel from "../model"
 
 const logout = (mdl) => {
@@ -12,7 +12,6 @@ const SettingsMenu = () => {
   return {
     view: ({ attrs: { mdl, side } }) =>
       m("ion-list", [
-        m(ProfileLink, { mdl }),
         m(
           "ion-item",
           m(MenuToggle, {
@@ -37,20 +36,7 @@ const SettingsMenu = () => {
               "Edit"
             ),
           }),
-          m(
-            "ion-button",
-            {
-              onclick: (e) => {
-                mdl.state.darkmode = !mdl.state.darkmode
-                document.body.classList.toggle("dark")
-                window.matchMedia("(prefers-color-scheme: dark)")
-              },
-            },
-            m("ion-icon", {
-              name: mdl.state.darkmode ? "sunny-outline" : "moon-outline",
-            }),
-            mdl.state.darkmode ? "Day" : "Night"
-          )
+          m(DarkModeToggle, { mdl })
         ),
         m("ion-item", m(TagList, { mdl })),
       ]),
@@ -63,10 +49,10 @@ export const SideBar = () => {
       m(Menu, {
         mdl,
         visibile: true,
-        title: m("ion-img", { src: "" }),
         side: "start",
         menuId: "options",
         contentId: "layout",
+        header: m(ProfileLink, { mdl }),
         contents: m(SettingsMenu, {
           mdl,
           side: "start",

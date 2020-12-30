@@ -28,9 +28,7 @@ export const MenuToggle = ({
 
 export const Menu = () => {
   return {
-    view: ({
-      attrs: { title, visible, side, menuId, contentId, contents },
-    }) => {
+    view: ({ attrs: { header, title, contentId, contents } }) => {
       // console.log("wtf", { title, visible, side, menuId, contentId, contents })
       return m(
         "ion-menu[type='push']",
@@ -50,7 +48,8 @@ export const Menu = () => {
           contentId,
         },
         [
-          m("ion-header", m("ion-toolbar", m("ion-title", title))),
+          header && header,
+          title && m("ion-header", m("ion-toolbar", m("ion-title", title))),
           m("ion-content", contents),
         ]
       )
