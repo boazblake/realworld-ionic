@@ -1,14 +1,18 @@
 import Http from "Http"
 import { log } from "Utils"
-import BaseModel from "../model"
-
-const logout = (mdl) => {
-  localStorage.clear()
-  mdl = BaseModel()
-  m.route.set("/home")
-}
 
 const submitTask = (http) => (mdl) => (data) => http.putTask(mdl)("user")(data)
+
+const submit = (mdl, data) => {
+  const onSuccess = ({ user }) => {
+    localStorage.setItem("user", JSON.stringify(user))
+    mdl.user = user
+    console.log(mdl.user)
+    m.route.set("/home")
+  }
+  const onError = log("error")
+  submitTask(Http)(mdl)(data).fork(onError, onSuccess)
+}
 
 const User = ({
   attrs: {
@@ -18,17 +22,6 @@ const User = ({
   },
 }) => {
   let data = { image, username, password, bio, email }
-  const submit = (mdl, data) => {
-    const onSuccess = ({ user }) => {
-      localStorage.setItem("user", JSON.stringify(user))
-      mdl.user = user
-      console.log(mdl.user)
-      m.route.set("/home")
-    }
-    const onError = log("error")
-    submitTask(Http)(mdl)(data).fork(onError, onSuccess)
-  }
-
   return {
     view: ({ attrs: { mdl } }) =>
       m(
@@ -92,11 +85,6 @@ const User = ({
           "ion-button",
           { onclick: (e) => submit(mdl, data) },
           " Update Settings "
-        ),
-        m(
-          "ion-button",
-          { onclick: (e) => logout(mdl, data) },
-          "Or click here to logout."
         )
       ),
   }

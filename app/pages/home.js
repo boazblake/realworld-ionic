@@ -1,7 +1,6 @@
 import Http from "Http"
-import { Loader, Paginator, Articles, FeedNav, TagList } from "components"
+import { Loader, Paginator, Articles, FeedNav } from "components"
 
-const getTagsTask = (http) => (mdl) => http.getTask(mdl)("tags")
 const getArticlesTask = (http) => (mdl) => (state) => (data) =>
   data.tags.current == "feed"
     ? http.getTask(mdl)(`articles/feed?limit=20&offset=${state.offset}`)
@@ -9,16 +8,7 @@ const getArticlesTask = (http) => (mdl) => (state) => (data) =>
         `articles?limit=20&offset=${state.offset}&tag=${data.tags.current}`
       )
 
-const loadDataTask = (http) => (mdl) => (state) => (data) =>
-  Task.of((tags) => (articles) => ({ ...tags, ...articles }))
-    .ap(getTagsTask(http)(mdl))
-    .ap(getArticlesTask(http)(mdl)(state)(data))
-
 const Home = () => {
-  const data = {
-    tags: { tagList: [], selected: [], current: "" },
-    articles: {},
-  }
   const state = {
     feedStatus: "loading",
     pageStatus: "loading",
@@ -29,10 +19,9 @@ const Home = () => {
   }
 
   const loadInitData = (mdl) => {
-    const onSuccess = ({ articles, articlesCount, tags }) => {
-      data.articles = articles
+    const onSuccess = ({ articles, articlesCount }) => {
+      mdl.data.articles = articles
       state.total = articlesCount
-      data.tags.tagList = tags
       state.pageStatus = "success"
       state.feedStatus = "success"
     }
@@ -43,12 +32,12 @@ const Home = () => {
       state.pageStatus = "error"
     }
     state.pageStatus = "loading"
-    loadDataTask(Http)(mdl)(state)(data).fork(onError, onSuccess)
+    getArticlesTask(Http)(mdl)(state)(mdl.data).fork(onError, onSuccess)
   }
 
   const loadArticles = (mdl) => {
     const onSuccess = ({ articles, articlesCount }) => {
-      data.articles = articles
+      mdl.data.articles = articles
       state.total = articlesCount
       state.feedStatus = "success"
     }
@@ -60,7 +49,7 @@ const Home = () => {
     }
 
     state.feedStatus = "loading"
-    getArticlesTask(Http)(mdl)(state)(data).fork(onError, onSuccess)
+    getArticlesTask(Http)(mdl)(state)(mdl.data).fork(onError, onSuccess)
   }
 
   return {
@@ -73,16 +62,18 @@ const Home = () => {
               m(Loader, [m("h1.logo-font", `Loading Data`)])),
 
           state.pageStatus == "error" &&
-            m(Banner, [
-              m("h1.logo-font", `Error Loading Data: ${state.error}`),
-            ]),
+            m(
+              "ion-text",
+              { color: "earning" },
+              m("h1", `Error Loading Data: ${state.error}`)
+            ),
 
           state.pageStatus == "success" && [
-            m(FeedNav, { fetchData: loadArticles, mdl, data }),
+            m(FeedNav, { fetchData: loadArticles, mdl, data: mdl.data }),
 
             state.feedStatus == "success" &&
               state.total && [
-                m(Articles, { mdl, data }),
+                m(Articles, { mdl, data: mdl.data }),
 
                 m(Paginator, {
                   mdl,
@@ -106,8 +97,6 @@ const Home = () => {
                   m("ion-fab-button", m("ion-icon", { name: "add-circle" })),
                 ])
               ),
-
-            m(TagList, { mdl, data }),
           ],
         ]),
       ]

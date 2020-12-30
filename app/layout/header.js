@@ -1,4 +1,4 @@
-import { MenuButton } from "components"
+import { MenuButton, MenuToggle } from "components"
 
 const Header = () => {
   return {
@@ -20,6 +20,7 @@ const Header = () => {
                       },
                       defaultHref: "/",
                     }),
+
                     m(
                       "ion-title.ion-align-center",
                       m(m.route.Link, { href: "#" }, "Home")
@@ -28,11 +29,17 @@ const Header = () => {
                 m(
                   "ion-buttons",
                   { slot: "end" },
-                  m(MenuButton, {
+
+                  m(MenuToggle, {
                     side: "start",
                     mdl,
-                    name: "options",
-                    label: "Options",
+                    eHandler: () => "",
+                    sHandler: () => "",
+                    contents: m(
+                      "ion-button",
+                      m("ion-icon", { name: "options" }),
+                      "Options"
+                    ),
                   })
                 ),
               ]

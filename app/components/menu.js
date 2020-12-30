@@ -1,25 +1,27 @@
 import { menuController } from "@ionic/core"
 
-export const MenuButton = () => {
-  const toggleMenu = (mdl, side) => {
+export const MenuToggle = ({
+  attrs: { mdl, side, contents, eHandler, sHandler },
+}) => {
+  const toggleMenu = () => {
     menuController
       .enable(true, side)
-      .then(menuController.open(side))
+      .then(menuController.toggle(side))
       .then(
-        (s) =>
-          console.log("s", s, mdl.menu ? (mdl.menu = side) : (mdl.menu = null)),
-        (e) => console.log("erro", e)
+        (x) => console.log("?menutoggle s", x),
+        (z) => console.log("menutoggle e", z)
       )
+    // .then(sHandler(mdl), eHandler(mdl))
   }
 
   return {
-    view: ({ attrs: { mdl, name, side, label } }) =>
+    view: () =>
       m(
         "ion-menu-toggle",
         {
-          onclick: () => toggleMenu(mdl, side),
+          onclick: () => toggleMenu,
         },
-        m("ion-button", {}, m("ion-icon", { name }), label)
+        contents
       ),
   }
 }
@@ -29,7 +31,7 @@ export const Menu = () => {
     view: ({
       attrs: { title, visible, side, menuId, contentId, contents },
     }) => {
-      console.log("wtf", { title, visible, side, menuId, contentId, contents })
+      // console.log("wtf", { title, visible, side, menuId, contentId, contents })
       return m(
         "ion-menu[type='push']",
         {
@@ -48,7 +50,7 @@ export const Menu = () => {
           contentId,
         },
         [
-          m("ion-header", m("ion-toolbar[translucent]", m("ion-title", title))),
+          m("ion-header", m("ion-toolbar", m("ion-title", title))),
           m("ion-content", contents),
         ]
       )

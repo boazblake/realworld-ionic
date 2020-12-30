@@ -115,8 +115,7 @@ const Profile = ({ attrs: { mdl } }) => {
     oninit: ({ attrs: { mdl } }) => loadInitData(mdl),
     view: ({ attrs: { mdl } }) => {
       return m(
-        "ion-content",
-        { id: "profile", contentId: "profile" },
+        "section.ion-page",
         state.pageStatus == "loading" &&
           m(Loader, [m("h1.logo-font", "Loading ...")]),
         state.pageStatus == "error" &&
@@ -184,8 +183,8 @@ const Profile = ({ attrs: { mdl } }) => {
           ),
           state.feedStatus == "loading" && "Loading Articles...",
           state.feedStatus == "error" &&
-            m(Banner, [
-              m("h1.logo-font", `Error Loading Data: ${state.error}`),
+            m("ion-text", { color: "warning" }, [
+              m("h1", `Error Loading Data: ${state.error}`),
             ]),
           state.feedStatus == "success" && [
             state.showFaveArticles
