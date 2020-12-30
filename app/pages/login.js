@@ -20,6 +20,11 @@ const Login = () => {
       localStorage.setItem("user", JSON.stringify(user))
       mdl.user = user
       state.disabled = false
+      // console.log(
+      //   "LOGGED IN",
+      //   localStorage.getItem("token"),
+      //   mdl.state.isLoggedIn("LOGGED IN")
+      // )
       m.route.set("/home")
     }
 

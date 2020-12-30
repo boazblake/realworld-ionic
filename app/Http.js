@@ -49,7 +49,10 @@ const getUserToken = () =>
     : ""
 
 const call = (_headers) => (method) => (mdl) => (url) => (body) => {
-  if (["POST", "PUT", "DELETE"].includes(method) && !mdl.state.isLoggedIn()) {
+  if (
+    ["POST", "PUT", "DELETE"].includes(method) &&
+    !mdl.state.isLoggedIn("http-call")
+  ) {
     if (!["/login", "/register"].includes(mdl.slug)) {
       return Task.rejected(m.route.set("/register"))
     }

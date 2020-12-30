@@ -9,7 +9,15 @@ const BaseModel = () => ({
     darkmode: false,
     isLoading: false,
     loadingProgress: { max: 0, value: 0 },
-    isLoggedIn: Stream(localStorage.getItem("token")),
+    isLoggedIn: (from) => {
+      // console.log(
+      //   "called is logged in",
+      //   from,
+      //   localStorage.getItem("token"),
+      //   !!localStorage.getItem("token")
+      // )
+      return !!localStorage.getItem("token")
+    },
   },
   settings: {},
   page: "",

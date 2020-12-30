@@ -7,7 +7,7 @@ const Header = () => {
         "ion-header",
         m(
           "ion-toolbar",
-          mdl.state.isLoggedIn()
+          mdl.state.isLoggedIn("header")
             ? [
                 m.route.get() !== "/home" &&
                   m(

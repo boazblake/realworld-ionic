@@ -60,7 +60,7 @@ const Home = () => {
           "ion-content",
           { scroll: false, id: "profile", contentId: "profile" },
           [
-            (!mdl.state.isLoggedIn() && state.pageStatus == "loading") ||
+            (!mdl.state.isLoggedIn("home") && state.pageStatus == "loading") ||
               (state.feedStatus == "loading" &&
                 m(Loader, [m("h1.logo-font", `Loading Data`)])),
 
@@ -95,7 +95,7 @@ const Home = () => {
                 !state.total &&
                 m("ion-text", "No articles are here... yet."),
 
-              mdl.state.isLoggedIn() &&
+              mdl.state.isLoggedIn("home") &&
                 m(
                   "ion-fab",
                   {

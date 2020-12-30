@@ -25,7 +25,7 @@ export const FeedNav = ({ attrs: { fetchData } }) => {
               )
             ),
 
-            mdl.state.isLoggedIn() &&
+            mdl.state.isLoggedIn("feed-nav") &&
               m(
                 "ion-col",
                 m(
