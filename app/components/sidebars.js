@@ -52,7 +52,7 @@ export const SideBar = () => {
         side: "start",
         menuId: "options",
         contentId: "layout",
-        header: m(ProfileLink, { mdl }),
+        header: m("ion-header", m(ProfileLink, { mdl })),
         contents: m(SettingsMenu, {
           mdl,
           side: "start",

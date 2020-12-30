@@ -1,13 +1,15 @@
 const toRouter = (mdl) => (Router, route) => {
-  let matcher = route.url.includes(":slug")
-    ? mdl.state.isLoggedIn()
-      ? ({ slug }) => {
-          mdl.slug = slug
+  let matcher = () =>
+    route.url.includes(":slug")
+      ? mdl.state.isLoggedIn()
+        ? ({ slug }) => {
+            mdl.slug = slug
+          }
+        : () => m.route.set("/login")
+      : (_, b) => {
+          mdl.slug = b
+          console.log("login", mdl)
         }
-      : () => m.route.set("/login")
-    : (_, b) => {
-        mdl.slug = b
-      }
 
   let renderer = () => {
     return route.config.isAuth
@@ -18,9 +20,11 @@ const toRouter = (mdl) => (Router, route) => {
   }
 
   Router[route.url] = {
-    onmatch: matcher,
+    onmatch: matcher(),
     render: renderer,
   }
+
+  // console.log("stringRouter", JSON.stringify(Router, null, 4))
   return Router
 }
 

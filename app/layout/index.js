@@ -10,8 +10,8 @@ const Layout = () => {
         m(Header, { mdl }),
         m(SideBar, { mdl }),
         m("ion-content", { id: "layout", contentId: "layout" }, children),
-        mdl.toast.msg && m(Toaster, { mdl }),
-        m(Footer, { mdl })
+        mdl.toast.msg && m(Toaster, { mdl })
+        // m(Footer, { mdl })
       ),
   }
 }

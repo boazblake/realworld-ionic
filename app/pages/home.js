@@ -98,7 +98,12 @@ const Home = () => {
               mdl.state.isLoggedIn() &&
                 m(
                   "ion-fab",
-                  { vertical: "bottom", horizontal: "end", slot: "fixed" },
+                  {
+                    style: { padding: "0 50px 40px 0" },
+                    vertical: "bottom",
+                    horizontal: "end",
+                    slot: "fixed",
+                  },
                   m(m.route.Link, { class: "nav-link", href: "/editor" }, [
                     m("ion-fab-button", m("ion-icon", { name: "add-circle" })),
                   ])

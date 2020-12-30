@@ -24,7 +24,7 @@ export const ProfileLink = () => {
                 m("ion-img", { src: sanitizeImg(mdl.user.image) })
               ),
 
-              m("ion-label", `${mdl.user.username}`)
+              m("ion-text", m("h1", `${mdl.user.username}`))
             )
           )
         ),

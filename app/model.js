@@ -1,4 +1,5 @@
 import Routes from "./routes"
+import Stream from "mithril-stream"
 
 const BaseModel = () => ({
   menus: ["settings", "options"],
@@ -8,7 +9,7 @@ const BaseModel = () => ({
     darkmode: false,
     isLoading: false,
     loadingProgress: { max: 0, value: 0 },
-    isLoggedIn: () => localStorage.getItem("token"),
+    isLoggedIn: Stream(localStorage.getItem("token")),
   },
   settings: {},
   page: "",

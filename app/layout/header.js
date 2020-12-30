@@ -1,4 +1,4 @@
-import { MenuButton, MenuToggle } from "components"
+import { MenuToggle } from "components"
 
 const Header = () => {
   return {
@@ -37,8 +37,7 @@ const Header = () => {
                     sHandler: () => "",
                     contents: m(
                       "ion-button",
-                      m("ion-icon", { name: "options" }),
-                      "Options"
+                      m("ion-icon", { name: "options" })
                     ),
                   })
                 ),
