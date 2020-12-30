@@ -6,7 +6,7 @@ const Layout = () => {
   return {
     view: ({ children, attrs: { mdl } }) =>
       m(
-        "ion-app.ion-page",
+        "ion-app",
         m(Header, { mdl }),
         m(SideBar, { mdl }),
         m("ion-content", { id: "layout", contentId: "layout" }, children),

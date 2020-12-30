@@ -56,49 +56,49 @@ const Home = () => {
     oninit: ({ attrs: { mdl } }) => loadInitData(mdl),
     view: ({ attrs: { mdl } }) => {
       return [
-        m("ion-content", { id: "profile", contentId: "profile" }, [
-          (!mdl.state.isLoggedIn() && state.pageStatus == "loading") ||
-            (state.feedStatus == "loading" &&
-              m(Loader, [m("h1.logo-font", `Loading Data`)])),
+        // m("ion-content", { id: "profile", contentId: "profile" }, [
+        (!mdl.state.isLoggedIn() && state.pageStatus == "loading") ||
+          (state.feedStatus == "loading" &&
+            m(Loader, [m("h1.logo-font", `Loading Data`)])),
 
-          state.pageStatus == "error" &&
+        state.pageStatus == "error" &&
+          m(
+            "ion-text",
+            { color: "earning" },
+            m("h1", `Error Loading Data: ${state.error}`)
+          ),
+
+        state.pageStatus == "success" && [
+          m(FeedNav, { fetchData: loadArticles, mdl, data: mdl.data }),
+
+          state.feedStatus == "success" &&
+            state.total && [
+              m(Articles, { mdl, data: mdl.data }),
+
+              m(Paginator, {
+                mdl,
+                state,
+                fetchDataFor: (offset) => {
+                  state.offset = offset
+                  loadArticles(mdl)
+                },
+              }),
+            ],
+
+          state.feedStatus == "success" &&
+            !state.total &&
+            m("ion-text", "No articles are here... yet."),
+
+          mdl.state.isLoggedIn() &&
             m(
-              "ion-text",
-              { color: "earning" },
-              m("h1", `Error Loading Data: ${state.error}`)
+              "ion-fab",
+              { vertical: "bottom", horizontal: "end", slot: "fixed" },
+              m(m.route.Link, { class: "nav-link", href: "/editor" }, [
+                m("ion-fab-button", m("ion-icon", { name: "add-circle" })),
+              ])
             ),
-
-          state.pageStatus == "success" && [
-            m(FeedNav, { fetchData: loadArticles, mdl, data: mdl.data }),
-
-            state.feedStatus == "success" &&
-              state.total && [
-                m(Articles, { mdl, data: mdl.data }),
-
-                m(Paginator, {
-                  mdl,
-                  state,
-                  fetchDataFor: (offset) => {
-                    state.offset = offset
-                    loadArticles(mdl)
-                  },
-                }),
-              ],
-
-            state.feedStatus == "success" &&
-              !state.total &&
-              m("ion-text", "No articles are here... yet."),
-
-            mdl.state.isLoggedIn() &&
-              m(
-                "ion-fab",
-                { vertical: "bottom", horizontal: "end", slot: "fixed" },
-                m(m.route.Link, { class: "nav-link", href: "/editor" }, [
-                  m("ion-fab-button", m("ion-icon", { name: "add-circle" })),
-                ])
-              ),
-          ],
-        ]),
+        ],
+        // ]),
       ]
     },
   }

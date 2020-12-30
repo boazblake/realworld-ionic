@@ -113,96 +113,93 @@ const Profile = ({ attrs: { mdl } }) => {
 
   return {
     oninit: ({ attrs: { mdl } }) => loadInitData(mdl),
-    view: ({ attrs: { mdl } }) => {
-      return m(
-        "section.ion-page",
-        state.pageStatus == "loading" &&
-          m(Loader, [m("h1.logo-font", "Loading ...")]),
-        state.pageStatus == "error" &&
-          m(Banner, [m("h1.logo-font", `Error Loading Data: ${state.error}`)]),
-        state.pageStatus == "success" && [
+    view: ({ attrs: { mdl } }) => [
+      state.pageStatus == "loading" &&
+        m(Loader, [m("h1.logo-font", "Loading ...")]),
+      state.pageStatus == "error" &&
+        m(Banner, [m("h1.logo-font", `Error Loading Data: ${state.error}`)]),
+      state.pageStatus == "success" && [
+        m(
+          "ion-grid",
           m(
-            "ion-grid",
+            "ion-row",
             m(
-              "ion-row",
-              m(
-                "ion-col",
-                m("ion-img", { src: sanitizeImg(data.profile.image) }),
-                m("ion-text", m("h4", data.profile.username)),
-                m("ion-text", m("p", data.profile.bio)),
+              "ion-col",
+              m("ion-img", { src: sanitizeImg(data.profile.image) }),
+              m("ion-text", m("h4", data.profile.username)),
+              m("ion-text", m("p", data.profile.bio)),
 
-                data.profile.username !== mdl.user.username
-                  ? m(
-                      "ion-chip",
-                      {
-                        onclick: (e) =>
-                          toggleAuthorFollow({
-                            author: {
-                              username: data.profile.username,
-                              following: data.profile.following,
-                            },
-                          }),
-                      },
-                      m("ion-icon", {
-                        name: data.profile.following
-                          ? "people-circle-outline"
-                          : "people-outline",
-                      }),
-                      m("ion-label", `${data.profile.username}`)
-                    )
-                  : m(
-                      "ion-chip",
-                      {
-                        onclick: (e) =>
-                          m.route.set(`/settings/${data.profile.username}`),
-                      },
-                      m("ion-icon", { name: "settings" }),
-                      m("ion-label", "Edit Profile Settings")
-                    )
-              )
+              data.profile.username !== mdl.user.username
+                ? m(
+                    "ion-chip",
+                    {
+                      onclick: (e) =>
+                        toggleAuthorFollow({
+                          author: {
+                            username: data.profile.username,
+                            following: data.profile.following,
+                          },
+                        }),
+                    },
+                    m("ion-icon", {
+                      name: data.profile.following
+                        ? "people-circle-outline"
+                        : "people-outline",
+                    }),
+                    m("ion-label", `${data.profile.username}`)
+                  )
+                : m(
+                    "ion-chip",
+                    {
+                      onclick: (e) =>
+                        m.route.set(`/settings/${data.profile.username}`),
+                    },
+                    m("ion-icon", { name: "settings" }),
+                    m("ion-label", "Edit Profile Settings")
+                  )
             )
+          )
+        ),
+        m(
+          "ion-list",
+          m(
+            "ion-button",
+            {
+              color: !state.showFaveArticles ? "primary" : "secondary",
+              onclick: (e) => selectFeed(false),
+            },
+            "Written Articles"
           ),
           m(
-            "ion-list",
-            m(
-              "ion-button",
-              {
-                color: !state.showFaveArticles ? "primary" : "secondary",
-                onclick: (e) => selectFeed(false),
-              },
-              "Written Articles"
-            ),
-            m(
-              "ion-button",
-              {
-                color: state.showFaveArticles ? "primary" : "secondary",
-                onclick: (e) => selectFeed(true),
-              },
-              "Favorited Articles"
-            )
-          ),
-          state.feedStatus == "loading" && "Loading Articles...",
-          state.feedStatus == "error" &&
-            m("ion-text", { color: "warning" }, [
-              m("h1", `Error Loading Data: ${state.error}`),
-            ]),
-          state.feedStatus == "success" && [
-            state.showFaveArticles
-              ? m(Articles, { mdl, data: data.authorFavoriteArticles })
-              : m(Articles, { mdl, data: data.authorArticles }),
+            "ion-button",
+            {
+              color: state.showFaveArticles ? "primary" : "secondary",
+              onclick: (e) => selectFeed(true),
+            },
+            "Favorited Articles"
+          )
+        ),
+        state.feedStatus == "loading" && "Loading Articles...",
+        state.feedStatus == "error" &&
+          m("ion-text", { color: "warning" }, [
+            m("h1", `Error Loading Data: ${state.error}`),
+          ]),
+        state.feedStatus == "success" && [
+          state.showFaveArticles
+            ? m(Articles, { mdl, data: data.authorFavoriteArticles })
+            : m(Articles, { mdl, data: data.authorArticles }),
 
-            m(Paginator, {
-              mdl,
-              state,
-              fetchDataFor: (offset) => {
-                state.offset = offset
-                loadData(mdl)
-              },
-            }),
-          ],
-        ]
-      )
-    },
+          m(Paginator, {
+            mdl,
+            state,
+            fetchDataFor: (offset) => {
+              state.offset = offset
+              loadData(mdl)
+            },
+          }),
+        ],
+      ],
+    ],
   }
 }
 
