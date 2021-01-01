@@ -44,7 +44,7 @@ const Article = () => {
 
       state.status == "success" && [
         m("ion-text", m("h1", data.article.title)),
-        m("ion-text", m.trust(md(data.article.body))),
+        m("ion-text", m.trust(mdl.sanitizer.sanitize(md(data.article.body)))),
         data.article.tagList.map((tag) => m("ion-chip", tag)),
         m(FollowFavorite, {
           mdl,

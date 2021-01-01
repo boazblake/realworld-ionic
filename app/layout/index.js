@@ -3,14 +3,15 @@ import { Toaster, SideBar } from "components"
 
 const Layout = () => {
   return {
-    view: ({ children, attrs: { mdl } }) =>
-      m(
+    view: ({ children, attrs: { mdl } }) => {
+      return m(
         "ion-app",
         m(Header, { mdl }),
         mdl.state.isLoggedIn() && m(SideBar, { mdl }),
         m("ion-content", { id: "layout", contentId: "layout" }, children),
-        mdl.toast.msg && m(Toaster, { mdl })
-      ),
+        mdl.state.isToaster() && m(Toaster, { mdl })
+      )
+    },
   }
 }
 

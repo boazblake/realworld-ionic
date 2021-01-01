@@ -4509,11 +4509,6 @@ minimist@^1.1.0, minimist@^1.1.1, minimist@^1.1.3, minimist@^1.2.0, minimist@^1.
   resolved "https://registry.npmjs.org/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
 
-mithril-stream@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/mithril-stream/-/mithril-stream-2.0.0.tgz#b33a9b8d1f1a93b50f79e13a3454d3a39d7e39fb"
-  integrity sha512-7anPud4n2FMGIXBQATVpFzclkddXHmJ1TzlqOP9STybk8JZYOPAD2otMYiMDc6sPrTNDY5S6GPDlYNIUY8Qs3Q==
-
 mithril@^2.0.4:
   version "2.0.4"
   resolved "https://registry.npmjs.org/mithril/-/mithril-2.0.4.tgz#d125969d992b924c7185d24ff92d997e5c00116b"

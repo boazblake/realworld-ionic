@@ -12,10 +12,11 @@ export const Toaster = () => {
               duration: mdl.toast.duration || 2000,
               showCloseButton: true,
               animated: true,
-              color: mdl.toast.status ? "success" : "danger",
+              color: mdl.toast.status,
             })
             .then((toast) => toast.present())
         },
+        onremove: () => localStorage.removeItem("toaster"),
       }),
   }
 }

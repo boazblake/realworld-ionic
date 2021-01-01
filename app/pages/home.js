@@ -30,7 +30,15 @@ const Home = () => {
       console.log("error", error)
       state.error = error
       state.pageStatus = "error"
+      localStorage.setItem("toaster", true)
+      mdl.toast = {
+        show: true,
+        duration: 2000,
+        status: "danger",
+        msg: error,
+      }
     }
+
     state.pageStatus = "loading"
     getArticlesTask(Http)(mdl)(state)(mdl.data).fork(onError, onSuccess)
   }
@@ -46,6 +54,13 @@ const Home = () => {
       console.log("error", error)
       state.error = error
       state.feedStatus = "error"
+      localStorage.setItem("toaster", true)
+      mdl.toast = {
+        show: true,
+        duration: 2000,
+        status: "danger",
+        msg: error,
+      }
     }
 
     state.feedStatus = "loading"
@@ -60,7 +75,7 @@ const Home = () => {
           "ion-content",
           { scroll: false, id: "profile", contentId: "profile" },
           [
-            (!mdl.state.isLoggedIn("home") && state.pageStatus == "loading") ||
+            (!mdl.state.isLoggedIn() && state.pageStatus == "loading") ||
               (state.feedStatus == "loading" &&
                 m(Loader, [m("h1.logo-font", `Loading Data`)])),
 
@@ -74,12 +89,13 @@ const Home = () => {
             state.pageStatus == "success" && [
               m(
                 "ion-list-header",
+                // { slot: "fixed" },
                 m(FeedNav, { fetchData: loadArticles, mdl, data: mdl.data })
               ),
 
               state.feedStatus == "success" &&
                 state.total && [
-                  m("ion-scroll", m(Articles, { mdl, data: mdl.data })),
+                  m(Articles, { mdl, data: mdl.data }),
 
                   m(Paginator, {
                     mdl,
@@ -95,7 +111,7 @@ const Home = () => {
                 !state.total &&
                 m("ion-text", "No articles are here... yet."),
 
-              mdl.state.isLoggedIn("home") &&
+              mdl.state.isLoggedIn() &&
                 m(
                   "ion-fab",
                   {

@@ -1,6 +1,6 @@
 import Http from "Http"
 import { log, sanitizeImg } from "Utils"
-
+import dayjs from "dayjs"
 const favoriteArticleUrl = (slug) => `articles/${slug}/favorite`
 const favoriteArticleTask = (http) => (mdl) => (slug) =>
   http.postTask(mdl)(favoriteArticleUrl(slug))()
@@ -52,35 +52,45 @@ const ArticlePreview = ({ attrs: { mdl, article } }) => {
           ),
           m("ion-row.ion-justify-content-between.ion-align-items-end", [
             m(
-              m.route.Link,
-              {
-                href: `/profile/${data.author.username}`,
-                options: { replace: true },
-              },
+              "ion-col",
+              { size: 9 },
               m(
-                "ion-avatar",
-                { slot: "start" },
-                m("img", { src: sanitizeImg(data.author.image) })
+                "ion-item",
+                {
+                  lines: "none",
+                  onclick: () =>
+                    m.route.set(`/profile/${data.author.username}`, {
+                      replace: true,
+                    }),
+                },
+                m(
+                  "ion-avatar",
+                  { slot: "start" },
+                  m("img", { src: sanitizeImg(data.author.image) })
+                ),
+                m(
+                  "ion-label",
+                  m("ion-text", m("h2", data.author.username)),
+                  m("p", dayjs().format("MM/DD/YYYY HH:mm", data.createdAt))
+                )
               )
             ),
             m(
-              "ion-label",
-              m("ion-text", m("h2", data.author.username)),
-              m("p", data.createdAt)
-            ),
-            m(
-              "ion-chip",
-              {
-                onclick: (e) => toggleArticleLike(data.favorited, data.slug),
-              },
-              [
+              "ion-col",
+              { size: 3 },
+              m(
+                "ion-item",
+                {
+                  lines: "none",
+                  onclick: (e) => toggleArticleLike(data.favorited, data.slug),
+                },
+
                 m("ion-icon", {
-                  name: data.favorited
-                    ? "heart-dislike-outline"
-                    : "heart-outline",
+                  color: "danger",
+                  name: data.favorited ? "heart" : "heart-outline",
                 }),
-                m("ion-text", data.favoritesCount),
-              ]
+                m("ion-text", data.favoritesCount)
+              )
             ),
           ]),
         ])

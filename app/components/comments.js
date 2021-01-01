@@ -76,6 +76,7 @@ const CommentForm = ({ attrs: { mdl, reload } }) => {
             m(
               "ion-button",
               {
+                color: "light",
                 onclick: (e) => {
                   state.disabled = true
                   submit(comment)

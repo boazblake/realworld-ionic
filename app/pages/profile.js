@@ -1,6 +1,6 @@
 import Http from "Http"
 import { log, sanitizeImg } from "Utils"
-import { Banner, Loader, Articles, Paginator } from "components"
+import { Loader, Articles, Paginator } from "components"
 
 const followAuthorUrl = (author) => `profiles/${author}/follow`
 
@@ -64,12 +64,21 @@ const Profile = ({ attrs: { mdl } }) => {
         ? data.authorFavoriteArticles.articlesCount
         : data.authorArticles.articlesCount
       state.feedStatus = "success"
+
+      console.log(state, data)
     }
 
     const onError = (error) => {
       console.log("error", error)
       state.error = error
       state.feedStatus = "error"
+      localStorage.setItem("toaster", true)
+      mdl.toast = {
+        show: true,
+        duration: 2000,
+        status: "danger",
+        msg: error,
+      }
     }
 
     state.feedStatus = "loading"
@@ -89,6 +98,13 @@ const Profile = ({ attrs: { mdl } }) => {
       console.log("error", error)
       state.error = error
       state.pageStatus = "error"
+      localStorage.setItem("toaster", true)
+      mdl.toast = {
+        show: true,
+        duration: 2000,
+        status: "danger",
+        msg: error,
+      }
       m.route.set("/home")
     }
 
@@ -115,12 +131,16 @@ const Profile = ({ attrs: { mdl } }) => {
     oninit: ({ attrs: { mdl } }) => loadInitData(mdl),
     view: ({ attrs: { mdl } }) => [
       state.pageStatus == "loading" &&
-        m(Loader, [m("h1.logo-font", "Loading ...")]),
+        m(Loader, m("h1.logo-font", "Loading ...")),
+
       state.pageStatus == "error" &&
-        m(Banner, [m("h1.logo-font", `Error Loading Data: ${state.error}`)]),
+        m("ion-text", m("h1", `Error Loading Data: ${state.error}`)),
+
       state.pageStatus == "success" && [
         m(
-          "ion-grid",
+          "ion-list-header",
+          // { slot: "fixed" },
+          // ("ion-grid",
           m(
             "ion-row",
             m(
@@ -157,47 +177,54 @@ const Profile = ({ attrs: { mdl } }) => {
                     m("ion-icon", { name: "settings" }),
                     m("ion-label", "Edit Profile Settings")
                   )
+              // )
+            ),
+            m(
+              "ion-row",
+              m(
+                "ion-col",
+                m(
+                  "ion-button",
+                  {
+                    color: !state.showFaveArticles ? "primary" : "secondary",
+                    onclick: (e) => selectFeed(false),
+                  },
+                  "Written Articles"
+                ),
+                m(
+                  "ion-button",
+                  {
+                    color: state.showFaveArticles ? "primary" : "secondary",
+                    onclick: (e) => selectFeed(true),
+                  },
+                  "Favorited Articles"
+                )
+              )
             )
           )
         ),
-        m(
-          "ion-list",
-          m(
-            "ion-button",
-            {
-              color: !state.showFaveArticles ? "primary" : "secondary",
-              onclick: (e) => selectFeed(false),
-            },
-            "Written Articles"
-          ),
-          m(
-            "ion-button",
-            {
-              color: state.showFaveArticles ? "primary" : "secondary",
-              onclick: (e) => selectFeed(true),
-            },
-            "Favorited Articles"
-          )
-        ),
+
         state.feedStatus == "loading" && "Loading Articles...",
         state.feedStatus == "error" &&
           m("ion-text", { color: "warning" }, [
             m("h1", `Error Loading Data: ${state.error}`),
           ]),
-        state.feedStatus == "success" && [
-          state.showFaveArticles
-            ? m(Articles, { mdl, data: data.authorFavoriteArticles })
-            : m(Articles, { mdl, data: data.authorArticles }),
 
-          m(Paginator, {
-            mdl,
-            state,
-            fetchDataFor: (offset) => {
-              state.offset = offset
-              loadData(mdl)
-            },
-          }),
-        ],
+        state.feedStatus == "success" &&
+          m("ion-grid", [
+            state.showFaveArticles
+              ? m(Articles, { mdl, data: data.authorFavoriteArticles })
+              : m(Articles, { mdl, data: data.authorArticles }),
+
+            m(Paginator, {
+              mdl,
+              state,
+              fetchDataFor: (offset) => {
+                state.offset = offset
+                loadData(mdl)
+              },
+            }),
+          ]),
       ],
     ],
   }

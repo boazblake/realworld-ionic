@@ -1,5 +1,5 @@
 import Http from "Http"
-import { uniq } from "ramda"
+import { trim, uniq } from "ramda"
 const getTagsTask = (http) => (mdl) => http.getTask(mdl)("tags")
 
 export const TagList = ({ attrs: { mdl } }) => {

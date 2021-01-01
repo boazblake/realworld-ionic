@@ -66,7 +66,11 @@ const Register = () => {
           value: data.password,
         }),
 
-        m("ion-button", { onclick: (e) => onSubmit(mdl, e) }, "Sign Up"),
+        m(
+          "ion-button",
+          { color: "light", onclick: (e) => onSubmit(mdl, e) },
+          "Sign Up"
+        ),
 
         m(
           "ion-link",

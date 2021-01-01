@@ -139,7 +139,7 @@ const Editor = ({ attrs: { mdl } }) => {
           ),
           m(
             "ion-button",
-            { onclick: (e) => submitData(data) },
+            { color: "light", onclick: (e) => submitData(data) },
             "Publish Article"
           ),
         ]

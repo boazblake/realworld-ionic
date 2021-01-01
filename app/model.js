@@ -1,5 +1,5 @@
 import Routes from "./routes"
-import Stream from "mithril-stream"
+const sanitizer = new Sanitizer()
 
 const BaseModel = () => ({
   menus: ["settings", "options"],
@@ -9,14 +9,8 @@ const BaseModel = () => ({
     darkmode: false,
     isLoading: false,
     loadingProgress: { max: 0, value: 0 },
-    isLoggedIn: (from) =>
-      // console.log(
-      //   "called is logged in",
-      //   from,
-      //   localStorage.getItem("token"),
-      //   !!localStorage.getItem("token")
-      // )
-      !!localStorage.getItem("token"),
+    isLoggedIn: () => !!localStorage.getItem("token"),
+    isToaster: () => !!localStorage.getItem("toaster"),
   },
   settings: {},
   page: "",
@@ -31,6 +25,7 @@ const BaseModel = () => ({
     tags: { tagList: [], selected: [], current: "" },
     articles: {},
   },
+  sanitizer,
 })
 
 export default BaseModel

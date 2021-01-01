@@ -20,12 +20,6 @@ const Login = () => {
       localStorage.setItem("user", JSON.stringify(user))
       mdl.user = user
       state.disabled = false
-      // console.log(
-      //   "LOGGED IN",
-      //   localStorage.getItem("token"),
-      //   mdl.state.isLoggedIn("LOGGED IN"),
-      //   mdl
-      // )
       m.route.set("/home")
     }
 
@@ -62,7 +56,11 @@ const Login = () => {
           onblur: (e) => state.isSubmitted && validate,
         }),
 
-        m("ion-button", { onclick: (e) => onSubmit(mdl, e) }, "Login"),
+        m(
+          "ion-button",
+          { color: "light", onclick: (e) => onSubmit(mdl, e) },
+          "Login"
+        ),
         m(
           "ion-link",
           m(

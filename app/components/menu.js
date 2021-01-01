@@ -29,7 +29,6 @@ export const MenuToggle = ({
 export const Menu = () => {
   return {
     view: ({ attrs: { header, title, contentId, contents } }) => {
-      // console.log("wtf", { title, visible, side, menuId, contentId, contents })
       return m(
         "ion-menu[type='push']",
         {

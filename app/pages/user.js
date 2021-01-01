@@ -83,7 +83,7 @@ const User = ({
         ),
         m(
           "ion-button",
-          { onclick: (e) => submit(mdl, data) },
+          { color: "light", onclick: (e) => submit(mdl, data) },
           " Update Settings "
         )
       ),

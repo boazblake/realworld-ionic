@@ -35,7 +35,7 @@ const xhrProgress = (mdl) => ({
 
 export const parseHttpError = (mdl) => (rej) => (e) => {
   mdl.state.isLoading = false
-  return rej(e.response.errors)
+  return e.response ? rej(e.response.errors) : rej("Something went wrong.")
 }
 
 export const parseHttpSuccess = (mdl) => (res) => (data) => {
@@ -49,10 +49,7 @@ const getUserToken = () =>
     : ""
 
 const call = (_headers) => (method) => (mdl) => (url) => (body) => {
-  if (
-    ["POST", "PUT", "DELETE"].includes(method) &&
-    !mdl.state.isLoggedIn("http-call")
-  ) {
+  if (["POST", "PUT", "DELETE"].includes(method) && !mdl.state.isLoggedIn()) {
     if (!["/login", "/register"].includes(mdl.slug)) {
       return Task.rejected(m.route.set("/register"))
     }
