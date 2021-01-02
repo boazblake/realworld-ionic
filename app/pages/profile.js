@@ -139,8 +139,6 @@ const Profile = ({ attrs: { mdl } }) => {
       state.pageStatus == "success" && [
         m(
           "ion-list-header",
-          // { slot: "fixed" },
-          // ("ion-grid",
           m(
             "ion-row",
             m(
@@ -151,8 +149,9 @@ const Profile = ({ attrs: { mdl } }) => {
 
               data.profile.username !== mdl.user.username
                 ? m(
-                    "ion-chip",
-                    {
+                    "ion-item",
+                    { lines: "none" },
+                    m("ion-icon", {
                       onclick: (e) =>
                         toggleAuthorFollow({
                           author: {
@@ -160,13 +159,10 @@ const Profile = ({ attrs: { mdl } }) => {
                             following: data.profile.following,
                           },
                         }),
-                    },
-                    m("ion-icon", {
                       name: data.profile.following
-                        ? "people-circle-outline"
+                        ? "people"
                         : "people-outline",
-                    }),
-                    m("ion-label", `${data.profile.username}`)
+                    })
                   )
                 : m(
                     "ion-chip",
@@ -177,7 +173,6 @@ const Profile = ({ attrs: { mdl } }) => {
                     m("ion-icon", { name: "settings" }),
                     m("ion-label", "Edit Profile Settings")
                   )
-              // )
             ),
             m(
               "ion-row",
@@ -186,18 +181,20 @@ const Profile = ({ attrs: { mdl } }) => {
                 m(
                   "ion-button",
                   {
-                    color: !state.showFaveArticles ? "primary" : "secondary",
+                    fill: !state.showFaveArticles && "solid",
+                    color: "light",
                     onclick: (e) => selectFeed(false),
                   },
-                  "Written Articles"
+                  m("ion-link", "Written Articles")
                 ),
                 m(
                   "ion-button",
                   {
-                    color: state.showFaveArticles ? "primary" : "secondary",
+                    fill: state.showFaveArticles && "solid",
+                    color: "light",
                     onclick: (e) => selectFeed(true),
                   },
-                  "Favorited Articles"
+                  m("ion-link", "Favorited Articles")
                 )
               )
             )

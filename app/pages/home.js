@@ -1,5 +1,5 @@
 import Http from "Http"
-import { Loader, Paginator, Articles, FeedNav } from "components"
+import { SkeletonText, Paginator, Articles, FeedNav } from "components"
 
 const getArticlesTask = (http) => (mdl) => (state) => (data) =>
   data.tags.current == "feed"
@@ -70,64 +70,61 @@ const Home = () => {
   return {
     oninit: ({ attrs: { mdl } }) => loadInitData(mdl),
     view: ({ attrs: { mdl } }) => {
-      return [
-        m(
-          "ion-content",
-          { scroll: false, id: "profile", contentId: "profile" },
-          [
-            (!mdl.state.isLoggedIn() && state.pageStatus == "loading") ||
-              (state.feedStatus == "loading" &&
-                m(Loader, [m("h1.logo-font", `Loading Data`)])),
+      return m(
+        "ion-content",
+        { scroll: false, id: "profile", contentId: "profile" },
 
-            state.pageStatus == "error" &&
-              m(
-                "ion-text",
-                { color: "earning" },
-                m("h1", `Error Loading Data: ${state.error}`)
-              ),
+        state.pageStatus == "success" && [
+          m(
+            "ion-list-header",
+            // { slot: "fixed" },
+            m(FeedNav, { fetchData: loadArticles, mdl, data: mdl.data })
+          ),
 
-            state.pageStatus == "success" && [
-              m(
-                "ion-list-header",
-                // { slot: "fixed" },
-                m(FeedNav, { fetchData: loadArticles, mdl, data: mdl.data })
-              ),
+          state.feedStatus == "success" &&
+            state.total && [
+              m(Articles, { mdl, data: mdl.data }),
 
-              state.feedStatus == "success" &&
-                state.total && [
-                  m(Articles, { mdl, data: mdl.data }),
-
-                  m(Paginator, {
-                    mdl,
-                    state,
-                    fetchDataFor: (offset) => {
-                      state.offset = offset
-                      loadArticles(mdl)
-                    },
-                  }),
-                ],
-
-              state.feedStatus == "success" &&
-                !state.total &&
-                m("ion-text", "No articles are here... yet."),
-
-              mdl.state.isLoggedIn() &&
-                m(
-                  "ion-fab",
-                  {
-                    style: { padding: "0 50px 40px 0" },
-                    vertical: "bottom",
-                    horizontal: "end",
-                    slot: "fixed",
-                  },
-                  m(m.route.Link, { class: "nav-link", href: "/editor" }, [
-                    m("ion-fab-button", m("ion-icon", { name: "add-circle" })),
-                  ])
-                ),
+              m(Paginator, {
+                mdl,
+                state,
+                fetchDataFor: (offset) => {
+                  state.offset = offset
+                  loadArticles(mdl)
+                },
+              }),
             ],
-          ]
-        ),
-      ]
+
+          state.feedStatus == "success" &&
+            !state.total &&
+            m("ion-text", "No articles are here... yet."),
+
+          mdl.state.isLoggedIn() &&
+            m(
+              "ion-fab",
+              {
+                style: { padding: "0 50px 40px 0" },
+                vertical: "bottom",
+                horizontal: "end",
+                slot: "fixed",
+              },
+              m(m.route.Link, { class: "nav-link", href: "/editor" }, [
+                m("ion-fab-button", m("ion-icon", { name: "add-circle" })),
+              ])
+            ),
+        ],
+
+        (!mdl.state.isLoggedIn() && state.pageStatus == "loading") ||
+          (state.feedStatus == "loading" &&
+            m(SkeletonText, [m("h1.logo-font", `Loading Data`)])),
+
+        state.pageStatus == "error" &&
+          m(
+            "ion-text",
+            { color: "danger" },
+            m("h1", `Error Loading Data: ${state.error}`)
+          )
+      )
     },
   }
 }

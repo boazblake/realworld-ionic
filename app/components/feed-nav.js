@@ -12,10 +12,10 @@ export const FeedNav = ({ attrs: { fetchData } }) => {
               m(
                 "ion-button",
                 {
-                  fill: "solid",
+                  fill: data.tags.current == "" && "solid",
                   expand: "full",
                   id: "",
-                  color: data.tags.current == "" ? "primary" : "secondary",
+                  color: "light",
                   onclick: (e) => {
                     data.tags.current = e.target.id
                     fetchData(mdl)
@@ -31,11 +31,10 @@ export const FeedNav = ({ attrs: { fetchData } }) => {
                 m(
                   "ion-button",
                   {
-                    fill: "solid",
+                    fill: data.tags.current == "feed" && "solid",
                     expand: "full",
                     id: "feed",
-                    color:
-                      data.tags.current == "feed" ? "primary" : "secondary",
+                    color: "light",
                     onclick: (e) => {
                       data.tags.current = e.target.id
                       fetchData(mdl)
@@ -55,9 +54,9 @@ export const FeedNav = ({ attrs: { fetchData } }) => {
                 m(
                   "ion-button",
                   {
-                    fill: "solid",
+                    fill: data.tags.current == tag && "solid",
                     size: "small",
-                    color: data.tags.current == tag ? "primary" : "secondary",
+                    color: "light",
                     id: tag,
                     onclick: (e) => {
                       data.tags.current = tag
