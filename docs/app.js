@@ -430,14 +430,7 @@ var ArticlePreview = function ArticlePreview(_ref) {
     view: function view() {
       return m("ion-item", {
         button: true
-      }, m("ion-grid", [m("ion-row.ion-justify-content-between.ion-align-items-end", m("ion-col", m(m.route.Link, {
-        "class": "preview-link",
-        href: "/article/".concat(data.slug)
-      }, m("ion-text", m("h1", data.title)), m("ion-text", m("p", data.description))))), m("ion-row", m("ion-col", m("ion-list", {
-        side: "end"
-      }, data.tagList.map(function (tag) {
-        return m("ion-chip", tag);
-      })))), m("ion-row.ion-justify-content-between.ion-align-items-end", [m("ion-col", {
+      }, m("ion-grid", [m("ion-row.ion-justify-content-between.ion-align-items-end", [m("ion-col", {
         size: 9
       }, m("ion-item", {
         lines: "none",
@@ -449,6 +442,9 @@ var ArticlePreview = function ArticlePreview(_ref) {
       }, m("ion-avatar", {
         slot: "start"
       }, m("img", {
+        style: {
+          transform: "scale(1.25)"
+        },
         src: (0, _Utils.sanitizeImg)(data.author.image)
       })), m("ion-label", m("ion-text", m("h2", data.author.username)), m("p", (0, _dayjs["default"])().format("MM/DD/YYYY HH:mm", data.createdAt))))), m("ion-col", {
         size: 3
@@ -460,7 +456,14 @@ var ArticlePreview = function ArticlePreview(_ref) {
       }, m("ion-icon", {
         color: "danger",
         name: data.favorited ? "heart" : "heart-outline"
-      }), m("ion-text", data.favoritesCount)))])]));
+      }), m("ion-text", data.favoritesCount)))]), m("ion-row.ion-justify-content-between.ion-align-items-end", m("ion-col", m(m.route.Link, {
+        "class": "preview-link",
+        href: "/article/".concat(data.slug)
+      }, m("ion-text", m("h1", data.title)), m("ion-text", m("p", data.description))))), m("ion-row", m("ion-col", m("ion-list", {
+        side: "end"
+      }, data.tagList.map(function (tag) {
+        return m("ion-chip", tag);
+      }))))]));
     }
   };
 };
@@ -1303,25 +1306,27 @@ var Menu = function Menu() {
   return {
     view: function view(_ref2) {
       var _ref2$attrs = _ref2.attrs,
+          mdl = _ref2$attrs.mdl,
           header = _ref2$attrs.header,
           title = _ref2$attrs.title,
           contentId = _ref2$attrs.contentId,
           contents = _ref2$attrs.contents;
       return m("ion-menu[type='push']", {
-        // onionWillOpen: (e) => {
-        //   console.log("onionWillOpen", e.target)
-        // },
+        onionWillOpen: function onionWillOpen(e) {
+          mdl.menu.menuId = contentId; // console.log("onionWillOpen", e.target)
+        },
         // onionDidOpen: (e) => {
         //   console.log("onionDidOpen", e)
         // },
-        // onionWillClose: (e) => {
-        //   console.log("onionwillClose", e)
-        // },
+        onionWillClose: function onionWillClose(e) {
+          mdl.menu.menuId = null;
+          console.log("onionwillClose", e);
+        },
         // onionDidClose: (e) => {
         //   console.log("ionDidClose", e)
         // },
         contentId: contentId
-      }, [header && header, title && m("ion-header", m("ion-toolbar", m("ion-title", title))), m("ion-content", contents)]);
+      }, [header && header, title && m("ion-header", m("ion-toolbar", m("ion-title", title))), m("ion-content.has-header.has-subheader", contents)]);
     }
   };
 };
@@ -1391,7 +1396,7 @@ var ProfileLink = function ProfileLink() {
   return {
     view: function view(_ref) {
       var mdl = _ref.attrs.mdl;
-      return m(_components.MenuToggle, {
+      return m("", m(_components.MenuToggle, {
         side: "start",
         contents: m("ion-grid", {
           onclick: function onclick(e) {
@@ -1400,7 +1405,7 @@ var ProfileLink = function ProfileLink() {
         }, m("a", m("ion-row.ion-justify-content-evenly.ion-align-items-end", m("ion-avatar", m("ion-img", {
           src: (0, _Utils.sanitizeImg)(mdl.user.image)
         })), m("ion-text", m("h1", "".concat(mdl.user.username))))))
-      });
+      }));
     }
   };
 };
@@ -1587,98 +1592,37 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.SkeletonText = void 0;
+var SkeletonItem = {
+  view: function view() {
+    return m("ion-item", [m("ion-thumbnail", {
+      slot: "start"
+    }, m("ion-skeleton-text", {
+      animated: ""
+    })), m("ion-label", [m("h3", m("ion-skeleton-text", {
+      animated: "",
+      style: {
+        width: "50%"
+      }
+    })), m("p", m("ion-skeleton-text", {
+      animated: "",
+      style: {
+        width: "80%"
+      }
+    })), m("p", m("ion-skeleton-text", {
+      animated: "",
+      style: {
+        width: "60%"
+      }
+    }))])]);
+  }
+};
 
 var SkeletonText = function SkeletonText() {
   return {
     view: function view() {
       return m("", {
         id: "skeleton"
-      }, [m("", [m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "60%"
-        }
-      }), m("ion-skeleton-text", {
-        animated: ""
-      }), m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "88%"
-        }
-      }), m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "70%"
-        }
-      }), m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "60%"
-        }
-      })]), m("ion-list", [m("ion-list-header", m("ion-label", m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "20%"
-        }
-      }))), m("ion-item", [m("ion-avatar", m("ion-skeleton-text", {
-        animated: ""
-      })), m("ion-label", [m("h3", m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "50%"
-        }
-      })), m("p", m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "80%"
-        }
-      })), m("p", m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "60%"
-        }
-      }))])]), m("ion-item", [m("ion-thumbnail", {
-        slot: "start"
-      }, m("ion-skeleton-text", {
-        animated: ""
-      })), m("ion-label", [m("h3", m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "50%"
-        }
-      })), m("p", m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "80%"
-        }
-      })), m("p", m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "60%"
-        }
-      }))])]), m("ion-item", [m("ion-skeleton-text", {
-        animated: "",
-        slot: "start",
-        style: {
-          width: "27px",
-          height: "27px"
-        }
-      }), m("ion-label", [m("h3", m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "50%"
-        }
-      })), m("p", m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "80%"
-        }
-      })), m("p", m("ion-skeleton-text", {
-        animated: "",
-        style: {
-          width: "60%"
-        }
-      }))])])])]);
+      }, [m("ion-list", [m(SkeletonItem), m(SkeletonItem), m(SkeletonItem), m(SkeletonItem), m(SkeletonItem), m(SkeletonItem), m(SkeletonItem), m(SkeletonItem)])]);
     }
   };
 };
@@ -1890,16 +1834,17 @@ var Header = function Header() {
   return {
     view: function view(_ref) {
       var mdl = _ref.attrs.mdl;
-      return m("ion-header", m("ion-toolbar", mdl.state.isLoggedIn() ? [m.route.get() !== "/home" && m("ion-buttons", m("ion-back-button", {
+      return m("ion-header", !mdl.menu.menuId && m("ion-toolbar", mdl.state.isLoggedIn() ? [m.route.get() !== "/home" && m("ion-back-button", {
         slot: "start",
         onclick: function onclick(e) {
           e.preventDefault();
           history.back();
         },
         defaultHref: "/"
-      }), m("ion-title.ion-align-center", m(m.route.Link, {
-        href: "#"
-      }, "Home"))), m("ion-buttons", {
+      }), m("ion-toolbar-container", m("ion-title", {
+        href: "#",
+        slot: "toolbar-content"
+      }, m(m.route.Link, "RealWorld-Ionic-Mithril"))), m("ion-buttons", {
         slot: "end"
       }, m(_components.MenuToggle, {
         side: "start",
@@ -1984,7 +1929,7 @@ var BaseModel = function BaseModel() {
     menu: {
       title: "",
       side: "",
-      menuId: "",
+      menuId: null,
       contentId: "",
       contents: null
     },
@@ -2731,7 +2676,7 @@ var Profile = function Profile(_ref) {
         }
       }, m("ion-icon", {
         name: "settings"
-      }), m("ion-label", "Edit Profile Settings"))), m("ion-row", m("ion-col", m("ion-button", {
+      }), m("ion-label", "Edit Profile Settings"))))), m("ion-buttons", m("ion-button", {
         fill: !state.showFaveArticles && "solid",
         color: "light",
         onclick: function onclick(e) {
@@ -2743,7 +2688,7 @@ var Profile = function Profile(_ref) {
         onclick: function onclick(e) {
           return selectFeed(true);
         }
-      }, m("ion-link", "Favorited Articles")))))), state.feedStatus == "loading" && "Loading Articles...", state.feedStatus == "error" && m("ion-text", {
+      }, m("ion-link", "Favorited Articles"))), state.feedStatus == "loading" && "Loading Articles...", state.feedStatus == "error" && m("ion-text", {
         color: "warning"
       }, [m("h1", "Error Loading Data: ".concat(state.error))]), state.feedStatus == "success" && m("ion-grid", [state.showFaveArticles ? m(_components.Articles, {
         mdl: mdl,

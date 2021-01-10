@@ -184,5 +184,10 @@ a {
   transition: all 0.5s ease-in-out;
 }
 
+#layout-overcast {
+  background-color: #383a3e;
+  --background: #222;
+}
+
 
 /*# sourceMappingURL=app.css.map*/

@@ -3,7 +3,7 @@ const sanitizer = new Sanitizer()
 
 const BaseModel = () => ({
   menus: ["settings", "options"],
-  menu: { title: "", side: "", menuId: "", contentId: "", contents: null },
+  menu: { title: "", side: "", menuId: null, contentId: "", contents: null },
   Routes,
   state: {
     darkmode: false,

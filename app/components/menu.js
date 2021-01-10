@@ -28,19 +28,21 @@ export const MenuToggle = ({
 
 export const Menu = () => {
   return {
-    view: ({ attrs: { header, title, contentId, contents } }) => {
+    view: ({ attrs: { mdl, header, title, contentId, contents } }) => {
       return m(
         "ion-menu[type='push']",
         {
-          // onionWillOpen: (e) => {
-          //   console.log("onionWillOpen", e.target)
-          // },
+          onionWillOpen: (e) => {
+            mdl.menu.menuId = contentId
+            // console.log("onionWillOpen", e.target)
+          },
           // onionDidOpen: (e) => {
           //   console.log("onionDidOpen", e)
           // },
-          // onionWillClose: (e) => {
-          //   console.log("onionwillClose", e)
-          // },
+          onionWillClose: (e) => {
+            mdl.menu.menuId = null
+            console.log("onionwillClose", e)
+          },
           // onionDidClose: (e) => {
           //   console.log("ionDidClose", e)
           // },
@@ -49,7 +51,7 @@ export const Menu = () => {
         [
           header && header,
           title && m("ion-header", m("ion-toolbar", m("ion-title", title))),
-          m("ion-content", contents),
+          m("ion-content.has-header.has-subheader", contents),
         ]
       )
     },

@@ -27,29 +27,6 @@ const ArticlePreview = ({ attrs: { mdl, article } }) => {
         "ion-item",
         { button: true },
         m("ion-grid", [
-          m(
-            "ion-row.ion-justify-content-between.ion-align-items-end",
-            m(
-              "ion-col",
-              m(
-                m.route.Link,
-                { class: "preview-link", href: `/article/${data.slug}` },
-                m("ion-text", m("h1", data.title)),
-                m("ion-text", m("p", data.description))
-              )
-            )
-          ),
-          m(
-            "ion-row",
-            m(
-              "ion-col",
-              m(
-                "ion-list",
-                { side: "end" },
-                data.tagList.map((tag) => m("ion-chip", tag))
-              )
-            )
-          ),
           m("ion-row.ion-justify-content-between.ion-align-items-end", [
             m(
               "ion-col",
@@ -66,7 +43,10 @@ const ArticlePreview = ({ attrs: { mdl, article } }) => {
                 m(
                   "ion-avatar",
                   { slot: "start" },
-                  m("img", { src: sanitizeImg(data.author.image) })
+                  m("img", {
+                    style: { transform: "scale(1.25)" },
+                    src: sanitizeImg(data.author.image),
+                  })
                 ),
                 m(
                   "ion-label",
@@ -93,6 +73,29 @@ const ArticlePreview = ({ attrs: { mdl, article } }) => {
               )
             ),
           ]),
+          m(
+            "ion-row.ion-justify-content-between.ion-align-items-end",
+            m(
+              "ion-col",
+              m(
+                m.route.Link,
+                { class: "preview-link", href: `/article/${data.slug}` },
+                m("ion-text", m("h1", data.title)),
+                m("ion-text", m("p", data.description))
+              )
+            )
+          ),
+          m(
+            "ion-row",
+            m(
+              "ion-col",
+              m(
+                "ion-list",
+                { side: "end" },
+                data.tagList.map((tag) => m("ion-chip", tag))
+              )
+            )
+          ),
         ])
       )
     },

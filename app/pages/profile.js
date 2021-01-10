@@ -173,34 +173,31 @@ const Profile = ({ attrs: { mdl } }) => {
                     m("ion-icon", { name: "settings" }),
                     m("ion-label", "Edit Profile Settings")
                   )
-            ),
-            m(
-              "ion-row",
-              m(
-                "ion-col",
-                m(
-                  "ion-button",
-                  {
-                    fill: !state.showFaveArticles && "solid",
-                    color: "light",
-                    onclick: (e) => selectFeed(false),
-                  },
-                  m("ion-link", "Written Articles")
-                ),
-                m(
-                  "ion-button",
-                  {
-                    fill: state.showFaveArticles && "solid",
-                    color: "light",
-                    onclick: (e) => selectFeed(true),
-                  },
-                  m("ion-link", "Favorited Articles")
-                )
-              )
             )
           )
         ),
+        m(
+          "ion-buttons",
 
+          m(
+            "ion-button",
+            {
+              fill: !state.showFaveArticles && "solid",
+              color: "light",
+              onclick: (e) => selectFeed(false),
+            },
+            m("ion-link", "Written Articles")
+          ),
+          m(
+            "ion-button",
+            {
+              fill: state.showFaveArticles && "solid",
+              color: "light",
+              onclick: (e) => selectFeed(true),
+            },
+            m("ion-link", "Favorited Articles")
+          )
+        ),
         state.feedStatus == "loading" && "Loading Articles...",
         state.feedStatus == "error" &&
           m("ion-text", { color: "warning" }, [

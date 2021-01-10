@@ -4,25 +4,29 @@ import { MenuToggle } from "components"
 export const ProfileLink = () => {
   return {
     view: ({ attrs: { mdl } }) =>
-      m(MenuToggle, {
-        side: "start",
-        contents: m(
-          "ion-grid",
-          { onclick: (e) => m.route.set(`/profile/${mdl.user.username}`) },
-          m(
-            "a",
+      m(
+        "",
+
+        m(MenuToggle, {
+          side: "start",
+          contents: m(
+            "ion-grid",
+            { onclick: (e) => m.route.set(`/profile/${mdl.user.username}`) },
             m(
-              "ion-row.ion-justify-content-evenly.ion-align-items-end",
-
+              "a",
               m(
-                "ion-avatar",
-                m("ion-img", { src: sanitizeImg(mdl.user.image) })
-              ),
+                "ion-row.ion-justify-content-evenly.ion-align-items-end",
 
-              m("ion-text", m("h1", `${mdl.user.username}`))
+                m(
+                  "ion-avatar",
+                  m("ion-img", { src: sanitizeImg(mdl.user.image) })
+                ),
+
+                m("ion-text", m("h1", `${mdl.user.username}`))
+              )
             )
-          )
-        ),
-      }),
+          ),
+        })
+      ),
   }
 }
