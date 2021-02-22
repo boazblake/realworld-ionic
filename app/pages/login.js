@@ -33,43 +33,50 @@ const Login = () => {
 
   return {
     view: ({ attrs: { mdl } }) =>
-      m("form", [
-        m("ion-text", m("h1", "Login")),
-
-        state.errors && m(FormErrors, { mdl, errors: state.errors }),
-
-        m("ion-input", {
-          type: "text",
-          disabled: state.disabled,
-          placeholder: "email",
-          onchange: (e) => (data.email = e.target.value),
-          value: data.email,
-          onblur: (e) => state.isSubmitted && validate,
-        }),
-
-        m("ion-input", {
-          type: "password",
-          disabled: state.disabled,
-          placeholder: "password",
-          onchange: (e) => (data.password = e.target.value),
-          value: data.password,
-          onblur: (e) => state.isSubmitted && validate,
-        }),
-
+      m(
+        "ion-card",
+        { width: "80vw" },
         m(
-          "ion-button",
-          { color: "light", onclick: (e) => onSubmit(mdl, e) },
-          "Login"
-        ),
-        m(
-          "ion-link",
-          m(
-            m.route.Link,
-            { href: "/register" },
-            m("ion-label", "Need an Account?")
-          )
-        ),
-      ]),
+          "ion-card-contents",
+          m("form", [
+            m("ion-text", m("h1", "Login")),
+
+            state.errors && m(FormErrors, { mdl, errors: state.errors }),
+
+            m("ion-input", {
+              type: "text",
+              disabled: state.disabled,
+              placeholder: "email",
+              onchange: (e) => (data.email = e.target.value),
+              value: data.email,
+              onblur: (e) => state.isSubmitted && validate,
+            }),
+
+            m("ion-input", {
+              type: "password",
+              disabled: state.disabled,
+              placeholder: "password",
+              onchange: (e) => (data.password = e.target.value),
+              value: data.password,
+              onblur: (e) => state.isSubmitted && validate,
+            }),
+
+            m(
+              "ion-button",
+              { color: "light", onclick: (e) => onSubmit(mdl, e) },
+              "Login"
+            ),
+            m(
+              "ion-link",
+              m(
+                m.route.Link,
+                { href: "/register" },
+                m("ion-label", "Need an Account?")
+              )
+            ),
+          ])
+        )
+      ),
   }
 }
 

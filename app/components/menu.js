@@ -41,7 +41,7 @@ export const Menu = () => {
           // },
           onionWillClose: (e) => {
             mdl.menu.menuId = null
-            console.log("onionwillClose", e)
+            // console.log("onionwillClose", e)
           },
           // onionDidClose: (e) => {
           //   console.log("ionDidClose", e)

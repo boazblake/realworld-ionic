@@ -8,10 +8,45 @@ const SkeletonItem = {
       ),
       m("ion-label", [
         m(
+          "h2",
+          m("ion-skeleton-text", {
+            animated: "",
+            style: { width: "50%" },
+          })
+        ),
+        m(
           "h3",
           m("ion-skeleton-text", {
             animated: "",
             style: { width: "50%" },
+          })
+        ),
+        m(
+          "p",
+          m("ion-skeleton-text", {
+            animated: "",
+            style: { width: "80%" },
+          })
+        ),
+        m(
+          "p",
+          m("ion-skeleton-text", {
+            animated: "",
+            style: { width: "60%" },
+          })
+        ),
+        m(
+          "p",
+          m("ion-skeleton-text", {
+            animated: "",
+            style: { width: "80%" },
+          })
+        ),
+        m(
+          "p",
+          m("ion-skeleton-text", {
+            animated: "",
+            style: { width: "60%" },
           })
         ),
         m(

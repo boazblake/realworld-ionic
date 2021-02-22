@@ -3,6 +3,7 @@ import { log, errorViewModel } from "Utils"
 import { FormErrors, Loader } from "components"
 import {
   compose,
+  head,
   join,
   lensPath,
   lensProp,
@@ -80,7 +81,8 @@ const Editor = ({ attrs: { mdl } }) => {
     oninit: ({ attrs: { mdl } }) => initEditor(mdl),
     view: () =>
       m(
-        "form",
+        "form.ion-align-items-evenly.ion-justify-content-center",
+        { "min-height": "100%", height: "100%" },
         state.status == "loading" && m(Loader, { mdl }),
         state.status == "error" && "Error!",
         state.status == "success" && [

@@ -22,12 +22,15 @@ const Header = () => {
                     }),
 
                   m(
-                    "ion-toolbar-container",
-                    m(
-                      "ion-title",
-                      { href: "#", slot: "toolbar-content" },
-                      m(m.route.Link, "RealWorld-Ionic-Mithril")
-                    )
+                    m.route.Link,
+                    { href: "#", slot: "primary" },
+                    "RealWorld-Ionic-Mithril"
+                  ),
+                  m(
+                    "ion-title",
+                    { slot: "secondary" },
+                    mdl.title
+                    // m.route.get().split("/")[1].toUpperCase()
                   ),
                   m(
                     "ion-buttons",

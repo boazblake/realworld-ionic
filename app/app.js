@@ -8,13 +8,13 @@ const toRouter = (mdl) => (Router, route) => {
       }
 
   let renderer = () => {
+    mdl.title = m.route.get().split("/")[1].toUpperCase()
     return route.config.isAuth
       ? mdl.state.isLoggedIn()
         ? route.component(mdl)
         : m.route.set("/login")
       : route.component(mdl)
   }
-
   Router[route.url] = {
     onmatch: matcher,
     render: renderer,

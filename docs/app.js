@@ -350,6 +350,7 @@ var toRouter = function toRouter(mdl) {
     };
 
     var renderer = function renderer() {
+      mdl.title = m.route.get().split("/")[1].toUpperCase();
       return route.config.isAuth ? mdl.state.isLoggedIn() ? route.component(mdl) : m.route.set("/login") : route.component(mdl);
     };
 
@@ -1319,8 +1320,7 @@ var Menu = function Menu() {
         //   console.log("onionDidOpen", e)
         // },
         onionWillClose: function onionWillClose(e) {
-          mdl.menu.menuId = null;
-          console.log("onionwillClose", e);
+          mdl.menu.menuId = null; // console.log("onionwillClose", e)
         },
         // onionDidClose: (e) => {
         //   console.log("ionDidClose", e)
@@ -1598,10 +1598,35 @@ var SkeletonItem = {
       slot: "start"
     }, m("ion-skeleton-text", {
       animated: ""
-    })), m("ion-label", [m("h3", m("ion-skeleton-text", {
+    })), m("ion-label", [m("h2", m("ion-skeleton-text", {
       animated: "",
       style: {
         width: "50%"
+      }
+    })), m("h3", m("ion-skeleton-text", {
+      animated: "",
+      style: {
+        width: "50%"
+      }
+    })), m("p", m("ion-skeleton-text", {
+      animated: "",
+      style: {
+        width: "80%"
+      }
+    })), m("p", m("ion-skeleton-text", {
+      animated: "",
+      style: {
+        width: "60%"
+      }
+    })), m("p", m("ion-skeleton-text", {
+      animated: "",
+      style: {
+        width: "80%"
+      }
+    })), m("p", m("ion-skeleton-text", {
+      animated: "",
+      style: {
+        width: "60%"
       }
     })), m("p", m("ion-skeleton-text", {
       animated: "",
@@ -1841,10 +1866,13 @@ var Header = function Header() {
           history.back();
         },
         defaultHref: "/"
-      }), m("ion-toolbar-container", m("ion-title", {
+      }), m(m.route.Link, {
         href: "#",
-        slot: "toolbar-content"
-      }, m(m.route.Link, "RealWorld-Ionic-Mithril"))), m("ion-buttons", {
+        slot: "primary"
+      }, "RealWorld-Ionic-Mithril"), m("ion-title", {
+        slot: "secondary"
+      }, mdl.title // m.route.get().split("/")[1].toUpperCase()
+      ), m("ion-buttons", {
         slot: "end"
       }, m(_components.MenuToggle, {
         side: "start",
@@ -2158,7 +2186,10 @@ var Editor = function Editor(_ref) {
       return initEditor(mdl);
     },
     view: function view() {
-      return m("form", state.status == "loading" && m(_components.Loader, {
+      return m("form.ion-align-items-evenly.ion-justify-content-center", {
+        "min-height": "100%",
+        height: "100%"
+      }, state.status == "loading" && m(_components.Loader, {
         mdl: mdl
       }), state.status == "error" && "Error!", state.status == "success" && [state.errors && m(_components.FormErrors, {
         mdl: mdl,
@@ -2415,7 +2446,9 @@ var Login = function Login() {
   return {
     view: function view(_ref2) {
       var mdl = _ref2.attrs.mdl;
-      return m("form", [m("ion-text", m("h1", "Login")), state.errors && m(_components.FormErrors, {
+      return m("ion-card", {
+        width: "80vw"
+      }, m("ion-card-contents", m("form", [m("ion-text", m("h1", "Login")), state.errors && m(_components.FormErrors, {
         mdl: mdl,
         errors: state.errors
       }), m("ion-input", {
@@ -2447,7 +2480,7 @@ var Login = function Login() {
         }
       }, "Login"), m("ion-link", m(m.route.Link, {
         href: "/register"
-      }, m("ion-label", "Need an Account?")))]);
+      }, m("ion-label", "Need an Account?")))])));
     }
   };
 };
