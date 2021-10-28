@@ -81,23 +81,24 @@ const Home = () => {
             m(FeedNav, { fetchData: loadArticles, mdl, data: mdl.data })
           ),
 
-          state.feedStatus == "success" &&
-            state.total && [
-              m(Articles, { mdl, data: mdl.data }),
+          state.feedStatus == "success" && state.total
+            ? [
+                m(Articles, { mdl, data: mdl.data }),
 
-              m(Paginator, {
-                mdl,
-                state,
-                fetchDataFor: (offset) => {
-                  state.offset = offset
-                  loadArticles(mdl)
-                },
-              }),
-            ],
-
-          state.feedStatus == "success" &&
-            !state.total &&
-            m("ion-text", "No articles are here... yet."),
+                m(Paginator, {
+                  mdl,
+                  state,
+                  fetchDataFor: (offset) => {
+                    state.offset = offset
+                    loadArticles(mdl)
+                  },
+                }),
+              ]
+            : "",
+          console.log(state),
+          state.feedStatus == "success" && !state.total
+            ? m("ion-text", "No articles are here... yet.")
+            : "",
 
           mdl.state.isLoggedIn() &&
             m(
@@ -117,6 +118,19 @@ const Home = () => {
         (!mdl.state.isLoggedIn() && state.pageStatus == "loading") ||
           (state.feedStatus == "loading" &&
             m(SkeletonText, [m("h1.logo-font", `Loading Data`)])),
+
+        !mdl.state.isLoggedIn() &&
+          m(
+            m.route.Link,
+            {
+              selector: "ion-fab",
+              vertical: "center",
+              horizontal: "end",
+              slot: "fixed",
+              href: "/login",
+            },
+            m("ion-fab-button", m("ion-icon", { name: "log-in-outline" }))
+          ),
 
         state.pageStatus == "error" &&
           m(
